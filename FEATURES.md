@@ -167,10 +167,25 @@ Default shortcuts:
 
 ---
 
-## Configuration Files
+## Execution Modes
 
-### Multi-site Manager Mode
+### Manager Mode
 
+UI for configuring and launching sites:
+
+```bash
+bird                      # Open manager UI
+bird --site gmail         # Launch gmail directly
+```
+
+Features:
+- Configure sites via React UI
+- Sites stored in `~/.config/bird/sites/*.json`
+- Fetch favicon from target sites
+- Create desktop shortcuts (per-site)
+- Export config JSON (for bundled mode)
+
+Config structure:
 ```
 ~/.config/bird/
 ├── global.json          # Global defaults (inherited by all sites)
@@ -182,23 +197,39 @@ Default shortcuts:
 
 Each site file contains a complete `SiteConfig`. Missing values are inherited from `global.json`.
 
-### Packed Mode
+#### Desktop Shortcuts
 
-Config is **embedded at build time**, no external files:
+Manager can create system shortcuts per site:
 
+| Platform | Location | Format |
+|----------|----------|--------|
+| Linux | `~/.local/share/applications/` | `.desktop` file |
+| macOS | `~/Applications/` | `.app` bundle (alias) |
+| Windows | Start Menu / Desktop | `.lnk` shortcut |
+
+Shortcuts launch Bird directly with `--site <name>`.
+
+### Bundled Mode
+
+Standalone app with embedded config, built from an exported JSON:
+
+```bash
+bird bundle --config ./gmail.json --out ./gmail-app/
+```
+
+Build process:
 ```
 src/
 └── config/
-    └── site.ts          # Hardcoded SiteConfig
+    └── site.ts          # Hardcoded SiteConfig (injected at build)
 ```
 
-Or injected via environment variable during build:
-
+Or via environment variable:
 ```bash
 BIRD_SITE_CONFIG=./configs/gmail.json pnpm build
 ```
 
-The resulting app is standalone: no `~/.config/bird/`, starts directly on the configured site.
+The resulting app is standalone: no `~/.config/bird/`, starts directly on the configured site. No manager UI included.
 
 ---
 
