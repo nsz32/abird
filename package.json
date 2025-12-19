@@ -1,0 +1,33 @@
+{
+	"name": "bird",
+	"version": "1.0.0",
+	"description": "Web app wrapper - isolate web applications from the browser",
+	"main": "out/main/index.js",
+	"scripts": {
+		"dev": "electron-vite dev",
+		"build": "electron-vite build",
+		"preview": "electron-vite preview",
+		"start": "electron .",
+		"package": "npm run build && electron-builder",
+		"lint": "biome check .",
+		"lint:fix": "biome check --write .",
+		"format": "biome format --write .",
+		"test": "vitest",
+		"test:run": "vitest run",
+		"typecheck": "tsc --noEmit"
+	},
+	"keywords": ["electron", "webapp", "wrapper"],
+	"author": "",
+	"license": "ISC",
+	"type": "module",
+	"devDependencies": {
+		"@biomejs/biome": "^1.9.4",
+		"@types/node": "^22.10.0",
+		"electron": "^39.2.7",
+		"electron-builder": "^26.0.12",
+		"electron-vite": "^3.0.0",
+		"typescript": "^5.9.3",
+		"vite": "^6.0.0",
+		"vitest": "^2.1.0"
+	}
+}
