@@ -3,12 +3,60 @@ import { BaseWindow, WebContentsView } from "electron"
 
 let mainWindow: BaseWindow | null = null
 let siteView: WebContentsView | null = null
-let overlayView: WebContentsView | null = null
 
-// Overlay dimensions
-const OVERLAY_WIDTH = 180
-const OVERLAY_HEIGHT = 70
-const OVERLAY_MARGIN = 20
+// Overlays registry
+const overlays: Map<string, { view: WebContentsView; bounds: OverlayBounds }> = new Map()
+
+interface OverlayBounds {
+	width: number
+	height: number
+	position: "bottom-left" | "bottom-right" | "top-left" | "top-right"
+	margin: number
+}
+
+function createOverlay(name: string, bounds: OverlayBounds): WebContentsView {
+	const view = new WebContentsView({
+		webPreferences: {
+			preload: join(__dirname, "../preload/index.mjs"),
+			nodeIntegration: false,
+			contextIsolation: true,
+		},
+	})
+
+	view.setBackgroundColor("#00000000")
+	overlays.set(name, { view, bounds })
+
+	return view
+}
+
+function updateOverlayBounds(windowBounds: { width: number; height: number }) {
+	for (const [, overlay] of overlays) {
+		const { view, bounds } = overlay
+		let x = bounds.margin
+		let y = bounds.margin
+
+		switch (bounds.position) {
+			case "bottom-left":
+				x = bounds.margin
+				y = windowBounds.height - bounds.height - bounds.margin
+				break
+			case "bottom-right":
+				x = windowBounds.width - bounds.width - bounds.margin
+				y = windowBounds.height - bounds.height - bounds.margin
+				break
+			case "top-left":
+				x = bounds.margin
+				y = bounds.margin
+				break
+			case "top-right":
+				x = windowBounds.width - bounds.width - bounds.margin
+				y = bounds.margin
+				break
+		}
+
+		view.setBounds({ x, y, width: bounds.width, height: bounds.height })
+	}
+}
 
 export function createWindow(): BaseWindow {
 	mainWindow = new BaseWindow({
@@ -24,37 +72,28 @@ export function createWindow(): BaseWindow {
 		},
 	})
 
-	// WebContentsView for our overlay (top layer - small, positioned bottom-left)
-	overlayView = new WebContentsView({
-		webPreferences: {
-			preload: join(__dirname, "../preload/index.mjs"),
-			nodeIntegration: false,
-			contextIsolation: true,
-		},
+	// Create navigation overlay
+	const navigationOverlay = createOverlay("navigation", {
+		width: 180,
+		height: 70,
+		position: "bottom-left",
+		margin: 20,
 	})
-
-	// Make overlay background transparent
-	overlayView.setBackgroundColor("#00000000")
 
 	// Add views to window - order matters (last = top)
 	mainWindow.contentView.addChildView(siteView)
-	mainWindow.contentView.addChildView(overlayView)
+	mainWindow.contentView.addChildView(navigationOverlay)
 
 	// Position views
 	const updateBounds = () => {
-		if (mainWindow && siteView && overlayView) {
+		if (mainWindow && siteView) {
 			const bounds = mainWindow.getContentBounds()
 
 			// Site fills the entire window
 			siteView.setBounds({ x: 0, y: 0, width: bounds.width, height: bounds.height })
 
-			// Overlay is a small box in the bottom-left corner
-			overlayView.setBounds({
-				x: OVERLAY_MARGIN,
-				y: bounds.height - OVERLAY_HEIGHT - OVERLAY_MARGIN,
-				width: OVERLAY_WIDTH,
-				height: OVERLAY_HEIGHT,
-			})
+			// Update all overlays
+			updateOverlayBounds(bounds)
 		}
 	}
 
@@ -65,17 +104,17 @@ export function createWindow(): BaseWindow {
 	// TODO: Temporaire - charger koreus.com pour test
 	siteView.webContents.loadURL("https://www.koreus.com")
 
-	// Load our overlay UI
+	// Load overlay UI
 	if (process.env.ELECTRON_RENDERER_URL) {
-		overlayView.webContents.loadURL(process.env.ELECTRON_RENDERER_URL)
+		navigationOverlay.webContents.loadURL(`${process.env.ELECTRON_RENDERER_URL}/navigation/`)
 	} else {
-		overlayView.webContents.loadFile(join(__dirname, "../renderer/index.html"))
+		navigationOverlay.webContents.loadFile(join(__dirname, "../overlays/navigation/index.html"))
 	}
 
 	mainWindow.on("closed", () => {
 		mainWindow = null
 		siteView = null
-		overlayView = null
+		overlays.clear()
 	})
 
 	return mainWindow
@@ -89,6 +128,6 @@ export function getSiteView(): WebContentsView | null {
 	return siteView
 }
 
-export function getOverlayView(): WebContentsView | null {
-	return overlayView
+export function getOverlay(name: string): WebContentsView | null {
+	return overlays.get(name)?.view ?? null
 }

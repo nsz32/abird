@@ -1,17 +1,6 @@
-import { contextBridge, ipcRenderer } from "electron"
+import { contextBridge } from "electron"
 
+// API exposed to overlays
 contextBridge.exposeInMainWorld("bird", {
-	// App info
-	getVersion: () => ipcRenderer.invoke("app:version"),
-
-	// Navigation
-	navigate: (url: string) => ipcRenderer.invoke("nav:goto", url),
-	goBack: () => ipcRenderer.invoke("nav:back"),
-	goForward: () => ipcRenderer.invoke("nav:forward"),
-	reload: () => ipcRenderer.invoke("nav:reload"),
-
-	// Events
-	onUrlChange: (callback: (url: string) => void) => {
-		ipcRenderer.on("url-changed", (_, url) => callback(url))
-	},
+	// APIs will be added as needed
 })

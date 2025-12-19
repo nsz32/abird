@@ -3,12 +3,15 @@
 	"version": "1.0.0",
 	"description": "Web app wrapper - isolate web applications from the browser",
 	"main": "out/main/index.js",
+	"pnpm": {
+		"onlyBuiltDependencies": ["@biomejs/biome", "electron", "esbuild"]
+	},
 	"scripts": {
 		"dev": "electron-vite dev",
 		"build": "electron-vite build",
 		"preview": "electron-vite preview",
 		"start": "electron .",
-		"package": "npm run build && electron-builder",
+		"package": "pnpm run build && electron-builder",
 		"lint": "biome check .",
 		"lint:fix": "biome check --write .",
 		"format": "biome format --write .",
@@ -23,11 +26,18 @@
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",
 		"@types/node": "^22.10.0",
+		"@types/react": "^19.2.7",
+		"@types/react-dom": "^19.2.3",
+		"@vitejs/plugin-react": "^5.1.2",
 		"electron": "^39.2.7",
 		"electron-builder": "^26.0.12",
 		"electron-vite": "^3.0.0",
 		"typescript": "^5.9.3",
 		"vite": "^6.0.0",
 		"vitest": "^2.1.0"
+	},
+	"dependencies": {
+		"react": "^19.2.3",
+		"react-dom": "^19.2.3"
 	}
 }
