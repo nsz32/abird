@@ -17,7 +17,7 @@ interface OverlayBounds {
 function createOverlay(name: string, bounds: OverlayBounds): WebContentsView {
 	const view = new WebContentsView({
 		webPreferences: {
-			preload: join(__dirname, "../preload/index.mjs"),
+			preload: join(__dirname, "../preload/index.js"),
 			nodeIntegration: false,
 			contextIsolation: true,
 		},
@@ -75,8 +75,8 @@ export function createWindow(): BaseWindow {
 
 	// Create navigation overlay
 	const navigationOverlay = createOverlay("navigation", {
-		width: 180,
-		height: 70,
+		width: 600,
+		height: 50,
 		position: "bottom-left",
 		margin: 20,
 	})

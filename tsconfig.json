@@ -18,7 +18,11 @@
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"noFallthroughCasesInSwitch": true,
-		"verbatimModuleSyntax": true
+		"verbatimModuleSyntax": true,
+		"baseUrl": ".",
+		"paths": {
+			"@shared/*": ["src/shared/*"]
+		}
 	},
 	"include": ["src/**/*", "electron.vite.config.ts"],
 	"exclude": ["node_modules", "dist", "out"]

@@ -13,29 +13,56 @@ body,
 	overflow: hidden;
 }
 
-.overlay-box {
+.navigation-bar {
 	width: 100%;
 	height: 100%;
-	background: rgba(26, 26, 46, 0.5);
-	color: #eee;
-	padding: 12px 16px;
+	background: rgba(26, 26, 46, 0.85);
+	padding: 8px;
 	border-radius: 10px;
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-	font-size: 14px;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 	backdrop-filter: blur(8px);
 	border: 1px solid rgba(255, 255, 255, 0.1);
 	display: flex;
-	flex-direction: column;
+	align-items: center;
 	justify-content: center;
+	gap: 8px;
 }
 
-.overlay-box .title {
-	font-weight: 600;
-	margin-bottom: 4px;
+.nav-button {
+	width: 44px;
+	height: 44px;
+	border: none;
+	border-radius: 8px;
+	background: rgba(255, 255, 255, 0.1);
+	color: #eee;
+	font-size: 20px;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: background 0.15s ease;
 }
 
-.overlay-box .message {
-	color: #888;
-	font-size: 12px;
+.nav-button:hover:not(:disabled) {
+	background: rgba(255, 255, 255, 0.2);
+}
+
+.nav-button:active:not(:disabled) {
+	background: rgba(255, 255, 255, 0.3);
+}
+
+.nav-button:disabled {
+	opacity: 0.3;
+	cursor: not-allowed;
+}
+
+.url-display {
+	flex: 1;
+	color: #aaa;
+	font-size: 13px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	padding: 0 8px;
 }
