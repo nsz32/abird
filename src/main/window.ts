@@ -62,6 +62,7 @@ export function createWindow(): BaseWindow {
 	mainWindow = new BaseWindow({
 		width: 1200,
 		height: 800,
+		backgroundColor: "#202830",
 	})
 
 	// WebContentsView for the website (bottom layer - full size)
@@ -97,8 +98,16 @@ export function createWindow(): BaseWindow {
 		}
 	}
 
+	// Initial bounds
 	updateBounds()
 	mainWindow.on("resize", updateBounds)
+
+	// Hide siteView until content is ready
+	siteView.setVisible(false)
+	siteView.webContents.once("dom-ready", () => {
+		updateBounds()
+		siteView?.setVisible(true)
+	})
 
 	// Load the website in siteView
 	// TODO: Temporaire - charger koreus.com pour test
