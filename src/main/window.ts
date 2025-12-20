@@ -1,20 +1,17 @@
 import { join } from "node:path"
 import { BaseWindow, WebContentsView } from "electron"
+import { getNavBarConfig, getStartUrl } from "./api/config"
+
+const NAV_BAR_HEIGHT = 40
 
 let mainWindow: BaseWindow | null = null
 let siteView: WebContentsView | null = null
+let navBar: WebContentsView | null = null
 
-// Overlays registry
-const overlays: Map<string, { view: WebContentsView; bounds: OverlayBounds }> = new Map()
-
-interface OverlayBounds {
-	width: number
-	height: number
-	position: "bottom-left" | "bottom-right" | "top-left" | "top-right"
-	margin: number
-}
-
-function createOverlay(name: string, bounds: OverlayBounds): WebContentsView {
+/**
+ * Crée une WebContentsView avec le preload
+ */
+function createView(transparent = false): WebContentsView {
 	const view = new WebContentsView({
 		webPreferences: {
 			preload: join(__dirname, "../preload/index.js"),
@@ -23,49 +20,23 @@ function createOverlay(name: string, bounds: OverlayBounds): WebContentsView {
 		},
 	})
 
-	view.setBackgroundColor("#00000000")
-	overlays.set(name, { view, bounds })
+	if (transparent) {
+		view.setBackgroundColor("#00000000")
+	}
 
 	return view
 }
 
-function updateOverlayBounds(windowBounds: { width: number; height: number }) {
-	for (const [, overlay] of overlays) {
-		const { view, bounds } = overlay
-		let x = bounds.margin
-		let y = bounds.margin
-
-		switch (bounds.position) {
-			case "bottom-left":
-				x = bounds.margin
-				y = windowBounds.height - bounds.height - bounds.margin
-				break
-			case "bottom-right":
-				x = windowBounds.width - bounds.width - bounds.margin
-				y = windowBounds.height - bounds.height - bounds.margin
-				break
-			case "top-left":
-				x = bounds.margin
-				y = bounds.margin
-				break
-			case "top-right":
-				x = windowBounds.width - bounds.width - bounds.margin
-				y = bounds.margin
-				break
-		}
-
-		view.setBounds({ x, y, width: bounds.width, height: bounds.height })
-	}
-}
-
 export function createWindow(): BaseWindow {
+	const navBarConfig = getNavBarConfig()
+
 	mainWindow = new BaseWindow({
 		width: 1200,
 		height: 800,
 		backgroundColor: "#202830",
 	})
 
-	// WebContentsView for the website (bottom layer - full size)
+	// WebContentsView for the website
 	siteView = new WebContentsView({
 		webPreferences: {
 			nodeIntegration: false,
@@ -73,29 +44,32 @@ export function createWindow(): BaseWindow {
 		},
 	})
 
-	// Create navigation overlay
-	const navigationOverlay = createOverlay("navigation", {
-		width: 600,
-		height: 50,
-		position: "bottom-left",
-		margin: 20,
-	})
+	// Navigation bar (fixed, not floating)
+	navBar = createView()
+	navBar.setBackgroundColor("#1a1a2e")
 
 	// Add views to window - order matters (last = top)
 	mainWindow.contentView.addChildView(siteView)
-	mainWindow.contentView.addChildView(navigationOverlay)
+	mainWindow.contentView.addChildView(navBar)
 
-	// Position views
+	// Position views based on config
 	const updateBounds = () => {
-		if (mainWindow && siteView) {
-			const bounds = mainWindow.getContentBounds()
+		if (!mainWindow || !siteView || !navBar) return
 
-			// Site fills the entire window
-			siteView.setBounds({ x: 0, y: 0, width: bounds.width, height: bounds.height })
+		const bounds = mainWindow.getContentBounds()
+		const navHeight = navBarConfig.visible ? NAV_BAR_HEIGHT : 0
 
-			// Update all overlays
-			updateOverlayBounds(bounds)
+		if (navBarConfig.position === "top") {
+			// Navbar en haut
+			navBar.setBounds({ x: 0, y: 0, width: bounds.width, height: navHeight })
+			siteView.setBounds({ x: 0, y: navHeight, width: bounds.width, height: bounds.height - navHeight })
+		} else {
+			// Navbar en bas
+			siteView.setBounds({ x: 0, y: 0, width: bounds.width, height: bounds.height - navHeight })
+			navBar.setBounds({ x: 0, y: bounds.height - navHeight, width: bounds.width, height: navHeight })
 		}
+
+		navBar.setVisible(navBarConfig.visible)
 	}
 
 	// Initial bounds
@@ -110,20 +84,19 @@ export function createWindow(): BaseWindow {
 	})
 
 	// Load the website in siteView
-	// TODO: Temporaire - charger koreus.com pour test
-	siteView.webContents.loadURL("https://www.koreus.com")
+	siteView.webContents.loadURL(getStartUrl())
 
-	// Load overlay UI
+	// Load navbar UI
 	if (process.env.ELECTRON_RENDERER_URL) {
-		navigationOverlay.webContents.loadURL(`${process.env.ELECTRON_RENDERER_URL}/navigation/`)
+		navBar.webContents.loadURL(`${process.env.ELECTRON_RENDERER_URL}/navbar/`)
 	} else {
-		navigationOverlay.webContents.loadFile(join(__dirname, "../overlays/navigation/index.html"))
+		navBar.webContents.loadFile(join(__dirname, "../ui/navbar/index.html"))
 	}
 
 	mainWindow.on("closed", () => {
 		mainWindow = null
 		siteView = null
-		overlays.clear()
+		navBar = null
 	})
 
 	return mainWindow
@@ -137,6 +110,12 @@ export function getSiteView(): WebContentsView | null {
 	return siteView
 }
 
+export function getNavBar(): WebContentsView | null {
+	return navBar
+}
+
+// Alias pour compatibilité avec navigation.ts
 export function getOverlay(name: string): WebContentsView | null {
-	return overlays.get(name)?.view ?? null
+	if (name === "navigation") return navBar
+	return null
 }

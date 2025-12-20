@@ -1,8 +1,12 @@
-import { BaseWindow, app } from "electron"
+import { BaseWindow, Menu, app } from "electron"
+import { loadConfig, registerConfigHandlers } from "./api/config"
 import { registerNavigationHandlers, setupNavigationStateSync } from "./api/navigation"
 import { createWindow } from "./window"
 
 app.whenReady().then(() => {
+	Menu.setApplicationMenu(null)
+	loadConfig()
+	registerConfigHandlers()
 	registerNavigationHandlers()
 	createWindow()
 	setupNavigationStateSync()

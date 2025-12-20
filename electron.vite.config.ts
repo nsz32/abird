@@ -35,13 +35,13 @@ export default defineConfig({
 		},
 	},
 	renderer: {
-		root: "src/overlays",
+		root: "src/ui",
 		plugins: [react()],
 		resolve: { alias: sharedAlias },
 		build: {
 			rollupOptions: {
 				input: {
-					navigation: resolve(__dirname, "src/overlays/navigation/index.html"),
+					navbar: resolve(__dirname, "src/ui/navbar/index.html"),
 				},
 			},
 		},

@@ -25,8 +25,8 @@ export function getNavigationState(): NavigationState {
 	return {
 		url: webContents.getURL(),
 		title: webContents.getTitle(),
-		canGoBack: webContents.canGoBack(),
-		canGoForward: webContents.canGoForward(),
+		canGoBack: webContents.navigationHistory.canGoBack(),
+		canGoForward: webContents.navigationHistory.canGoForward(),
 		isLoading: webContents.isLoading(),
 	}
 }
@@ -36,8 +36,8 @@ export function getNavigationState(): NavigationState {
  */
 export function goBack(): void {
 	const siteView = getSiteView()
-	if (siteView?.webContents.canGoBack()) {
-		siteView.webContents.goBack()
+	if (siteView?.webContents.navigationHistory.canGoBack()) {
+		siteView.webContents.navigationHistory.goBack()
 	}
 }
 
@@ -46,8 +46,8 @@ export function goBack(): void {
  */
 export function goForward(): void {
 	const siteView = getSiteView()
-	if (siteView?.webContents.canGoForward()) {
-		siteView.webContents.goForward()
+	if (siteView?.webContents.navigationHistory.canGoForward()) {
+		siteView.webContents.navigationHistory.goForward()
 	}
 }
 
@@ -64,6 +64,22 @@ export function reload(ignoreCache = false): void {
 	} else {
 		siteView.webContents.reload()
 	}
+}
+
+/**
+ * Navigue vers une URL
+ */
+export function goTo(url: string): void {
+	const siteView = getSiteView()
+	if (!siteView) return
+
+	// Normaliser l'URL
+	let normalizedUrl = url.trim()
+	if (!normalizedUrl.startsWith("http://") && !normalizedUrl.startsWith("https://")) {
+		normalizedUrl = `https://${normalizedUrl}`
+	}
+
+	siteView.webContents.loadURL(normalizedUrl)
 }
 
 /**
@@ -85,6 +101,10 @@ export function registerNavigationHandlers(): void {
 	ipcMain.handle(IpcChannels.NAVIGATION_RELOAD, (_event, ignoreCache?: boolean) => {
 		reload(ignoreCache)
 	})
+
+	ipcMain.handle(IpcChannels.NAVIGATION_GO_TO, (_event, url: string) => {
+		goTo(url)
+	})
 }
 
 /**
@@ -94,6 +114,27 @@ function pushNavigationState(): void {
 	const navigationOverlay = getOverlay("navigation")
 	if (navigationOverlay) {
 		navigationOverlay.webContents.send(IpcChannels.NAVIGATION_STATE_CHANGED, getNavigationState())
+	}
+}
+
+/**
+ * Supprime les entrées d'historique consécutives avec la même URL
+ */
+function deduplicateHistory(): void {
+	const siteView = getSiteView()
+	if (!siteView) return
+
+	const history = siteView.webContents.navigationHistory
+	const activeIndex = history.getActiveIndex()
+	const startIndex = Math.max(0, activeIndex - 10)
+
+	// Itérer à l'envers pour ne pas décaler les index lors des suppressions
+	for (let i = activeIndex - 1; i >= startIndex; i--) {
+		const entry = history.getEntryAtIndex(i)
+		const nextEntry = history.getEntryAtIndex(i + 1)
+		if (entry?.url === nextEntry?.url) {
+			history.removeEntryAtIndex(i)
+		}
 	}
 }
 
@@ -109,7 +150,10 @@ export function setupNavigationStateSync(): void {
 
 	// Événements qui changent l'état de navigation
 	webContents.on("did-navigate", pushNavigationState)
-	webContents.on("did-navigate-in-page", pushNavigationState)
+	webContents.on("did-navigate-in-page", () => {
+		deduplicateHistory()
+		pushNavigationState()
+	})
 	webContents.on("did-start-loading", pushNavigationState)
 	webContents.on("did-stop-loading", pushNavigationState)
 	webContents.on("did-finish-load", pushNavigationState)
