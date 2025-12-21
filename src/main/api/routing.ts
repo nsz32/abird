@@ -33,9 +33,11 @@ function matchesPatterns(url: string, patterns: string | string[]): boolean {
 
 /**
  * Vérifie si l'URL est interne (doit rester dans Bird)
+ * Si pas de config routing, tout est externe
  */
 export function isInternalUrl(url: string): boolean {
 	const config = getRoutingConfig()
+	if (!config) return false
 	return matchesPatterns(url, config.internal)
 }
 
@@ -44,7 +46,7 @@ export function isInternalUrl(url: string): boolean {
  */
 export function isDownloadAllowed(url: string): boolean {
 	const config = getRoutingConfig()
-	if (!config.download || (Array.isArray(config.download) && config.download.length === 0)) {
+	if (!config?.download || (Array.isArray(config.download) && config.download.length === 0)) {
 		return false
 	}
 	return matchesPatterns(url, config.download)

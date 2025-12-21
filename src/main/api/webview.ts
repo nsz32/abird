@@ -2,17 +2,26 @@
  * Factory pour créer des WebContentsView de sites
  */
 
-import { WebContentsView } from "electron"
+import { WebContentsView, session } from "electron"
+import { getPartitionName } from "./config"
 import { setupRouting } from "./routing"
 
 /**
  * Crée une WebContentsView pour afficher un site (sans preload)
+ * Utilise la partition de l'app courante pour isoler les données
  */
 export function createSiteView(): WebContentsView {
+	const partitionName = getPartitionName()
+
+	// Créer ou récupérer la session avec partition persistante
+	// Les données sont stockées dans userData/Partitions/<partitionName>/
+	const partitionSession = session.fromPartition(`persist:${partitionName}`)
+
 	const view = new WebContentsView({
 		webPreferences: {
 			nodeIntegration: false,
 			contextIsolation: true,
+			session: partitionSession,
 		},
 	})
 

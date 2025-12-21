@@ -43,6 +43,14 @@ export interface RoutingConfig {
 	download?: string | string[] // URLs autorisées pour downloads
 }
 
+// Configuration d'une app (site web isolé)
+export interface AppConfig {
+	partition: string // Nom de la partition (données isolées)
+	startUrl: string
+	navBar?: Partial<NavBarConfig>
+	routing?: Partial<RoutingConfig>
+}
+
 // API Bird exposée aux overlays via contextBridge
 export interface BirdApi {
 	navigation: {

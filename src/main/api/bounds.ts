@@ -105,4 +105,4 @@ export const onContentBoundsChanged = contentBounds$.subscribe
  * S'abonne aux changements de bounds de la navbar
  */
 export const onNavBarBoundsChanged = navBarBounds$.subscribe
-// 
+//

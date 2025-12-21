@@ -5,7 +5,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { homedir } from "node:os"
 import { join } from "node:path"
-import { IpcChannels, type NavBarConfig, type RoutingConfig } from "@shared/types"
+import { type AppConfig, IpcChannels, type NavBarConfig, type RoutingConfig } from "@shared/types"
 import { ipcMain } from "electron"
 
 // Chemins de configuration
@@ -22,32 +22,35 @@ const defaultNavBarConfig: NavBarConfig = {
 	showReload: true,
 }
 
-const defaultRoutingConfig: RoutingConfig = {
-	internal: "https://www.koreus.com",
-}
-
-// Configuration par défaut complète
-interface AppConfig {
+// Configuration globale du fichier (navBar global + apps)
+interface GlobalConfig {
 	navBar: NavBarConfig
-	routing: RoutingConfig
-	startUrl: string
+	apps: Record<string, AppConfig>
 }
 
-const defaultConfig: AppConfig = {
+const defaultGlobalConfig: GlobalConfig = {
 	navBar: defaultNavBarConfig,
-	routing: defaultRoutingConfig,
-	startUrl: "https://www.koreus.com",
+	apps: {
+		koreus: {
+			partition: "default",
+			startUrl: "https://www.koreus.com",
+			routing: { internal: "https://www.koreus.com" },
+		},
+	},
 }
 
-// Config actuelle
-let config: AppConfig = structuredClone(defaultConfig)
+// Config globale chargée
+let globalConfig: GlobalConfig = structuredClone(defaultGlobalConfig)
+
+// App courante (définie par CLI)
+let currentAppName: string | null = null
+let currentAppConfig: AppConfig | null = null
 
 /**
  * Charge la configuration depuis le fichier JSON
  */
 export function loadConfig(): void {
 	if (!existsSync(CONFIG_FILE)) {
-		// Créer le fichier de config par défaut
 		saveConfig()
 		return
 	}
@@ -55,15 +58,13 @@ export function loadConfig(): void {
 	try {
 		const content = readFileSync(CONFIG_FILE, "utf-8")
 		const loaded = JSON.parse(content)
-		// Merge avec les defaults pour les nouvelles propriétés
-		config = {
-			...defaultConfig,
+		globalConfig = {
+			...defaultGlobalConfig,
 			...loaded,
 			navBar: { ...defaultNavBarConfig, ...loaded.navBar },
-			routing: { ...defaultRoutingConfig, ...loaded.routing },
+			apps: { ...defaultGlobalConfig.apps, ...loaded.apps },
 		}
 	} catch {
-		// En cas d'erreur, garder les defaults
 		console.error("Failed to load config, using defaults")
 	}
 }
@@ -76,46 +77,69 @@ export function saveConfig(): void {
 		if (!existsSync(CONFIG_DIR)) {
 			mkdirSync(CONFIG_DIR, { recursive: true })
 		}
-		writeFileSync(CONFIG_FILE, JSON.stringify(config, null, "\t"))
+		writeFileSync(CONFIG_FILE, JSON.stringify(globalConfig, null, "\t"))
 	} catch (err) {
 		console.error("Failed to save config:", err)
 	}
 }
 
 /**
- * Retourne la configuration complète
+ * Sélectionne l'app courante par son nom
+ * Retourne false si l'app n'existe pas
  */
-export function getConfig(): AppConfig {
-	return config
+export function selectApp(appName: string): boolean {
+	const app = globalConfig.apps[appName]
+	if (!app) {
+		return false
+	}
+	currentAppName = appName
+	currentAppConfig = app
+	return true
 }
 
 /**
- * Retourne la configuration de la navbar
+ * Retourne le nom de l'app courante
+ */
+export function getCurrentAppName(): string | null {
+	return currentAppName
+}
+
+/**
+ * Retourne la liste des apps disponibles
+ */
+export function getAvailableApps(): string[] {
+	return Object.keys(globalConfig.apps)
+}
+
+/**
+ * Retourne la configuration de la navbar (merge global + app)
  */
 export function getNavBarConfig(): NavBarConfig {
-	return config.navBar
+	return {
+		...globalConfig.navBar,
+		...currentAppConfig?.navBar,
+	}
 }
 
 /**
- * Retourne l'URL de démarrage
+ * Retourne l'URL de démarrage de l'app courante
  */
 export function getStartUrl(): string {
-	return config.startUrl
+	return currentAppConfig?.startUrl || "about:blank"
 }
 
 /**
- * Retourne la configuration du routing
+ * Retourne la configuration du routing de l'app courante
  */
-export function getRoutingConfig(): RoutingConfig {
-	return config.routing
+export function getRoutingConfig(): RoutingConfig | null {
+	return currentAppConfig?.routing || null
 }
 
 /**
- * Met à jour la configuration de la navbar
+ * Retourne le nom de la partition de l'app courante
  */
-export function setNavBarConfig(navBarConfig: Partial<NavBarConfig>): void {
-	config.navBar = { ...config.navBar, ...navBarConfig }
-	saveConfig()
+export function getPartitionName(): string {
+	return currentAppConfig?.partition || "default"
 }
 
 /**
