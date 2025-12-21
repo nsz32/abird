@@ -46,7 +46,6 @@ function computeBounds(): { content: Rectangle; navBar: Rectangle } {
  */
 function updateBounds(): void {
 	const { content, navBar } = computeBounds()
-	console.log("updateBounds:", { content, navBar })
 	contentBounds$.emit(content)
 	navBarBounds$.emit(navBar)
 }

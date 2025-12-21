@@ -17,6 +17,8 @@ export function createSiteView(): WebContentsView {
 	// Les données sont stockées dans userData/Partitions/<partitionName>/
 	const partitionSession = session.fromPartition(`persist:${partitionName}`)
 
+	console.log(`Using partition: ${partitionName} (${partitionSession.getStoragePath()})`)
+
 	const view = new WebContentsView({
 		webPreferences: {
 			nodeIntegration: false,

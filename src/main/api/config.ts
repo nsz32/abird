@@ -8,9 +8,12 @@ import { join } from "node:path"
 import { type AppConfig, IpcChannels, type NavBarConfig, type RoutingConfig } from "@shared/types"
 import { ipcMain } from "electron"
 
-// Chemins de configuration
+// Chemins de configuration par défaut
 const CONFIG_DIR = join(homedir(), ".config", "bird")
-const CONFIG_FILE = join(CONFIG_DIR, "config.json")
+const DEFAULT_CONFIG_FILE = join(CONFIG_DIR, "config.json")
+
+// Chemin du fichier de config utilisé (peut être custom via --config)
+let configFilePath = DEFAULT_CONFIG_FILE
 
 // Configuration par défaut de la navbar
 const defaultNavBarConfig: NavBarConfig = {
@@ -48,15 +51,21 @@ let currentAppConfig: AppConfig | null = null
 
 /**
  * Charge la configuration depuis le fichier JSON
+ * @param customPath Chemin custom du fichier de config (optionnel)
  */
-export function loadConfig(): void {
-	if (!existsSync(CONFIG_FILE)) {
+export function loadConfig(customPath?: string | null): void {
+	// Utiliser le chemin custom si fourni
+	if (customPath) {
+		configFilePath = customPath
+	}
+
+	if (!existsSync(configFilePath)) {
 		saveConfig()
 		return
 	}
 
 	try {
-		const content = readFileSync(CONFIG_FILE, "utf-8")
+		const content = readFileSync(configFilePath, "utf-8")
 		const loaded = JSON.parse(content)
 		globalConfig = {
 			...defaultGlobalConfig,
@@ -74,10 +83,11 @@ export function loadConfig(): void {
  */
 export function saveConfig(): void {
 	try {
-		if (!existsSync(CONFIG_DIR)) {
-			mkdirSync(CONFIG_DIR, { recursive: true })
+		const configDir = join(configFilePath, "..")
+		if (!existsSync(configDir)) {
+			mkdirSync(configDir, { recursive: true })
 		}
-		writeFileSync(CONFIG_FILE, JSON.stringify(globalConfig, null, "\t"))
+		writeFileSync(configFilePath, JSON.stringify(globalConfig, null, "\t"))
 	} catch (err) {
 		console.error("Failed to save config:", err)
 	}

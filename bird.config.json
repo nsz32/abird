@@ -1,0 +1,19 @@
+{
+	"navBar": {
+		"position": "top",
+		"visible": true,
+		"autoHide": false,
+		"urlEditable": true,
+		"showBackForward": true,
+		"showReload": true
+	},
+	"apps": {
+		"koreus": {
+			"partition": "koreus",
+			"startUrl": "https://www.koreus.com",
+			"routing": {
+				"internal": "https://www.koreus.com"
+			}
+		}
+	}
+}

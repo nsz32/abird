@@ -5,15 +5,18 @@ import { registerNavigationHandlers, setupNavigationSync } from "./api/navigatio
 import { createWindow } from "./window"
 
 /**
- * Parse les arguments CLI pour extraire --app <name>
+ * Parse les arguments CLI pour extraire --app <name> et --config <path>
  */
-function parseCliArgs(): { appName: string | null } {
+function parseCliArgs(): { appName: string | null; configPath: string | null } {
 	const args = process.argv.slice(2)
+
 	const appIndex = args.indexOf("--app")
-	if (appIndex !== -1 && args[appIndex + 1]) {
-		return { appName: args[appIndex + 1] }
-	}
-	return { appName: null }
+	const appName = appIndex !== -1 && args[appIndex + 1] ? args[appIndex + 1] : null
+
+	const configIndex = args.indexOf("--config")
+	const configPath = configIndex !== -1 && args[configIndex + 1] ? args[configIndex + 1] : null
+
+	return { appName, configPath }
 }
 
 // Configurer userData vers ~/.local/share/bird (XDG_DATA_HOME)
@@ -23,10 +26,14 @@ app.setPath("userData", join(xdgDataHome, "bird"))
 
 app.whenReady().then(() => {
 	Menu.setApplicationMenu(null)
-	loadConfig()
+
+	// Parser les arguments CLI
+	const { appName, configPath } = parseCliArgs()
+
+	// Charger la config (avec chemin custom si fourni)
+	loadConfig(configPath)
 
 	// Sélectionner l'app depuis CLI
-	const { appName } = parseCliArgs()
 	if (appName) {
 		if (!selectApp(appName)) {
 			console.error(`App "${appName}" not found. Available apps: ${getAvailableApps().join(", ")}`)

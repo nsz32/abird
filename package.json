@@ -8,6 +8,7 @@
 	},
 	"scripts": {
 		"dev": "electron-vite dev",
+		"start:local": "electron-vite dev -- --config bird.config.json",
 		"build": "electron-vite build",
 		"preview": "electron-vite preview",
 		"start": "electron .",
