@@ -1,6 +1,7 @@
 import { join } from "node:path"
 import { BaseWindow, WebContentsView } from "electron"
 import { getNavBarConfig, getStartUrl } from "./api/config"
+import { setupRouting } from "./api/routing"
 
 const NAV_BAR_HEIGHT = 40
 
@@ -75,6 +76,9 @@ export function createWindow(): BaseWindow {
 	// Initial bounds
 	updateBounds()
 	mainWindow.on("resize", updateBounds)
+
+	// Setup routing (internal vs external URLs)
+	setupRouting(siteView)
 
 	// Hide siteView until content is ready
 	siteView.setVisible(false)

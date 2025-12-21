@@ -82,9 +82,7 @@ export function App() {
 					</NavButton>
 				</>
 			)}
-			{config.showReload && (
-				<NavButton onClick={() => window.bird.navigation.reload()}>{state.isLoading ? "..." : "↻"}</NavButton>
-			)}
+			{config.showReload && <NavButton onClick={() => window.bird.navigation.reload()}>{state.isLoading ? "..." : "↻"}</NavButton>}
 			{config.urlEditable ? (
 				<form className="url-form" onSubmit={handleUrlSubmit}>
 					<input

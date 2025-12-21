@@ -37,6 +37,12 @@ export interface NavBarConfig {
 	showReload: boolean
 }
 
+// Configuration du routage des URLs
+export interface RoutingConfig {
+	internal: string | string[] // URLs internes (regex ^... ou baseUrl)
+	download?: string | string[] // URLs autorisées pour downloads
+}
+
 // API Bird exposée aux overlays via contextBridge
 export interface BirdApi {
 	navigation: {

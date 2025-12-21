@@ -5,7 +5,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { homedir } from "node:os"
 import { join } from "node:path"
-import { IpcChannels, type NavBarConfig } from "@shared/types"
+import { IpcChannels, type NavBarConfig, type RoutingConfig } from "@shared/types"
 import { ipcMain } from "electron"
 
 // Chemins de configuration
@@ -22,14 +22,20 @@ const defaultNavBarConfig: NavBarConfig = {
 	showReload: true,
 }
 
+const defaultRoutingConfig: RoutingConfig = {
+	internal: "https://www.koreus.com",
+}
+
 // Configuration par défaut complète
 interface AppConfig {
 	navBar: NavBarConfig
+	routing: RoutingConfig
 	startUrl: string
 }
 
 const defaultConfig: AppConfig = {
 	navBar: defaultNavBarConfig,
+	routing: defaultRoutingConfig,
 	startUrl: "https://www.koreus.com",
 }
 
@@ -54,6 +60,7 @@ export function loadConfig(): void {
 			...defaultConfig,
 			...loaded,
 			navBar: { ...defaultNavBarConfig, ...loaded.navBar },
+			routing: { ...defaultRoutingConfig, ...loaded.routing },
 		}
 	} catch {
 		// En cas d'erreur, garder les defaults
@@ -94,6 +101,13 @@ export function getNavBarConfig(): NavBarConfig {
  */
 export function getStartUrl(): string {
 	return config.startUrl
+}
+
+/**
+ * Retourne la configuration du routing
+ */
+export function getRoutingConfig(): RoutingConfig {
+	return config.routing
 }
 
 /**
