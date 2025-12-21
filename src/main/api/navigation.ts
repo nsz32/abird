@@ -4,14 +4,15 @@
 
 import { IpcChannels, type NavigationState } from "@shared/types"
 import { ipcMain } from "electron"
-import { getOverlay, getSiteView } from "../window"
+import { getNavBar } from "../window"
+import { getActiveTab, onNavigationStateChanged } from "./tabs"
 
 /**
- * Retourne l'état de navigation actuel
+ * Retourne l'état de navigation du tab actif
  */
-export function getNavigationState(): NavigationState {
-	const siteView = getSiteView()
-	if (!siteView) {
+function getNavigationState(): NavigationState {
+	const tab = getActiveTab()
+	if (!tab) {
 		return {
 			url: "",
 			title: "",
@@ -21,65 +22,63 @@ export function getNavigationState(): NavigationState {
 		}
 	}
 
-	const webContents = siteView.webContents
+	const wc = tab.view.webContents
 	return {
-		url: webContents.getURL(),
-		title: webContents.getTitle(),
-		canGoBack: webContents.navigationHistory.canGoBack(),
-		canGoForward: webContents.navigationHistory.canGoForward(),
-		isLoading: webContents.isLoading(),
+		url: wc.getURL(),
+		title: wc.getTitle(),
+		canGoBack: wc.navigationHistory.canGoBack(),
+		canGoForward: wc.navigationHistory.canGoForward(),
+		isLoading: wc.isLoading(),
 	}
 }
 
 /**
  * Navigue vers la page précédente
  */
-export function goBack(): void {
-	const siteView = getSiteView()
-	if (siteView?.webContents.navigationHistory.canGoBack()) {
-		siteView.webContents.navigationHistory.goBack()
+function goBack(): void {
+	const tab = getActiveTab()
+	if (tab?.view.webContents.navigationHistory.canGoBack()) {
+		tab.view.webContents.navigationHistory.goBack()
 	}
 }
 
 /**
  * Navigue vers la page suivante
  */
-export function goForward(): void {
-	const siteView = getSiteView()
-	if (siteView?.webContents.navigationHistory.canGoForward()) {
-		siteView.webContents.navigationHistory.goForward()
+function goForward(): void {
+	const tab = getActiveTab()
+	if (tab?.view.webContents.navigationHistory.canGoForward()) {
+		tab.view.webContents.navigationHistory.goForward()
 	}
 }
 
 /**
  * Recharge la page
- * @param ignoreCache - Si true, ignore le cache (hard reload)
  */
-export function reload(ignoreCache = false): void {
-	const siteView = getSiteView()
-	if (!siteView) return
+function reload(ignoreCache = false): void {
+	const tab = getActiveTab()
+	if (!tab) return
 
 	if (ignoreCache) {
-		siteView.webContents.reloadIgnoringCache()
+		tab.view.webContents.reloadIgnoringCache()
 	} else {
-		siteView.webContents.reload()
+		tab.view.webContents.reload()
 	}
 }
 
 /**
  * Navigue vers une URL
  */
-export function goTo(url: string): void {
-	const siteView = getSiteView()
-	if (!siteView) return
+function goTo(url: string): void {
+	const tab = getActiveTab()
+	if (!tab) return
 
-	// Normaliser l'URL
 	let normalizedUrl = url.trim()
 	if (!normalizedUrl.startsWith("http://") && !normalizedUrl.startsWith("https://")) {
 		normalizedUrl = `https://${normalizedUrl}`
 	}
 
-	siteView.webContents.loadURL(normalizedUrl)
+	tab.view.webContents.loadURL(normalizedUrl)
 }
 
 /**
@@ -108,55 +107,13 @@ export function registerNavigationHandlers(): void {
 }
 
 /**
- * Envoie l'état de navigation à l'overlay navigation
+ * Configure la synchronisation de l'état de navigation vers la navbar
  */
-function pushNavigationState(): void {
-	const navigationOverlay = getOverlay("navigation")
-	if (navigationOverlay) {
-		navigationOverlay.webContents.send(IpcChannels.NAVIGATION_STATE_CHANGED, getNavigationState())
-	}
-}
-
-/**
- * Supprime les entrées d'historique consécutives avec la même URL
- */
-function deduplicateHistory(): void {
-	const siteView = getSiteView()
-	if (!siteView) return
-
-	const history = siteView.webContents.navigationHistory
-	const activeIndex = history.getActiveIndex()
-	const startIndex = Math.max(0, activeIndex - 10)
-
-	// Itérer à l'envers pour ne pas décaler les index lors des suppressions
-	for (let i = activeIndex - 1; i >= startIndex; i--) {
-		const entry = history.getEntryAtIndex(i)
-		const nextEntry = history.getEntryAtIndex(i + 1)
-		if (entry?.url === nextEntry?.url) {
-			history.removeEntryAtIndex(i)
+export function setupNavigationSync(): void {
+	onNavigationStateChanged((state) => {
+		const navBar = getNavBar()
+		if (navBar) {
+			navBar.webContents.send(IpcChannels.NAVIGATION_STATE_CHANGED, state)
 		}
-	}
-}
-
-/**
- * Configure la synchronisation de l'état de navigation
- * Écoute les événements webContents et push l'état aux overlays
- */
-export function setupNavigationStateSync(): void {
-	const siteView = getSiteView()
-	if (!siteView) return
-
-	const webContents = siteView.webContents
-
-	// Événements qui changent l'état de navigation
-	webContents.on("did-navigate", pushNavigationState)
-	webContents.on("did-navigate-in-page", () => {
-		deduplicateHistory()
-		pushNavigationState()
 	})
-	webContents.on("did-start-loading", pushNavigationState)
-	webContents.on("did-stop-loading", pushNavigationState)
-	webContents.on("did-finish-load", pushNavigationState)
-	webContents.on("page-title-updated", pushNavigationState)
-	webContents.on("did-frame-navigate", pushNavigationState)
 }

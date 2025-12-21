@@ -1,6 +1,6 @@
 import { BaseWindow, Menu, app } from "electron"
 import { loadConfig, registerConfigHandlers } from "./api/config"
-import { registerNavigationHandlers, setupNavigationStateSync } from "./api/navigation"
+import { registerNavigationHandlers, setupNavigationSync } from "./api/navigation"
 import { createWindow } from "./window"
 
 app.whenReady().then(() => {
@@ -8,8 +8,8 @@ app.whenReady().then(() => {
 	loadConfig()
 	registerConfigHandlers()
 	registerNavigationHandlers()
+	setupNavigationSync()
 	createWindow()
-	setupNavigationStateSync()
 
 	app.on("activate", () => {
 		if (BaseWindow.getAllWindows().length === 0) {

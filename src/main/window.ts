@@ -1,94 +1,95 @@
 import { join } from "node:path"
 import { BaseWindow, WebContentsView } from "electron"
-import { getNavBarConfig, getStartUrl } from "./api/config"
-import { setupRouting } from "./api/routing"
-
-const NAV_BAR_HEIGHT = 40
+import { getNavBarBounds, initBounds, onContentBoundsChanged, onNavBarBoundsChanged, showWindowWithBounds } from "./api/bounds"
+import { getNavBarConfig } from "./api/config"
+import { createTab, onTabActivated, onTabClosed, onTabCreated } from "./api/tabs"
 
 let mainWindow: BaseWindow | null = null
-let siteView: WebContentsView | null = null
 let navBar: WebContentsView | null = null
+let activeTabView: WebContentsView | null = null
 
 /**
- * Crée une WebContentsView avec le preload
+ * Crée une WebContentsView avec le preload (pour overlays)
  */
-function createView(transparent = false): WebContentsView {
-	const view = new WebContentsView({
+function createOverlayView(): WebContentsView {
+	return new WebContentsView({
 		webPreferences: {
 			preload: join(__dirname, "../preload/index.js"),
 			nodeIntegration: false,
 			contextIsolation: true,
 		},
 	})
-
-	if (transparent) {
-		view.setBackgroundColor("#00000000")
-	}
-
-	return view
 }
 
 export function createWindow(): BaseWindow {
-	const navBarConfig = getNavBarConfig()
-
 	mainWindow = new BaseWindow({
 		width: 1200,
 		height: 800,
 		backgroundColor: "#202830",
+		show: false, // Attendre ready-to-show pour afficher avec les bonnes dimensions
 	})
 
-	// WebContentsView for the website
-	siteView = new WebContentsView({
-		webPreferences: {
-			nodeIntegration: false,
-			contextIsolation: true,
-		},
-	})
+	// Initialiser le système de bounds AVANT de créer les views
+	initBounds(mainWindow)
 
-	// Navigation bar (fixed, not floating)
-	navBar = createView()
+	// Navigation bar
+	navBar = createOverlayView()
 	navBar.setBackgroundColor("#1a1a2e")
-
-	// Add views to window - order matters (last = top)
-	mainWindow.contentView.addChildView(siteView)
 	mainWindow.contentView.addChildView(navBar)
 
-	// Position views based on config
-	const updateBounds = () => {
-		if (!mainWindow || !siteView || !navBar) return
+	// Appliquer bounds navbar immédiatement
+	const navBarConfig = getNavBarConfig()
+	navBar.setBounds(getNavBarBounds())
+	navBar.setVisible(navBarConfig.visible)
 
-		const bounds = mainWindow.getContentBounds()
-		const navHeight = navBarConfig.visible ? NAV_BAR_HEIGHT : 0
-
-		if (navBarConfig.position === "top") {
-			// Navbar en haut
-			navBar.setBounds({ x: 0, y: 0, width: bounds.width, height: navHeight })
-			siteView.setBounds({ x: 0, y: navHeight, width: bounds.width, height: bounds.height - navHeight })
-		} else {
-			// Navbar en bas
-			siteView.setBounds({ x: 0, y: 0, width: bounds.width, height: bounds.height - navHeight })
-			navBar.setBounds({ x: 0, y: bounds.height - navHeight, width: bounds.width, height: navHeight })
+	// S'abonner aux changements de bounds navbar
+	onNavBarBoundsChanged((bounds) => {
+		if (navBar) {
+			navBar.setBounds(bounds)
 		}
-
-		navBar.setVisible(navBarConfig.visible)
-	}
-
-	// Initial bounds
-	updateBounds()
-	mainWindow.on("resize", updateBounds)
-
-	// Setup routing (internal vs external URLs)
-	setupRouting(siteView)
-
-	// Hide siteView until content is ready
-	siteView.setVisible(false)
-	siteView.webContents.once("dom-ready", () => {
-		updateBounds()
-		siteView?.setVisible(true)
 	})
 
-	// Load the website in siteView
-	siteView.webContents.loadURL(getStartUrl())
+	// S'abonner aux changements de bounds contenu pour le tab actif
+	onContentBoundsChanged((bounds) => {
+		if (activeTabView) {
+			activeTabView.setBounds(bounds)
+		}
+	})
+
+	// S'abonner aux événements tabs
+	onTabCreated((tab) => {
+		if (!mainWindow || !navBar) return
+
+		// Ajouter la vue à la window (sous la navbar)
+		mainWindow.contentView.addChildView(tab.view)
+		// Réordonner pour que navbar reste au-dessus
+		mainWindow.contentView.removeChildView(navBar)
+		mainWindow.contentView.addChildView(navBar)
+
+		// Cacher par défaut, sera affiché quand activé
+		tab.view.setVisible(false)
+	})
+
+	onTabClosed((_id) => {
+		// La vue sera retirée par le garbage collector
+	})
+
+	onTabActivated((tab) => {
+		// Cacher l'ancien tab actif
+		if (activeTabView) {
+			activeTabView.setVisible(false)
+		}
+
+		activeTabView = tab.view
+		activeTabView.setVisible(true)
+		// Bounds déjà appliqués par onContentBoundsChanged lors du subscribe
+	})
+
+	// Créer le premier tab
+	createTab()
+
+	// Afficher la window quand la navbar est prête
+	navBar.webContents.once("dom-ready", showWindowWithBounds)
 
 	// Load navbar UI
 	if (process.env.ELECTRON_RENDERER_URL) {
@@ -99,27 +100,13 @@ export function createWindow(): BaseWindow {
 
 	mainWindow.on("closed", () => {
 		mainWindow = null
-		siteView = null
 		navBar = null
+		activeTabView = null
 	})
 
 	return mainWindow
 }
 
-export function getMainWindow(): BaseWindow | null {
-	return mainWindow
-}
-
-export function getSiteView(): WebContentsView | null {
-	return siteView
-}
-
 export function getNavBar(): WebContentsView | null {
 	return navBar
-}
-
-// Alias pour compatibilité avec navigation.ts
-export function getOverlay(name: string): WebContentsView | null {
-	if (name === "navigation") return navBar
-	return null
 }
