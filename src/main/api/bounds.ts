@@ -62,9 +62,10 @@ export function initBounds(window: BaseWindow): void {
 
 	// Mise à jour sur resize
 	window.on("resize", updateBounds)
+	window.on("enter-full-screen", updateBounds)
+	window.on("leave-full-screen", updateBounds)
 
 	// Recalculer après que le window manager ait finalisé la taille
-
 
 	// Cleanup
 	window.on("closed", () => {
@@ -78,8 +79,7 @@ export function initBounds(window: BaseWindow): void {
  */
 export function showWindowWithBounds(): void {
 	mainWindowRef?.show()
-	for(let i = 100; i <= 500; i+= 10)
-		setTimeout(updateBounds, i)
+	for (let i = 100; i <= 500; i += 10) setTimeout(updateBounds, i)
 }
 
 /**
@@ -105,4 +105,3 @@ export const onContentBoundsChanged = contentBounds$.subscribe
  * S'abonne aux changements de bounds de la navbar
  */
 export const onNavBarBoundsChanged = navBarBounds$.subscribe
-

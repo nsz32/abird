@@ -16,6 +16,7 @@ export function createSiteView(): WebContentsView {
 		},
 	})
 
+	view.setBackgroundColor("#202830")
 	setupRouting(view)
 
 	return view
