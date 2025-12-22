@@ -1,57 +1,65 @@
-/**
- * Pattern Observable minimaliste
- */
-
 type Listener<T> = (value: T) => void
+// biome-ignore lint/suspicious/noExplicitAny: necessary for type inference
+type Combined<T extends readonly StateObservable<any>[]> = { [K in keyof T]: T[K] extends StateObservable<infer U> ? U : never }
 
-export interface Observable<T> {
-	subscribe(listener: Listener<T>): () => void
-	emit(value: T): void
-}
+export class Observable<T> {
+	private listeners = new Set<Listener<T>>()
 
-export interface StateObservable<T> extends Observable<T> {
-	get(): T
-}
-
-export function createObservable<T>(): Observable<T> {
-	const listeners = new Set<Listener<T>>()
-
-	return {
-		subscribe(listener: Listener<T>): () => void {
-			listeners.add(listener)
-			return () => listeners.delete(listener)
-		},
-		emit(value: T): void {
-			for (const listener of listeners) {
-				listener(value)
-			}
-		},
+	subscribe(l: Listener<T>) {
+		this.listeners.add(l)
+		return () => this.listeners.delete(l)
+	}
+	emit(value: T) {
+		for (const listener of this.listeners) listener(value)
 	}
 }
 
-/**
- * Observable avec état - stocke la dernière valeur
- * Les subscribers reçoivent la valeur courante immédiatement
- */
-export function createStateObservable<T>(initial: T): StateObservable<T> {
-	let current = initial
-	const listeners = new Set<Listener<T>>()
+export class StateObservable<T> {
+	private listeners = new Set<Listener<T>>()
 
-	return {
-		subscribe(listener: Listener<T>): () => void {
-			listeners.add(listener)
-			// Émettre immédiatement la valeur courante
-			listener(current)
-			return () => listeners.delete(listener)
-		},
-		emit(value: T): void {
-			current = value
-			for (const listener of listeners) {
-				listener(value)
-			}
-		},
-		get(): T {
-			return current
-		},
+	constructor(private state: T) {}
+
+	subscribe(l: Listener<T>) {
+		this.listeners.add(l)
+		l(this.state)
+		return () => this.listeners.delete(l)
+	}
+	emit(state: T) {
+		this.state = state
+		for (const listener of this.listeners) listener(state)
+	}
+	get() {
+		return this.state
+	}
+}
+
+// biome-ignore lint/suspicious/noExplicitAny: necessary for type inference
+export class CombinedObservable<const T extends readonly StateObservable<any>[], U> {
+	private listeners = new Set<Listener<U>>()
+	private unsubscribers: Array<() => void> = []
+
+	constructor(
+		private observables: T,
+		private combine: (...values: Combined<T>) => U,
+	) {
+		for (const obs of observables)
+			this.unsubscribers.push(
+				obs.subscribe(() => {
+					const value = this.combine(...(this.observables.map((o) => o.get()) as Combined<T>))
+					for (const listener of this.listeners) listener(value)
+				}),
+			)
+	}
+
+	subscribe(l: Listener<U>) {
+		this.listeners.add(l)
+		return () => this.listeners.delete(l)
+	}
+	get() {
+		return this.combine(...(this.observables.map((o) => o.get()) as Combined<T>))
+	}
+	dispose() {
+		for (const unsub of this.unsubscribers) unsub()
+		this.listeners.clear()
 	}
 }

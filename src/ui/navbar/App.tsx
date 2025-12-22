@@ -1,4 +1,4 @@
-import type { NavBarConfig, NavigationState } from "@shared/types"
+import type { NavBarConfig, NavigationState, TabInfo } from "@shared/types"
 import { useEffect, useState } from "react"
 
 interface NavButtonProps {
@@ -27,6 +27,7 @@ export function App() {
 	const [config, setConfig] = useState<NavBarConfig | null>(null)
 	const [inputUrl, setInputUrl] = useState("")
 	const [isEditing, setIsEditing] = useState(false)
+	const [tabs, setTabs] = useState<TabInfo[]>([])
 
 	useEffect(() => {
 		window.bird.config.getNavBar().then(setConfig)
@@ -34,13 +35,16 @@ export function App() {
 			setState(s)
 			setInputUrl(s.url)
 		})
-		const unsubscribe = window.bird.navigation.onStateChanged((s) => {
+		window.bird.tabs.getList().then(setTabs)
+		const unsubscribeNav = window.bird.navigation.onStateChanged((s) => {
 			setState(s)
-			if (!isEditing) {
-				setInputUrl(s.url)
-			}
+			if (!isEditing) setInputUrl(s.url)
 		})
-		return unsubscribe
+		const unsubscribeTabs = window.bird.tabs.onListChanged(setTabs)
+		return () => {
+			unsubscribeNav()
+			unsubscribeTabs()
+		}
 	}, [isEditing])
 
 	const handleUrlSubmit = (e: React.FormEvent) => {
@@ -98,6 +102,22 @@ export function App() {
 				</form>
 			) : (
 				<span className="url-display">{state.url}</span>
+			)}
+			{tabs.length > 1 && (
+				<div className="tabs-list">
+					{tabs.map((tab) => (
+						<button
+							key={tab.id}
+							type="button"
+							className={`tab-button ${tab.isActive ? "active" : ""}`}
+							onClick={() => window.bird.tabs.activate(tab.id)}
+						>
+							<span className="tab-title">{tab.title || "New Tab"}</span>
+							<span className="tab-close" onClick={(e) => { e.stopPropagation(); window.bird.tabs.close(tab.id) }}>×</span>
+						</button>
+					))}
+					<button type="button" className="tab-add" onClick={() => window.bird.tabs.create()}>+</button>
+				</div>
 			)}
 		</div>
 	)

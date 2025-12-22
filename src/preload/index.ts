@@ -1,4 +1,4 @@
-import { IpcChannels, type NavBarConfig, type NavigationState } from "@shared/types"
+import { IpcChannels, type NavBarConfig, type NavigationState, type TabInfo } from "@shared/types"
 import { contextBridge, ipcRenderer } from "electron"
 
 // API exposed to UI components
@@ -14,6 +14,17 @@ contextBridge.exposeInMainWorld("bird", {
 			ipcRenderer.on(IpcChannels.NAVIGATION_STATE_CHANGED, listener)
 			return () => ipcRenderer.removeListener(IpcChannels.NAVIGATION_STATE_CHANGED, listener)
 		},
+	},
+	tabs: {
+		getList: (): Promise<TabInfo[]> => ipcRenderer.invoke(IpcChannels.TABS_GET_LIST),
+		onListChanged: (callback: (tabs: TabInfo[]) => void): (() => void) => {
+			const listener = (_event: Electron.IpcRendererEvent, tabs: TabInfo[]) => callback(tabs)
+			ipcRenderer.on(IpcChannels.TABS_LIST_CHANGED, listener)
+			return () => ipcRenderer.removeListener(IpcChannels.TABS_LIST_CHANGED, listener)
+		},
+		activate: (id: string) => ipcRenderer.invoke(IpcChannels.TABS_ACTIVATE, id),
+		close: (id: string) => ipcRenderer.invoke(IpcChannels.TABS_CLOSE, id),
+		create: () => ipcRenderer.invoke(IpcChannels.TABS_CREATE),
 	},
 	config: {
 		getNavBar: (): Promise<NavBarConfig> => ipcRenderer.invoke(IpcChannels.CONFIG_GET_NAVBAR),

@@ -91,3 +91,65 @@ body,
 	text-overflow: ellipsis;
 	padding: 0 10px;
 }
+
+.tabs-list {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	margin-left: 8px;
+}
+
+.tab-button {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	height: 28px;
+	padding: 0 8px;
+	border: none;
+	border-radius: 6px;
+	background: rgba(255, 255, 255, 0.08);
+	color: #aaa;
+	font-size: 12px;
+	cursor: pointer;
+	max-width: 150px;
+}
+
+.tab-button:hover {
+	background: rgba(255, 255, 255, 0.12);
+}
+
+.tab-button.active {
+	background: rgba(100, 150, 255, 0.2);
+	color: #fff;
+}
+
+.tab-title {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.tab-close {
+	font-size: 14px;
+	opacity: 0.5;
+}
+
+.tab-close:hover {
+	opacity: 1;
+}
+
+.tab-add {
+	width: 24px;
+	height: 24px;
+	border: none;
+	border-radius: 6px;
+	background: transparent;
+	color: #aaa;
+	font-size: 16px;
+	cursor: pointer;
+}
+
+.tab-add:hover {
+	background: rgba(255, 255, 255, 0.1);
+	color: #fff;
+}

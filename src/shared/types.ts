@@ -11,6 +11,13 @@ export interface NavigationState {
 	isLoading: boolean
 }
 
+// Info d'un tab (envoyé aux overlays)
+export interface TabInfo {
+	id: string
+	title: string
+	isActive: boolean
+}
+
 // Canaux IPC (évite les typos, autocomplétion)
 export const IpcChannels = {
 	// Navigation
@@ -20,6 +27,12 @@ export const IpcChannels = {
 	NAVIGATION_GO_TO: "bird:navigation:go-to",
 	NAVIGATION_GET_STATE: "bird:navigation:get-state",
 	NAVIGATION_STATE_CHANGED: "bird:navigation:state-changed",
+	// Tabs
+	TABS_GET_LIST: "bird:tabs:get-list",
+	TABS_LIST_CHANGED: "bird:tabs:list-changed",
+	TABS_ACTIVATE: "bird:tabs:activate",
+	TABS_CLOSE: "bird:tabs:close",
+	TABS_CREATE: "bird:tabs:create",
 	// Config
 	CONFIG_GET_NAVBAR: "bird:config:get-navbar",
 } as const
@@ -60,6 +73,13 @@ export interface BirdApi {
 		goTo: (url: string) => Promise<void>
 		getState: () => Promise<NavigationState>
 		onStateChanged: (callback: (state: NavigationState) => void) => () => void
+	}
+	tabs: {
+		getList: () => Promise<TabInfo[]>
+		onListChanged: (callback: (tabs: TabInfo[]) => void) => () => void
+		activate: (id: string) => Promise<void>
+		close: (id: string) => Promise<void>
+		create: () => Promise<void>
 	}
 	config: {
 		getNavBar: () => Promise<NavBarConfig>
