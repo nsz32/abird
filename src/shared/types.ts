@@ -2,6 +2,9 @@
  * Types partagés entre main, preload et renderer
  */
 
+// Theme mode
+export type ThemeMode = "system" | "light" | "dark"
+
 // État de navigation (envoyé aux overlays)
 export interface NavigationState {
 	url: string
@@ -61,6 +64,7 @@ export interface RoutingConfig {
 export interface AppConfig {
 	partition: string // Nom de la partition (données isolées)
 	startUrl: string
+	theme?: ThemeMode
 	navBar?: Partial<NavBarConfig>
 	routing?: Partial<RoutingConfig>
 }

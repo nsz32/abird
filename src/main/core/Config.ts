@@ -1,8 +1,8 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { homedir } from "node:os"
 import { join } from "node:path"
-import type { AppConfig, NavBarConfig } from "@shared/types"
-import { navBarConfig$, partition$, routing$, startUrl$ } from "../states"
+import type { AppConfig, NavBarConfig, ThemeMode } from "@shared/types"
+import { navBarConfig$, partition$, routing$, startUrl$, theme$ } from "../states"
 
 const CONFIG_DIR = join(homedir(), ".config", "bird")
 const DEFAULT_CONFIG_FILE = join(CONFIG_DIR, "config.json")
@@ -17,11 +17,13 @@ const defaultNavBarConfig: NavBarConfig = {
 }
 
 interface GlobalConfig {
+	theme: ThemeMode
 	navBar: NavBarConfig
 	apps: Record<string, AppConfig>
 }
 
 const defaultGlobalConfig: GlobalConfig = {
+	theme: "system",
 	navBar: defaultNavBarConfig,
 	apps: {},
 }
@@ -44,6 +46,7 @@ export function loadConfig(customPath?: string | null) {
 		globalConfig = {
 			...defaultGlobalConfig,
 			...loaded,
+			theme: loaded.theme || defaultGlobalConfig.theme,
 			navBar: { ...defaultNavBarConfig, ...loaded.navBar },
 			apps: { ...defaultGlobalConfig.apps, ...loaded.apps },
 		}
@@ -71,6 +74,7 @@ export function selectApp(appName: string): boolean {
 	routing$.emit(app.routing || null)
 	startUrl$.emit(app.startUrl)
 	partition$.emit(app.partition || "default")
+	theme$.emit(app.theme || globalConfig.theme)
 	return true
 }
 

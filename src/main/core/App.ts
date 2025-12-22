@@ -1,5 +1,6 @@
+import { nativeTheme } from "electron"
 import { getTabsList, registerHandlers } from "../ipc/handlers"
-import { activeTab$, contentBounds$, navBarBounds$, navBarConfig$, navState$, tabs$ } from "../states"
+import { activeTab$, contentBounds$, navBarBounds$, navBarConfig$, navState$, tabs$, theme$ } from "../states"
 import { createTab } from "../tabs/Tabs"
 import { NavBar } from "../ui/NavBar"
 import { MainWindow } from "./MainWindow"
@@ -12,6 +13,12 @@ export function startApp() {
 	mainWindow.addView(navBar.view)
 	navBar.setBounds(navBarBounds$.get())
 	navBar.setVisible(navBarConfig$.get().visible)
+
+	// Subscribe theme
+	theme$.subscribe((theme) => {
+		nativeTheme.themeSource = theme
+		console.log(`Theme set to: ${theme} (shouldUseDarkColors: ${nativeTheme.shouldUseDarkColors})`)
+	})
 
 	// Subscribe bounds
 	navBarBounds$.subscribe((bounds) => navBar.setBounds(bounds))
