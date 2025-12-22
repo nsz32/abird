@@ -112,6 +112,7 @@ export function App() {
 							className={`tab-button ${tab.isActive ? "active" : ""}`}
 							onClick={() => window.bird.tabs.activate(tab.id)}
 						>
+							{tab.favicon && <img className="tab-favicon" src={tab.favicon} alt="" />}
 							<span className="tab-title">{tab.title || "New Tab"}</span>
 							<span className="tab-close" onClick={(e) => { e.stopPropagation(); window.bird.tabs.close(tab.id) }}>×</span>
 						</button>

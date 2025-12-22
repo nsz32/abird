@@ -15,6 +15,7 @@ export interface NavigationState {
 export interface TabInfo {
 	id: string
 	title: string
+	favicon: string | null
 	isActive: boolean
 }
 

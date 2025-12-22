@@ -5,6 +5,8 @@ import { closeTab, createTab } from "../tabs/Tabs"
 
 export class SiteView {
 	readonly view: WebContentsView
+	ready = false
+	favicon: string | null = null
 	readonly navState$ = new StateObservable<NavigationState>({
 		url: "",
 		title: "",
@@ -17,6 +19,7 @@ export class SiteView {
 		partition: string,
 		private routingConfig: RoutingConfig | null,
 		private tabId: string,
+		private onReady?: () => void,
 	) {
 		const partitionSession = session.fromPartition(`persist:${partition}`)
 		console.log(`Using partition: ${partition} (${partitionSession.getStoragePath()})`)
@@ -38,7 +41,6 @@ export class SiteView {
 		const wc = this.view.webContents
 
 		wc.on("will-navigate", (event, url) => {
-			console.log("will-navigate:", url)
 			if (!this.shouldHandleUrl(url)) {
 				event.preventDefault()
 				shell.openExternal(url)
@@ -46,7 +48,6 @@ export class SiteView {
 		})
 
 		wc.on("will-redirect", (event, url) => {
-			console.log("will-redirect:", url)
 			if (!this.shouldHandleUrl(url)) {
 				event.preventDefault()
 				shell.openExternal(url)
@@ -58,7 +59,6 @@ export class SiteView {
 		})
 
 		wc.setWindowOpenHandler(({ url }) => {
-			console.log("windowOpen:", url)
 			if (this.shouldHandleUrl(url)) {
 				createTab(url)
 			} else {
@@ -102,12 +102,22 @@ export class SiteView {
 			this.updateNavState()
 		}
 
-		wc.on("did-navigate", update)
+		wc.on("did-navigate", () => {
+			if (!this.ready) {
+				this.ready = true
+				this.onReady?.()
+			}
+			update()
+		})
 		wc.on("did-navigate-in-page", updateWithDedup)
 		wc.on("did-start-loading", update)
 		wc.on("did-stop-loading", update)
 		wc.on("did-finish-load", update)
 		wc.on("page-title-updated", update)
+		wc.on("page-favicon-updated", (_, favicons) => {
+			this.favicon = favicons[0] || null
+			this.onReady?.() // Refresh navbar
+		})
 		wc.on("did-frame-navigate", update)
 	}
 

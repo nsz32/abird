@@ -44,4 +44,8 @@ export class NavBar {
 	onReady(callback: () => void) {
 		this.view.webContents.once("dom-ready", callback)
 	}
+
+	openDevTools() {
+		this.view.webContents.openDevTools({ mode: "detach" })
+	}
 }

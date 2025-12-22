@@ -4,9 +4,8 @@ import { Tab } from "./Tab"
 let unsubscribeNavState: (() => void) | null = null
 
 export function createTab(url?: string, activate = true): Tab {
-	const tab = new Tab(partition$.get(), routing$.get(), url || startUrl$.get())
+	const tab = new Tab(partition$.get(), routing$.get(), url || startUrl$.get(), activate)
 	tabs$.emit([...tabs$.get(), tab])
-	if (activate) activateTab(tab.id)
 	return tab
 }
 

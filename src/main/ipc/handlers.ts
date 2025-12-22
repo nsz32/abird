@@ -6,7 +6,15 @@ import { activateTab, closeTab, createTab } from "../tabs/Tabs"
 
 export function getTabsList(): TabInfo[] {
 	const activeId = activeTab$.get()?.id
-	return tabs$.get().map((t) => ({ id: t.id, title: t.siteView.navState$.get().title || "New Tab", isActive: t.id === activeId }))
+	return tabs$
+		.get()
+		.filter((t) => t.siteView.ready)
+		.map((t) => ({
+			id: t.id,
+			title: t.siteView.navState$.get().title || "New Tab",
+			favicon: t.siteView.favicon,
+			isActive: t.id === activeId,
+		}))
 }
 
 export function registerHandlers() {

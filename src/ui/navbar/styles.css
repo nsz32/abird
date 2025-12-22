@@ -123,6 +123,12 @@ body,
 	color: #fff;
 }
 
+.tab-favicon {
+	width: 16px;
+	height: 16px;
+	flex-shrink: 0;
+}
+
 .tab-title {
 	overflow: hidden;
 	text-overflow: ellipsis;

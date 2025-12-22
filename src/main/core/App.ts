@@ -27,10 +27,10 @@ export function startApp() {
 		mainWindow.bringToFront(navBar.view)
 	})
 
-	// Subscribe active tab - gérer visibilité
+	// Subscribe active tab - gérer visibilité (seulement si ready)
 	activeTab$.subscribe((activeTab) => {
 		for (const t of tabs$.get()) {
-			const isActive = t.id === activeTab?.id
+			const isActive = t.id === activeTab?.id && t.siteView.ready
 			t.siteView.setVisible(isActive)
 			if (isActive) t.siteView.setBounds(contentBounds$.get())
 		}
