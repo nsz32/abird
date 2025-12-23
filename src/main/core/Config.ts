@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { homedir } from "node:os"
 import { join } from "node:path"
 import type { AppConfig, NavBarConfig, ThemeMode } from "@shared/types"
-import { navBarConfig$, partition$, routing$, startUrl$, theme$ } from "../states"
+import { navBarConfig$, partition$, routing$, startUrl$, theme$, userAgent$ } from "../states"
 
 const CONFIG_DIR = join(homedir(), ".config", "bird")
 const DEFAULT_CONFIG_FILE = join(CONFIG_DIR, "config.json")
@@ -75,6 +75,7 @@ export function selectApp(appName: string): boolean {
 	startUrl$.emit(app.startUrl)
 	partition$.emit(app.partition || "default")
 	theme$.emit(app.theme || globalConfig.theme)
+	userAgent$.emit(app.userAgentRaw || app.userAgent || "desktop:bird")
 	return true
 }
 

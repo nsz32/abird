@@ -9,22 +9,18 @@ export function startApp() {
 	const mainWindow = new MainWindow()
 	const navBar = new NavBar()
 
-	// Ajouter navbar
 	mainWindow.addView(navBar.view)
 	navBar.setBounds(navBarBounds$.get())
 	navBar.setVisible(navBarConfig$.get().visible)
 
-	// Subscribe theme
 	theme$.subscribe((theme) => {
 		nativeTheme.themeSource = theme
 		console.log(`Theme set to: ${theme} (shouldUseDarkColors: ${nativeTheme.shouldUseDarkColors})`)
 	})
 
-	// Subscribe bounds
 	navBarBounds$.subscribe((bounds) => navBar.setBounds(bounds))
 	contentBounds$.subscribe((bounds) => activeTab$.get()?.siteView.setBounds(bounds))
 
-	// Subscribe tabs - ajouter les nouvelles vues
 	tabs$.subscribe((tabList) => {
 		for (const tab of tabList) {
 			if (!tab.siteView.view.webContents.hostWebContents) {
@@ -34,7 +30,6 @@ export function startApp() {
 		mainWindow.bringToFront(navBar.view)
 	})
 
-	// Subscribe active tab - gérer visibilité (seulement si ready)
 	activeTab$.subscribe((activeTab) => {
 		for (const t of tabs$.get()) {
 			const isActive = t.id === activeTab?.id && t.siteView.ready
@@ -43,7 +38,6 @@ export function startApp() {
 		}
 	})
 
-	// Sync vers navbar
 	const syncNavbar = () => {
 		navBar.sendNavigationState(navState$.get())
 		navBar.sendTabsList(getTabsList())
@@ -52,10 +46,8 @@ export function startApp() {
 	tabs$.subscribe(syncNavbar)
 	activeTab$.subscribe(syncNavbar)
 
-	// IPC
 	registerHandlers()
 
-	// Start
 	navBar.load()
 	navBar.onReady(() => mainWindow.show())
 	createTab()

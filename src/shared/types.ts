@@ -65,6 +65,8 @@ export interface AppConfig {
 	partition: string // Nom de la partition (données isolées)
 	startUrl: string
 	theme?: ThemeMode
+	userAgent?: string // Shortcode: "mobile:chrome", "desktop:firefox:linux"
+	userAgentRaw?: string // UA custom brut (prioritaire sur userAgent)
 	navBar?: Partial<NavBarConfig>
 	routing?: Partial<RoutingConfig>
 }

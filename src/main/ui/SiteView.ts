@@ -2,6 +2,7 @@ import type { NavigationState, RoutingConfig } from "@shared/types"
 import { type Rectangle, WebContentsView, session, shell } from "electron"
 import { StateObservable } from "../api/observable"
 import { closeTab, createTab } from "../tabs/Tabs"
+import { resolveUserAgent } from "../utils/userAgents"
 
 export class SiteView {
 	readonly view: WebContentsView
@@ -19,10 +20,16 @@ export class SiteView {
 		partition: string,
 		private routingConfig: RoutingConfig | null,
 		private tabId: string,
+		userAgent: string,
 		private onReady?: () => void,
 	) {
 		const partitionSession = session.fromPartition(`persist:${partition}`)
 		console.log(`Using partition: ${partition} (${partitionSession.getStoragePath()})`)
+
+		// Appliquer le User-Agent
+		const ua = resolveUserAgent(userAgent)
+		partitionSession.setUserAgent(ua)
+		console.log(`Using User-Agent: ${ua.substring(0, 80)}...`)
 
 		this.view = new WebContentsView({
 			webPreferences: {
@@ -68,9 +75,10 @@ export class SiteView {
 			}
 		})
 
-		wc.setWindowOpenHandler(({ url }) => {
+		wc.setWindowOpenHandler(({ url, disposition }) => {
 			if (this.shouldHandleUrl(url)) {
-				createTab(url)
+				const activate = disposition !== "background-tab"
+				createTab(url, activate)
 			} else {
 				shell.openExternal(url)
 			}
@@ -120,10 +128,11 @@ export class SiteView {
 				::-webkit-scrollbar-thumb:hover { background: #5a5a7e; }
 				::-webkit-scrollbar-corner { background: #1a1a2e; }
 			`)
-			if (!this.ready) {
-				this.ready = true
-				this.onReady?.()
-			}
+			update()
+		})
+		wc.once("did-start-loading", () => {
+			this.ready = true
+			this.onReady?.()
 			update()
 		})
 		wc.on("did-navigate-in-page", updateWithDedup)

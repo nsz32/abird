@@ -9,9 +9,9 @@ export class Tab {
 	readonly id: string
 	readonly siteView: SiteView
 
-	constructor(partition: string, routing: RoutingConfig | null, url: string, shouldActivate: boolean) {
+	constructor(partition: string, routing: RoutingConfig | null, url: string, userAgent: string, shouldActivate: boolean) {
 		this.id = `tab-${nextId++}`
-		this.siteView = new SiteView(partition, routing, this.id, () => {
+		this.siteView = new SiteView(partition, routing, this.id, userAgent, () => {
 			if (shouldActivate) {
 				activateTab(this.id)
 			} else {

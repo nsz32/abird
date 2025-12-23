@@ -26,6 +26,7 @@
 		"news": {
 			"partition": "google",
 			"startUrl": "https://news.google.com",
+			"userAgent": "desktop:firefox:linux",
 			"routing": {
 				"internal": "^https://[^/]*\\.google\\.com"
 			}

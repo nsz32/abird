@@ -20,6 +20,7 @@ export const routing$ = new StateObservable<RoutingConfig | null>(null)
 export const startUrl$ = new StateObservable<string>("about:blank")
 export const partition$ = new StateObservable<string>("default")
 export const theme$ = new StateObservable<ThemeMode>("system")
+export const userAgent$ = new StateObservable<string>("desktop:bird")
 
 // Window
 export const windowBounds$ = new StateObservable<Rectangle>({ x: 0, y: 0, width: 0, height: 0 })

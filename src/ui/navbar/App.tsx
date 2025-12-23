@@ -114,10 +114,20 @@ export function App() {
 						>
 							{tab.favicon && <img className="tab-favicon" src={tab.favicon} alt="" />}
 							<span className="tab-title">{tab.title || "New Tab"}</span>
-							<span className="tab-close" onClick={(e) => { e.stopPropagation(); window.bird.tabs.close(tab.id) }}>×</span>
+							<span
+								className="tab-close"
+								onClick={(e) => {
+									e.stopPropagation()
+									window.bird.tabs.close(tab.id)
+								}}
+							>
+								×
+							</span>
 						</button>
 					))}
-					<button type="button" className="tab-add" onClick={() => window.bird.tabs.create()}>+</button>
+					<button type="button" className="tab-add" onClick={() => window.bird.tabs.create()}>
+						+
+					</button>
 				</div>
 			)}
 		</div>

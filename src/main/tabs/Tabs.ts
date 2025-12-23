@@ -1,10 +1,10 @@
-import { activeTab$, navState$, partition$, routing$, startUrl$, tabs$ } from "../states"
+import { activeTab$, navState$, partition$, routing$, startUrl$, tabs$, userAgent$ } from "../states"
 import { Tab } from "./Tab"
 
 let unsubscribeNavState: (() => void) | null = null
 
 export function createTab(url?: string, activate = true): Tab {
-	const tab = new Tab(partition$.get(), routing$.get(), url || startUrl$.get(), activate)
+	const tab = new Tab(partition$.get(), routing$.get(), url || startUrl$.get(), userAgent$.get(), activate)
 	tabs$.emit([...tabs$.get(), tab])
 	return tab
 }
