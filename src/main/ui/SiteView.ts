@@ -40,14 +40,24 @@ export class SiteView {
 	private setupRouting() {
 		const wc = this.view.webContents
 
-		wc.on("will-navigate", (event, url) => {
+		wc.on("will-navigate", async (event, url) => {
+			console.log("will-navigate:", url)
 			if (!this.shouldHandleUrl(url)) {
 				event.preventDefault()
 				shell.openExternal(url)
+				// Fermer le tab s'il est vide (page de redirection JS)
+				if (!wc.navigationHistory.canGoBack()) {
+					const innerTextLength = await wc.executeJavaScript("document.body?.innerText.trim().length || 0")
+					console.log("will-navigate: innerTextLength =", innerTextLength)
+					if (innerTextLength === 0) {
+						closeTab(this.tabId)
+					}
+				}
 			}
 		})
 
 		wc.on("will-redirect", (event, url) => {
+			console.log("will-redirect:", url)
 			if (!this.shouldHandleUrl(url)) {
 				event.preventDefault()
 				shell.openExternal(url)
