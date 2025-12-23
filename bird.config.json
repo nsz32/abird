@@ -1,7 +1,7 @@
 {
 	"theme": "dark",
 	"navBar": {
-		"position": "top",
+		"position": "bottom",
 		"visible": true,
 		"autoHide": false,
 		"urlEditable": true,

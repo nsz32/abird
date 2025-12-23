@@ -3,9 +3,13 @@ import { Tab } from "./Tab"
 
 let unsubscribeNavState: (() => void) | null = null
 
-export function createTab(url?: string, activate = true): Tab {
-	const tab = new Tab(partition$.get(), routing$.get(), url || startUrl$.get(), userAgent$.get(), activate)
-	tabs$.emit([...tabs$.get(), tab])
+export function createTab(url?: string, activate = true, position: "start" | "end" = "end"): Tab {
+	const tab = new Tab(partition$.get(), routing$.get(), url || startUrl$.get(), userAgent$.get())
+	const currentTabs = tabs$.get()
+	tabs$.emit(position === "start" ? [tab, ...currentTabs] : [...currentTabs, tab])
+	if (activate) {
+		activateTab(tab.id)
+	}
 	return tab
 }
 

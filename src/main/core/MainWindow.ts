@@ -1,8 +1,9 @@
 import { BaseWindow, type WebContentsView } from "electron"
-import { windowBounds$ } from "../states"
+import { tabs$, windowBounds$ } from "../states"
 
 export class MainWindow {
 	readonly window: BaseWindow
+	private navBarView: WebContentsView | null = null
 
 	constructor() {
 		this.window = new BaseWindow({
@@ -16,6 +17,15 @@ export class MainWindow {
 		this.window.on("resize", () => this.updateBounds())
 		this.window.on("enter-full-screen", () => this.updateBounds())
 		this.window.on("leave-full-screen", () => this.updateBounds())
+
+		tabs$.subscribe((tabList) => {
+			for (const tab of tabList) {
+				if (!tab.siteView.view.webContents.hostWebContents) {
+					this.addView(tab.siteView.view)
+				}
+			}
+			if (this.navBarView) this.bringToFront(this.navBarView)
+		})
 	}
 
 	private updateBounds() {
@@ -31,7 +41,12 @@ export class MainWindow {
 		this.window.contentView.addChildView(view)
 	}
 
-	bringToFront(view: WebContentsView) {
+	setNavBar(view: WebContentsView) {
+		this.navBarView = view
+		this.addView(view)
+	}
+
+	private bringToFront(view: WebContentsView) {
 		this.window.contentView.removeChildView(view)
 		this.window.contentView.addChildView(view)
 	}

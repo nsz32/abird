@@ -97,6 +97,8 @@ body,
 	align-items: center;
 	gap: 4px;
 	margin-left: 8px;
+	flex: 1;
+	min-width: 0;
 }
 
 .tab-button {
@@ -111,7 +113,8 @@ body,
 	color: #aaa;
 	font-size: 12px;
 	cursor: pointer;
-	max-width: 150px;
+	flex: 1;
+	min-width: 0;
 }
 
 .tab-button:hover {
@@ -133,10 +136,10 @@ body,
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+	flex: 1;
 }
 
 .tab-close {
-	font-size: 14px;
 	opacity: 0.5;
 }
 
@@ -158,4 +161,13 @@ body,
 .tab-add:hover {
 	background: rgba(255, 255, 255, 0.1);
 	color: #fff;
+}
+
+.spinning {
+	animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+	from { transform: rotate(0deg); }
+	to { transform: rotate(360deg); }
 }

@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld("bird", {
 		back: () => ipcRenderer.invoke(IpcChannels.NAVIGATION_BACK),
 		forward: () => ipcRenderer.invoke(IpcChannels.NAVIGATION_FORWARD),
 		reload: (ignoreCache?: boolean) => ipcRenderer.invoke(IpcChannels.NAVIGATION_RELOAD, ignoreCache),
+		stop: () => ipcRenderer.invoke(IpcChannels.NAVIGATION_STOP),
 		goTo: (url: string) => ipcRenderer.invoke(IpcChannels.NAVIGATION_GO_TO, url),
 		getState: (): Promise<NavigationState> => ipcRenderer.invoke(IpcChannels.NAVIGATION_GET_STATE),
 		onStateChanged: (callback: (state: NavigationState) => void): (() => void) => {
@@ -24,7 +25,7 @@ contextBridge.exposeInMainWorld("bird", {
 		},
 		activate: (id: string) => ipcRenderer.invoke(IpcChannels.TABS_ACTIVATE, id),
 		close: (id: string) => ipcRenderer.invoke(IpcChannels.TABS_CLOSE, id),
-		create: () => ipcRenderer.invoke(IpcChannels.TABS_CREATE),
+		create: (position?: "start" | "end") => ipcRenderer.invoke(IpcChannels.TABS_CREATE, position),
 	},
 	config: {
 		getNavBar: (): Promise<NavBarConfig> => ipcRenderer.invoke(IpcChannels.CONFIG_GET_NAVBAR),

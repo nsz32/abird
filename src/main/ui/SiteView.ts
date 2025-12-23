@@ -200,6 +200,10 @@ export class SiteView {
 		}
 	}
 
+	stop() {
+		this.view.webContents.stop()
+	}
+
 	goTo(url: string) {
 		let normalized = url.trim()
 		if (!normalized.startsWith("http://") && !normalized.startsWith("https://")) {

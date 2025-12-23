@@ -9,30 +9,17 @@ export function startApp() {
 	const mainWindow = new MainWindow()
 	const navBar = new NavBar()
 
-	mainWindow.addView(navBar.view)
+	mainWindow.setNavBar(navBar.view)
 	navBar.setBounds(navBarBounds$.get())
 	navBar.setVisible(navBarConfig$.get().visible)
 
-	theme$.subscribe((theme) => {
-		nativeTheme.themeSource = theme
-		console.log(`Theme set to: ${theme} (shouldUseDarkColors: ${nativeTheme.shouldUseDarkColors})`)
-	})
-
+	theme$.subscribe((theme) => nativeTheme.themeSource = theme)
 	navBarBounds$.subscribe((bounds) => navBar.setBounds(bounds))
 	contentBounds$.subscribe((bounds) => activeTab$.get()?.siteView.setBounds(bounds))
 
-	tabs$.subscribe((tabList) => {
-		for (const tab of tabList) {
-			if (!tab.siteView.view.webContents.hostWebContents) {
-				mainWindow.addView(tab.siteView.view)
-			}
-		}
-		mainWindow.bringToFront(navBar.view)
-	})
-
 	activeTab$.subscribe((activeTab) => {
 		for (const t of tabs$.get()) {
-			const isActive = t.id === activeTab?.id && t.siteView.ready
+			const isActive = t.id === activeTab?.id
 			t.siteView.setVisible(isActive)
 			if (isActive) t.siteView.setBounds(contentBounds$.get())
 		}

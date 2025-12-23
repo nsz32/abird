@@ -8,16 +8,14 @@ let nextId = 1
 export class Tab {
 	readonly id: string
 	readonly siteView: SiteView
+	readonly initialUrl: string
 
-	constructor(partition: string, routing: RoutingConfig | null, url: string, userAgent: string, shouldActivate: boolean) {
+	constructor(partition: string, routing: RoutingConfig | null, url: string, userAgent: string) {
 		this.id = `tab-${nextId++}`
+		this.initialUrl = url
 		this.siteView = new SiteView(partition, routing, this.id, userAgent, () => {
-			if (shouldActivate) {
-				activateTab(this.id)
-			} else {
-				// Refresh navbar pour afficher le nouveau tab
-				activeTab$.emit(activeTab$.get())
-			}
+			// Refresh navbar pour afficher le nouveau tab dans la liste
+			activeTab$.emit(activeTab$.get())
 		})
 		this.siteView.loadURL(url)
 	}

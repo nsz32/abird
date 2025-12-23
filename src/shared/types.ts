@@ -18,8 +18,10 @@ export interface NavigationState {
 export interface TabInfo {
 	id: string
 	title: string
+	url: string
 	favicon: string | null
 	isActive: boolean
+	isLoading: boolean
 }
 
 // Canaux IPC (évite les typos, autocomplétion)
@@ -28,6 +30,7 @@ export const IpcChannels = {
 	NAVIGATION_BACK: "bird:navigation:back",
 	NAVIGATION_FORWARD: "bird:navigation:forward",
 	NAVIGATION_RELOAD: "bird:navigation:reload",
+	NAVIGATION_STOP: "bird:navigation:stop",
 	NAVIGATION_GO_TO: "bird:navigation:go-to",
 	NAVIGATION_GET_STATE: "bird:navigation:get-state",
 	NAVIGATION_STATE_CHANGED: "bird:navigation:state-changed",
@@ -77,6 +80,7 @@ export interface BirdApi {
 		back: () => Promise<void>
 		forward: () => Promise<void>
 		reload: (ignoreCache?: boolean) => Promise<void>
+		stop: () => Promise<void>
 		goTo: (url: string) => Promise<void>
 		getState: () => Promise<NavigationState>
 		onStateChanged: (callback: (state: NavigationState) => void) => () => void
@@ -86,7 +90,7 @@ export interface BirdApi {
 		onListChanged: (callback: (tabs: TabInfo[]) => void) => () => void
 		activate: (id: string) => Promise<void>
 		close: (id: string) => Promise<void>
-		create: () => Promise<void>
+		create: (position?: "start" | "end") => Promise<void>
 	}
 	config: {
 		getNavBar: () => Promise<NavBarConfig>

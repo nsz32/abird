@@ -1,4 +1,5 @@
 import type { NavBarConfig, NavigationState, TabInfo } from "@shared/types"
+import { ArrowLeft, ArrowRight, HousePlus, LoaderCircle, RotateCw, X } from "lucide-react"
 import { useEffect, useState } from "react"
 
 interface NavButtonProps {
@@ -79,41 +80,42 @@ export function App() {
 			{config.showBackForward && (
 				<>
 					<NavButton onClick={() => window.bird.navigation.back()} disabled={!state.canGoBack}>
-						&#8592;
+						<ArrowLeft size={16} />
 					</NavButton>
 					<NavButton onClick={() => window.bird.navigation.forward()} disabled={!state.canGoForward}>
-						&#8594;
+						<ArrowRight size={16} />
 					</NavButton>
 				</>
 			)}
-			{config.showReload && <NavButton onClick={() => window.bird.navigation.reload()}>{state.isLoading ? "..." : "↻"}</NavButton>}
-			{config.urlEditable ? (
-				<form className="url-form" onSubmit={handleUrlSubmit}>
-					<input
-						type="text"
-						className="url-input"
-						value={inputUrl}
-						onChange={(e) => setInputUrl(e.target.value)}
-						onFocus={handleInputFocus}
-						onBlur={handleInputBlur}
-						onKeyDown={handleKeyDown}
-						spellCheck={false}
-					/>
-				</form>
-			) : (
-				<span className="url-display">{state.url}</span>
+			{config.showReload && (
+				state.isLoading ? (
+					<NavButton onClick={() => window.bird.navigation.stop()}>
+						<X size={16} strokeWidth={2.5} />
+					</NavButton>
+				) : (
+					<NavButton onClick={() => window.bird.navigation.reload()}>
+						<RotateCw size={16} />
+					</NavButton>
+				)
 			)}
-			{tabs.length > 1 && (
-				<div className="tabs-list">
-					{tabs.map((tab) => (
-						<button
-							key={tab.id}
-							type="button"
-							className={`tab-button ${tab.isActive ? "active" : ""}`}
-							onClick={() => window.bird.tabs.activate(tab.id)}
-						>
-							{tab.favicon && <img className="tab-favicon" src={tab.favicon} alt="" />}
-							<span className="tab-title">{tab.title || "New Tab"}</span>
+			<NavButton onClick={() => window.bird.tabs.create("start")}>
+				<HousePlus size={16} />
+			</NavButton>
+			<div className="tabs-list">
+				{tabs.map((tab) => (
+					<button
+						key={tab.id}
+						type="button"
+						className={`tab-button ${tab.isActive ? "active" : ""}`}
+						onClick={() => window.bird.tabs.activate(tab.id)}
+					>
+						{tab.isLoading ? (
+							<LoaderCircle size={16} className="tab-favicon spinning" />
+						) : (
+							tab.favicon && <img className="tab-favicon" src={tab.favicon} alt="" />
+						)}
+						<span className="tab-title">{tab.title || tab.url}</span>
+						{tabs.length > 1 && (
 							<span
 								className="tab-close"
 								onClick={(e) => {
@@ -121,15 +123,12 @@ export function App() {
 									window.bird.tabs.close(tab.id)
 								}}
 							>
-								×
+								<X size={16} strokeWidth={2.5} />
 							</span>
-						</button>
-					))}
-					<button type="button" className="tab-add" onClick={() => window.bird.tabs.create()}>
-						+
+						)}
 					</button>
-				</div>
-			)}
+				))}
+			</div>
 		</div>
 	)
 }
