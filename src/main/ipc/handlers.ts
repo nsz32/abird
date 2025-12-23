@@ -29,6 +29,6 @@ export function registerHandlers() {
 	ipcMain.handle(IpcChannels.TABS_GET_LIST, () => getTabsList())
 	ipcMain.handle(IpcChannels.TABS_ACTIVATE, (_, id: string) => activateTab(id))
 	ipcMain.handle(IpcChannels.TABS_CLOSE, (_, id: string) => closeTab(id))
-	ipcMain.handle(IpcChannels.TABS_CREATE, (_, position?: "start" | "end") => createTab(undefined, true, position))
+	ipcMain.handle(IpcChannels.TABS_CREATE, (_, index?: number) => createTab(undefined, true, index))
 	ipcMain.handle(IpcChannels.CONFIG_GET_NAVBAR, () => navBarConfig$.get())
 }

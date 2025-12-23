@@ -57,6 +57,15 @@ export interface NavBarConfig {
 	showReload: boolean
 }
 
+export const defaultNavBarConfig: NavBarConfig = {
+	position: "top",
+	visible: true,
+	autoHide: false,
+	urlEditable: true,
+	showBackForward: true,
+	showReload: true,
+}
+
 // Configuration du routage des URLs
 export interface RoutingConfig {
 	internal: string | string[] // URLs internes (regex ^... ou baseUrl)
@@ -90,7 +99,7 @@ export interface BirdApi {
 		onListChanged: (callback: (tabs: TabInfo[]) => void) => () => void
 		activate: (id: string) => Promise<void>
 		close: (id: string) => Promise<void>
-		create: (position?: "start" | "end") => Promise<void>
+		create: (index?: number) => Promise<void>
 	}
 	config: {
 		getNavBar: () => Promise<NavBarConfig>

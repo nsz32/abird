@@ -1,20 +1,11 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { homedir } from "node:os"
 import { join } from "node:path"
-import type { AppConfig, NavBarConfig, ThemeMode } from "@shared/types"
+import { type AppConfig, type NavBarConfig, type ThemeMode, defaultNavBarConfig } from "@shared/types"
 import { navBarConfig$, partition$, routing$, startUrl$, theme$, userAgent$ } from "../states"
 
 const CONFIG_DIR = join(homedir(), ".config", "bird")
 const DEFAULT_CONFIG_FILE = join(CONFIG_DIR, "config.json")
-
-const defaultNavBarConfig: NavBarConfig = {
-	position: "top",
-	visible: true,
-	autoHide: false,
-	urlEditable: true,
-	showBackForward: true,
-	showReload: true,
-}
 
 interface GlobalConfig {
 	theme: ThemeMode

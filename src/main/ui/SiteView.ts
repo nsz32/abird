@@ -1,13 +1,17 @@
-import type { NavigationState, RoutingConfig } from "@shared/types"
+import type { NavigationState } from "@shared/types"
 import { type Rectangle, WebContentsView, session, shell } from "electron"
 import { StateObservable } from "../api/observable"
-import { closeTab, createTab } from "../tabs/Tabs"
+import type { UrlRouter } from "../routing/UrlRouter"
+import { closeTab, createTab, getTabIndex } from "../tabs/Tabs"
 import { resolveUserAgent } from "../utils/userAgents"
+
+const MIN_READY_DELAY = 150
 
 export class SiteView {
 	readonly view: WebContentsView
 	ready = false
 	favicon: string | null = null
+	private readonly createdAt = Date.now()
 	readonly navState$ = new StateObservable<NavigationState>({
 		url: "",
 		title: "",
@@ -18,7 +22,7 @@ export class SiteView {
 
 	constructor(
 		partition: string,
-		private routingConfig: RoutingConfig | null,
+		private router: UrlRouter,
 		private tabId: string,
 		userAgent: string,
 		private onReady?: () => void,
@@ -49,7 +53,7 @@ export class SiteView {
 
 		wc.on("will-navigate", async (event, url) => {
 			console.log("will-navigate:", url)
-			if (!this.shouldHandleUrl(url)) {
+			if (!this.router.shouldHandle(url)) {
 				event.preventDefault()
 				shell.openExternal(url)
 				// Fermer le tab s'il est vide (page de redirection JS)
@@ -65,7 +69,7 @@ export class SiteView {
 
 		wc.on("will-redirect", (event, url) => {
 			console.log("will-redirect:", url)
-			if (!this.shouldHandleUrl(url)) {
+			if (!this.router.shouldHandle(url)) {
 				event.preventDefault()
 				shell.openExternal(url)
 				// Fermer le tab s'il n'a pas d'historique (tab créé juste pour ce lien)
@@ -76,9 +80,10 @@ export class SiteView {
 		})
 
 		wc.setWindowOpenHandler(({ url, disposition }) => {
-			if (this.shouldHandleUrl(url)) {
+			if (this.router.shouldHandle(url)) {
 				const activate = disposition !== "background-tab"
-				createTab(url, activate)
+				const parentIndex = getTabIndex(this.tabId)
+				createTab(url, activate, parentIndex + 1)
 			} else {
 				shell.openExternal(url)
 			}
@@ -88,28 +93,6 @@ export class SiteView {
 		wc.session.on("will-download", (_event, item) => {
 			console.log(`Download started: ${item.getFilename()} from ${item.getURL()}`)
 		})
-	}
-
-	private shouldHandleUrl(url: string): boolean {
-		if (!url || url.startsWith("about:") || url.startsWith("javascript:") || url.startsWith("data:")) {
-			return true
-		}
-		return this.isInternalUrl(url) || this.isDownloadAllowed(url)
-	}
-
-	private isInternalUrl(url: string): boolean {
-		if (!this.routingConfig) return false
-		return this.matchesPatterns(url, this.routingConfig.internal)
-	}
-
-	private isDownloadAllowed(url: string): boolean {
-		if (!this.routingConfig?.download) return false
-		return this.matchesPatterns(url, this.routingConfig.download)
-	}
-
-	private matchesPatterns(url: string, patterns: string | string[]): boolean {
-		const list = Array.isArray(patterns) ? patterns : [patterns]
-		return list.some((p) => (p.startsWith("^") ? new RegExp(p).test(url) : url.startsWith(p)))
 	}
 
 	private setupListeners() {
@@ -131,9 +114,19 @@ export class SiteView {
 			update()
 		})
 		wc.once("did-start-loading", () => {
-			this.ready = true
-			this.onReady?.()
-			update()
+			const elapsed = Date.now() - this.createdAt
+			const remaining = MIN_READY_DELAY - elapsed
+			if (remaining <= 0) {
+				this.ready = true
+				this.onReady?.()
+				update()
+			} else {
+				setTimeout(() => {
+					this.ready = true
+					this.onReady?.()
+					update()
+				}, remaining)
+			}
 		})
 		wc.on("did-navigate-in-page", updateWithDedup)
 		wc.on("did-start-loading", update)

@@ -1,44 +1,60 @@
 import { activeTab$, navState$, partition$, routing$, startUrl$, tabs$, userAgent$ } from "../states"
 import { Tab } from "./Tab"
 
-let unsubscribeNavState: (() => void) | null = null
+class TabManager {
+	private unsubscribeNavState: (() => void) | null = null
 
-export function createTab(url?: string, activate = true, position: "start" | "end" = "end"): Tab {
-	const tab = new Tab(partition$.get(), routing$.get(), url || startUrl$.get(), userAgent$.get())
-	const currentTabs = tabs$.get()
-	tabs$.emit(position === "start" ? [tab, ...currentTabs] : [...currentTabs, tab])
-	if (activate) {
-		activateTab(tab.id)
+	create(url?: string, activate = true, index?: number): Tab {
+		const tab = new Tab(partition$.get(), routing$.get(), url || startUrl$.get(), userAgent$.get())
+		const currentTabs = tabs$.get()
+		const insertAt = index ?? currentTabs.length
+		const newTabs = [...currentTabs.slice(0, insertAt), tab, ...currentTabs.slice(insertAt)]
+		tabs$.emit(newTabs)
+		if (activate) {
+			this.activate(tab.id)
+		}
+		return tab
 	}
-	return tab
-}
 
-export function closeTab(id: string) {
-	const list = tabs$.get()
-	const index = list.findIndex((t) => t.id === id)
-	if (index === -1) return
+	close(id: string) {
+		const list = tabs$.get()
+		const index = list.findIndex((t) => t.id === id)
+		if (index === -1) return
 
-	const newList = list.filter((t) => t.id !== id)
-	tabs$.emit(newList)
+		const newList = list.filter((t) => t.id !== id)
+		tabs$.emit(newList)
 
-	if (activeTab$.get()?.id === id) {
-		if (newList.length > 0) {
-			activateTab(newList[Math.min(index, newList.length - 1)].id)
-		} else {
-			activeTab$.emit(null)
+		if (activeTab$.get()?.id === id) {
+			if (newList.length > 0) {
+				const newIndex = index > 0 ? index - 1 : 0
+				this.activate(newList[newIndex].id)
+			} else {
+				activeTab$.emit(null)
+			}
 		}
 	}
+
+	getIndex(id: string): number {
+		return tabs$.get().findIndex((t) => t.id === id)
+	}
+
+	activate(id: string) {
+		const tab = tabs$.get().find((t) => t.id === id)
+		if (!tab) return
+
+		if (this.unsubscribeNavState) {
+			this.unsubscribeNavState()
+		}
+
+		this.unsubscribeNavState = tab.siteView.navState$.subscribe((state) => navState$.emit(state))
+		activeTab$.emit(tab)
+	}
 }
 
-export function activateTab(id: string) {
-	const tab = tabs$.get().find((t) => t.id === id)
-	if (!tab) return
+export const tabManager = new TabManager()
 
-	// Désabonner l'ancien
-	if (unsubscribeNavState) unsubscribeNavState()
-
-	// Abonner le nouveau
-	unsubscribeNavState = tab.siteView.navState$.subscribe((state) => navState$.emit(state))
-
-	activeTab$.emit(tab)
-}
+// Exports pour compatibilité
+export const createTab = tabManager.create.bind(tabManager)
+export const closeTab = tabManager.close.bind(tabManager)
+export const getTabIndex = tabManager.getIndex.bind(tabManager)
+export const activateTab = tabManager.activate.bind(tabManager)

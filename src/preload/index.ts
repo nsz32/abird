@@ -25,7 +25,7 @@ contextBridge.exposeInMainWorld("bird", {
 		},
 		activate: (id: string) => ipcRenderer.invoke(IpcChannels.TABS_ACTIVATE, id),
 		close: (id: string) => ipcRenderer.invoke(IpcChannels.TABS_CLOSE, id),
-		create: (position?: "start" | "end") => ipcRenderer.invoke(IpcChannels.TABS_CREATE, position),
+		create: (index?: number) => ipcRenderer.invoke(IpcChannels.TABS_CREATE, index),
 	},
 	config: {
 		getNavBar: (): Promise<NavBarConfig> => ipcRenderer.invoke(IpcChannels.CONFIG_GET_NAVBAR),

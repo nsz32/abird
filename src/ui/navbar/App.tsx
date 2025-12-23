@@ -26,52 +26,19 @@ export function App() {
 	})
 
 	const [config, setConfig] = useState<NavBarConfig | null>(null)
-	const [inputUrl, setInputUrl] = useState("")
-	const [isEditing, setIsEditing] = useState(false)
 	const [tabs, setTabs] = useState<TabInfo[]>([])
 
 	useEffect(() => {
 		window.bird.config.getNavBar().then(setConfig)
-		window.bird.navigation.getState().then((s) => {
-			setState(s)
-			setInputUrl(s.url)
-		})
+		window.bird.navigation.getState().then(setState)
 		window.bird.tabs.getList().then(setTabs)
-		const unsubscribeNav = window.bird.navigation.onStateChanged((s) => {
-			setState(s)
-			if (!isEditing) setInputUrl(s.url)
-		})
+		const unsubscribeNav = window.bird.navigation.onStateChanged(setState)
 		const unsubscribeTabs = window.bird.tabs.onListChanged(setTabs)
 		return () => {
 			unsubscribeNav()
 			unsubscribeTabs()
 		}
-	}, [isEditing])
-
-	const handleUrlSubmit = (e: React.FormEvent) => {
-		e.preventDefault()
-		if (inputUrl.trim()) {
-			window.bird.navigation.goTo(inputUrl.trim())
-			setIsEditing(false)
-		}
-	}
-
-	const handleInputFocus = () => {
-		setIsEditing(true)
-	}
-
-	const handleInputBlur = () => {
-		setIsEditing(false)
-		setInputUrl(state.url)
-	}
-
-	const handleKeyDown = (e: React.KeyboardEvent) => {
-		if (e.key === "Escape") {
-			setIsEditing(false)
-			setInputUrl(state.url)
-			;(e.target as HTMLInputElement).blur()
-		}
-	}
+	}, [])
 
 	if (!config) return null
 
@@ -87,8 +54,8 @@ export function App() {
 					</NavButton>
 				</>
 			)}
-			{config.showReload && (
-				state.isLoading ? (
+			{config.showReload &&
+				(state.isLoading ? (
 					<NavButton onClick={() => window.bird.navigation.stop()}>
 						<X size={16} strokeWidth={2.5} />
 					</NavButton>
@@ -96,9 +63,8 @@ export function App() {
 					<NavButton onClick={() => window.bird.navigation.reload()}>
 						<RotateCw size={16} />
 					</NavButton>
-				)
-			)}
-			<NavButton onClick={() => window.bird.tabs.create("start")}>
+				))}
+			<NavButton onClick={() => window.bird.tabs.create(0)}>
 				<HousePlus size={16} />
 			</NavButton>
 			<div className="tabs-list">
@@ -116,7 +82,8 @@ export function App() {
 						)}
 						<span className="tab-title">{tab.title || tab.url}</span>
 						{tabs.length > 1 && (
-							<span
+							<button
+								type="button"
 								className="tab-close"
 								onClick={(e) => {
 									e.stopPropagation()
@@ -124,7 +91,7 @@ export function App() {
 								}}
 							>
 								<X size={16} strokeWidth={2.5} />
-							</span>
+							</button>
 						)}
 					</button>
 				))}

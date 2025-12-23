@@ -124,6 +124,7 @@ body,
 .tab-button.active {
 	background: rgba(100, 150, 255, 0.2);
 	color: #fff;
+	cursor: default;
 }
 
 .tab-favicon {
@@ -140,7 +141,16 @@ body,
 }
 
 .tab-close {
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	opacity: 0.5;
+	flex-shrink: 0;
+	cursor: pointer;
+	background: none;
+	border: none;
+	padding: 0;
+	color: inherit;
 }
 
 .tab-close:hover {
@@ -168,6 +178,10 @@ body,
 }
 
 @keyframes spin {
-	from { transform: rotate(0deg); }
-	to { transform: rotate(360deg); }
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
 }
