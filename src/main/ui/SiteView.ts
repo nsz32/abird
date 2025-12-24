@@ -1,36 +1,28 @@
-import type { NavigationState } from "@shared/types"
+import type { NavigationState, RoutingConfig } from "@shared/types"
 import { type Rectangle, WebContentsView, session, shell } from "electron"
-import { StateObservable } from "../api/observable"
-import type { UrlRouter } from "../routing/UrlRouter"
-import { closeTab, createTab, getTabIndex } from "../tabs/Tabs"
+import { shouldHandleUrl } from "../routing/UrlRouter"
 import { resolveUserAgent } from "../utils/userAgents"
 
-const MIN_READY_DELAY = 150
+export interface SiteViewCallbacks {
+	onNavStateChanged?: (state: NavigationState) => void
+	onFaviconChanged?: (favicon: string | null) => void
+	onFirstLoad?: () => void
+	onNewTab?: (url: string, activate: boolean) => void
+	onCloseTab?: () => void
+}
 
 export class SiteView {
 	readonly view: WebContentsView
-	ready = false
-	favicon: string | null = null
-	private readonly createdAt = Date.now()
-	readonly navState$ = new StateObservable<NavigationState>({
-		url: "",
-		title: "",
-		canGoBack: false,
-		canGoForward: false,
-		isLoading: false,
-	})
 
 	constructor(
 		partition: string,
-		private router: UrlRouter,
-		private tabId: string,
+		private routing: Partial<RoutingConfig> | null,
 		userAgent: string,
-		private onReady?: () => void,
+		private callbacks: SiteViewCallbacks = {},
 	) {
 		const partitionSession = session.fromPartition(`persist:${partition}`)
 		console.log(`Using partition: ${partition} (${partitionSession.getStoragePath()})`)
 
-		// Appliquer le User-Agent
 		const ua = resolveUserAgent(userAgent)
 		partitionSession.setUserAgent(ua)
 		console.log(`Using User-Agent: ${ua.substring(0, 80)}...`)
@@ -53,15 +45,14 @@ export class SiteView {
 
 		wc.on("will-navigate", async (event, url) => {
 			console.log("will-navigate:", url)
-			if (!this.router.shouldHandle(url)) {
+			if (!shouldHandleUrl(url, this.routing)) {
 				event.preventDefault()
 				shell.openExternal(url)
-				// Fermer le tab s'il est vide (page de redirection JS)
 				if (!wc.navigationHistory.canGoBack()) {
 					const innerTextLength = await wc.executeJavaScript("document.body?.innerText.trim().length || 0")
 					console.log("will-navigate: innerTextLength =", innerTextLength)
 					if (innerTextLength === 0) {
-						closeTab(this.tabId)
+						this.callbacks.onCloseTab?.()
 					}
 				}
 			}
@@ -69,21 +60,19 @@ export class SiteView {
 
 		wc.on("will-redirect", (event, url) => {
 			console.log("will-redirect:", url)
-			if (!this.router.shouldHandle(url)) {
+			if (!shouldHandleUrl(url, this.routing)) {
 				event.preventDefault()
 				shell.openExternal(url)
-				// Fermer le tab s'il n'a pas d'historique (tab créé juste pour ce lien)
 				if (!wc.navigationHistory.canGoBack()) {
-					closeTab(this.tabId)
+					this.callbacks.onCloseTab?.()
 				}
 			}
 		})
 
 		wc.setWindowOpenHandler(({ url, disposition }) => {
-			if (this.router.shouldHandle(url)) {
+			if (shouldHandleUrl(url, this.routing)) {
 				const activate = disposition !== "background-tab"
-				const parentIndex = getTabIndex(this.tabId)
-				createTab(url, activate, parentIndex + 1)
+				this.callbacks.onNewTab?.(url, activate)
 			} else {
 				shell.openExternal(url)
 			}
@@ -97,10 +86,10 @@ export class SiteView {
 
 	private setupListeners() {
 		const wc = this.view.webContents
-		const update = () => this.updateNavState()
-		const updateWithDedup = () => {
+		const emitNavState = () => this.emitNavState()
+		const emitNavStateWithDedup = () => {
 			this.deduplicateHistory()
-			this.updateNavState()
+			this.emitNavState()
 		}
 
 		wc.on("did-navigate", () => {
@@ -111,38 +100,28 @@ export class SiteView {
 				::-webkit-scrollbar-thumb:hover { background: #5a5a7e; }
 				::-webkit-scrollbar-corner { background: #1a1a2e; }
 			`)
-			update()
+			emitNavState()
 		})
+
 		wc.once("did-start-loading", () => {
-			const elapsed = Date.now() - this.createdAt
-			const remaining = MIN_READY_DELAY - elapsed
-			if (remaining <= 0) {
-				this.ready = true
-				this.onReady?.()
-				update()
-			} else {
-				setTimeout(() => {
-					this.ready = true
-					this.onReady?.()
-					update()
-				}, remaining)
-			}
+			this.callbacks.onFirstLoad?.()
+			emitNavState()
 		})
-		wc.on("did-navigate-in-page", updateWithDedup)
-		wc.on("did-start-loading", update)
-		wc.on("did-stop-loading", update)
-		wc.on("did-finish-load", update)
-		wc.on("page-title-updated", update)
+
+		wc.on("did-navigate-in-page", emitNavStateWithDedup)
+		wc.on("did-start-loading", emitNavState)
+		wc.on("did-stop-loading", emitNavState)
+		wc.on("did-finish-load", emitNavState)
+		wc.on("page-title-updated", emitNavState)
 		wc.on("page-favicon-updated", (_, favicons) => {
-			this.favicon = favicons[0] || null
-			this.onReady?.() // Refresh navbar
+			this.callbacks.onFaviconChanged?.(favicons[0] || null)
 		})
-		wc.on("did-frame-navigate", update)
+		wc.on("did-frame-navigate", emitNavState)
 	}
 
-	private updateNavState() {
+	private emitNavState() {
 		const wc = this.view.webContents
-		this.navState$.emit({
+		this.callbacks.onNavStateChanged?.({
 			url: wc.getURL(),
 			title: wc.getTitle(),
 			canGoBack: wc.navigationHistory.canGoBack(),

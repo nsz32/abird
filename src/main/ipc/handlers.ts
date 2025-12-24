@@ -8,14 +8,14 @@ export function getTabsList(): TabInfo[] {
 	const activeId = activeTab$.get()?.id
 	return tabs$
 		.get()
-		.filter((t) => t.siteView.ready)
+		.filter((t) => t.ready)
 		.map((t) => ({
 			id: t.id,
-			title: t.siteView.navState$.get().title,
-			url: t.siteView.navState$.get().url || t.initialUrl,
-			favicon: t.siteView.favicon,
+			title: t.navState$.get().title,
+			url: t.navState$.get().url || t.initialUrl,
+			favicon: t.favicon,
 			isActive: t.id === activeId,
-			isLoading: t.siteView.navState$.get().isLoading,
+			isLoading: t.navState$.get().isLoading,
 		}))
 }
 

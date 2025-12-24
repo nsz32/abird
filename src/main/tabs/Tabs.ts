@@ -6,13 +6,20 @@ class TabManager {
 
 	create(url?: string, activate = true, index?: number): Tab {
 		const tab = new Tab(partition$.get(), routing$.get(), url || startUrl$.get(), userAgent$.get())
+
 		const currentTabs = tabs$.get()
 		const insertAt = index ?? currentTabs.length
 		const newTabs = [...currentTabs.slice(0, insertAt), tab, ...currentTabs.slice(insertAt)]
 		tabs$.emit(newTabs)
-		if (activate) {
-			this.activate(tab.id)
-		}
+
+		tab.onReady(() => {
+			if (activate) {
+				this.activate(tab.id)
+			} else {
+				activeTab$.emit(activeTab$.get())
+			}
+		})
+
 		return tab
 	}
 
@@ -46,7 +53,7 @@ class TabManager {
 			this.unsubscribeNavState()
 		}
 
-		this.unsubscribeNavState = tab.siteView.navState$.subscribe((state) => navState$.emit(state))
+		this.unsubscribeNavState = tab.navState$.subscribe((state) => navState$.emit(state))
 		activeTab$.emit(tab)
 	}
 }

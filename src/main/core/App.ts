@@ -22,7 +22,7 @@ export function startApp() {
 	activeTab$.subscribe((activeTab) => {
 		for (const t of tabs$.get()) {
 			const isActive = t.id === activeTab?.id
-			t.siteView.setVisible(isActive)
+			t.siteView.setVisible(isActive && t.ready)
 			if (isActive) t.siteView.setBounds(contentBounds$.get())
 		}
 	})
