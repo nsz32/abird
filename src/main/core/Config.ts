@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { homedir } from "node:os"
-import { join } from "node:path"
+import { dirname, join } from "node:path"
 import { type AppConfig, type NavBarConfig, type ThemeMode, defaultNavBarConfig } from "@shared/types"
 import { navBarConfig$, partition$, routing$, startUrl$, theme$, userAgent$ } from "../states"
 
@@ -31,29 +31,12 @@ export function loadConfig(customPath?: string | null) {
 		return
 	}
 
-	try {
-		const content = readFileSync(configFilePath, "utf-8")
-		const loaded = JSON.parse(content)
-		globalConfig = {
-			...defaultGlobalConfig,
-			...loaded,
-			theme: loaded.theme || defaultGlobalConfig.theme,
-			navBar: { ...defaultNavBarConfig, ...loaded.navBar },
-			apps: { ...defaultGlobalConfig.apps, ...loaded.apps },
-		}
-	} catch {
-		console.error("Failed to load config, using defaults")
-	}
+	globalConfig = parseConfigFile()
 }
 
 export function saveConfig() {
-	try {
-		const configDir = join(configFilePath, "..")
-		if (!existsSync(configDir)) mkdirSync(configDir, { recursive: true })
-		writeFileSync(configFilePath, JSON.stringify(globalConfig, null, "\t"))
-	} catch (err) {
-		console.error("Failed to save config:", err)
-	}
+	ensureConfigDir()
+	writeConfigFile()
 }
 
 export function selectApp(appName: string): boolean {
@@ -61,12 +44,7 @@ export function selectApp(appName: string): boolean {
 	if (!app) return false
 
 	currentAppName = appName
-	navBarConfig$.emit({ ...globalConfig.navBar, ...app.navBar })
-	routing$.emit(app.routing || null)
-	startUrl$.emit(app.startUrl)
-	partition$.emit(app.partition || "default")
-	theme$.emit(app.theme || globalConfig.theme)
-	userAgent$.emit(app.userAgentRaw || app.userAgent || "desktop:bird")
+	emitAppConfig(app)
 	return true
 }
 
@@ -76,4 +54,49 @@ export function getAvailableApps(): string[] {
 
 export function getCurrentAppName(): string | null {
 	return currentAppName
+}
+
+function parseConfigFile(): GlobalConfig {
+	try {
+		const content = readFileSync(configFilePath, "utf-8")
+		const loaded = JSON.parse(content)
+		return mergeWithDefaults(loaded)
+	} catch {
+		console.error("Failed to load config, using defaults")
+		return structuredClone(defaultGlobalConfig)
+	}
+}
+
+function mergeWithDefaults(loaded: Partial<GlobalConfig>): GlobalConfig {
+	return {
+		...defaultGlobalConfig,
+		...loaded,
+		theme: loaded.theme || defaultGlobalConfig.theme,
+		navBar: { ...defaultNavBarConfig, ...loaded.navBar },
+		apps: { ...defaultGlobalConfig.apps, ...loaded.apps },
+	}
+}
+
+function ensureConfigDir() {
+	const dir = dirname(configFilePath)
+	if (!existsSync(dir)) {
+		mkdirSync(dir, { recursive: true })
+	}
+}
+
+function writeConfigFile() {
+	try {
+		writeFileSync(configFilePath, JSON.stringify(globalConfig, null, "\t"))
+	} catch (err) {
+		console.error("Failed to save config:", err)
+	}
+}
+
+function emitAppConfig(app: AppConfig) {
+	navBarConfig$.emit({ ...globalConfig.navBar, ...app.navBar })
+	routing$.emit(app.routing || null)
+	startUrl$.emit(app.startUrl)
+	partition$.emit(app.partition || "default")
+	theme$.emit(app.theme || globalConfig.theme)
+	userAgent$.emit(app.userAgentRaw || app.userAgent || "desktop:bird")
 }

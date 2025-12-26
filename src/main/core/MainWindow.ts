@@ -1,6 +1,8 @@
 import { BaseWindow, type WebContentsView } from "electron"
 import { tabs$, windowBounds$ } from "../states"
 
+const BOUNDS_UPDATE_DELAYS = [100, 200, 300, 400, 500]
+
 export class MainWindow {
 	readonly window: BaseWindow
 	private navBarView: WebContentsView | null = null
@@ -14,28 +16,13 @@ export class MainWindow {
 			show: false,
 		})
 
-		this.window.on("resize", () => this.updateBounds())
-		this.window.on("enter-full-screen", () => this.updateBounds())
-		this.window.on("leave-full-screen", () => this.updateBounds())
-
-		tabs$.subscribe((tabList) => {
-			for (const tab of tabList) {
-				if (!tab.siteView.view.webContents.hostWebContents) {
-					this.addView(tab.siteView.view)
-				}
-			}
-			this.bringOverlaysToFront()
-		})
-	}
-
-	private updateBounds() {
-		windowBounds$.emit(this.window.getContentBounds())
+		this.setupEventListeners()
+		this.setupTabsSubscription()
 	}
 
 	show() {
 		this.window.show()
-		this.updateBounds()
-		for (let i = 100; i <= 500; i += 100) setTimeout(() => this.updateBounds(), i)
+		this.emitBoundsWithRetry()
 	}
 
 	addView(view: WebContentsView) {
@@ -56,6 +43,34 @@ export class MainWindow {
 	bringOverlaysToFront() {
 		if (this.navBarView) this.bringToFront(this.navBarView)
 		if (this.notificationView) this.bringToFront(this.notificationView)
+	}
+
+	private setupEventListeners() {
+		this.window.on("resize", () => this.emitBounds())
+		this.window.on("enter-full-screen", () => this.emitBounds())
+		this.window.on("leave-full-screen", () => this.emitBounds())
+	}
+
+	private setupTabsSubscription() {
+		tabs$.subscribe((tabList) => {
+			for (const tab of tabList) {
+				if (!tab.siteView.view.webContents.hostWebContents) {
+					this.addView(tab.siteView.view)
+				}
+			}
+			this.bringOverlaysToFront()
+		})
+	}
+
+	private emitBounds() {
+		windowBounds$.emit(this.window.getContentBounds())
+	}
+
+	private emitBoundsWithRetry() {
+		this.emitBounds()
+		for (const delay of BOUNDS_UPDATE_DELAYS) {
+			setTimeout(() => this.emitBounds(), delay)
+		}
 	}
 
 	private bringToFront(view: WebContentsView) {
