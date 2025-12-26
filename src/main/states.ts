@@ -3,8 +3,6 @@ import type { Rectangle } from "electron"
 import { CombinedObservable, StateObservable } from "./api/observable"
 import type { Tab } from "./tabs/Tab"
 
-const NAV_BAR_HEIGHT = 40
-
 // Config
 export const navBarConfig$ = new StateObservable<NavBarConfig>(defaultNavBarConfig)
 export const routing$ = new StateObservable<Partial<RoutingConfig> | null>(null)
@@ -15,6 +13,7 @@ export const userAgent$ = new StateObservable<string>("desktop:bird")
 
 // Window
 export const windowBounds$ = new StateObservable<Rectangle>({ x: 0, y: 0, width: 0, height: 0 })
+export const navBarHeight$ = new StateObservable<number>(0)
 
 // Tabs
 export const tabs$ = new StateObservable<Tab[]>([])
@@ -30,15 +29,18 @@ export const navState$ = new StateObservable<NavigationState>({
 })
 
 // Bounds dérivés
-export const navBarBounds$ = new CombinedObservable([windowBounds$, navBarConfig$], (windowBounds, navBarConfig) => {
-	const navHeight = navBarConfig.visible ? NAV_BAR_HEIGHT : 0
+const DEFAULT_NAVBAR_HEIGHT = 40
+
+export const navBarBounds$ = new CombinedObservable([windowBounds$, navBarConfig$, navBarHeight$], (windowBounds, navBarConfig, navBarHeight) => {
+	const height = navBarConfig.visible ? (navBarHeight || DEFAULT_NAVBAR_HEIGHT) : 0
+	const width = windowBounds.width || 1
 	return navBarConfig.position === "top"
-		? { x: 0, y: 0, width: windowBounds.width, height: navHeight }
-		: { x: 0, y: windowBounds.height - navHeight, width: windowBounds.width, height: navHeight }
+		? { x: 0, y: 0, width, height }
+		: { x: 0, y: windowBounds.height - height, width, height }
 })
 
-export const contentBounds$ = new CombinedObservable([windowBounds$, navBarConfig$], (windowBounds, navBarConfig) => {
-	const navHeight = navBarConfig.visible ? NAV_BAR_HEIGHT : 0
+export const contentBounds$ = new CombinedObservable([windowBounds$, navBarConfig$, navBarHeight$], (windowBounds, navBarConfig, navBarHeight) => {
+	const navHeight = navBarConfig.visible ? (navBarHeight || DEFAULT_NAVBAR_HEIGHT) : 0
 	return navBarConfig.position === "top"
 		? { x: 0, y: navHeight, width: windowBounds.width, height: windowBounds.height - navHeight }
 		: { x: 0, y: 0, width: windowBounds.width, height: windowBounds.height - navHeight }

@@ -61,6 +61,8 @@ export const IpcChannels = {
 	NOTIF_DISMISS: "bird:notif:dismiss",
 	NOTIF_GET_LIST: "bird:notif:get-list",
 	NOTIF_RESIZE: "bird:notif:resize",
+	// Navbar
+	NAVBAR_RESIZE: "bird:navbar:resize",
 } as const
 
 // Type utilitaire pour les valeurs de IpcChannels
@@ -123,6 +125,9 @@ export interface BirdApi {
 	}
 	config: {
 		getNavBar: () => Promise<NavBarConfig>
+	}
+	navbar: {
+		resize: (height: number) => void
 	}
 	notifications: {
 		getList: () => Promise<Notification[]>

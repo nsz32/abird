@@ -1,7 +1,8 @@
 import { join } from "node:path"
 import type { NavigationState, TabInfo } from "@shared/types"
 import { IpcChannels } from "@shared/types"
-import { type Rectangle, WebContentsView } from "electron"
+import { type Rectangle, WebContentsView, ipcMain } from "electron"
+import { navBarHeight$ } from "../states"
 
 export class NavBar {
 	readonly view: WebContentsView
@@ -15,6 +16,10 @@ export class NavBar {
 			},
 		})
 		this.view.setBackgroundColor("#1a1a2e")
+
+		ipcMain.on(IpcChannels.NAVBAR_RESIZE, (_, height: number) => {
+			navBarHeight$.emit(height)
+		})
 	}
 
 	setBounds(bounds: Rectangle) {

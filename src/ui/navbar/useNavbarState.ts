@@ -1,5 +1,5 @@
 import type { NavBarConfig, NavigationState, TabInfo } from "@shared/types"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 const EXTERNAL_INDICATOR_DURATION = 800
 
@@ -14,6 +14,7 @@ export function useNavbarState() {
 	const [config, setConfig] = useState<NavBarConfig | null>(null)
 	const [tabs, setTabs] = useState<TabInfo[]>([])
 	const [externalTabIds, setExternalTabIds] = useState<Set<string>>(new Set())
+	const containerRef = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
 		window.bird.config.getNavBar().then(setConfig)
@@ -40,5 +41,17 @@ export function useNavbarState() {
 		}
 	}, [])
 
-	return { navState, config, tabs, externalTabIds }
+	useEffect(() => {
+		if (!containerRef.current) return
+
+		const observer = new ResizeObserver((entries) => {
+			const height = entries[0]?.contentRect.height ?? 0
+			window.bird.navbar.resize(height)
+		})
+
+		observer.observe(containerRef.current)
+		return () => observer.disconnect()
+	})
+
+	return { navState, config, tabs, externalTabIds, containerRef }
 }

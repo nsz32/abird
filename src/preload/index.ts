@@ -35,6 +35,9 @@ contextBridge.exposeInMainWorld("bird", {
 	config: {
 		getNavBar: (): Promise<NavBarConfig> => ipcRenderer.invoke(IpcChannels.CONFIG_GET_NAVBAR),
 	},
+	navbar: {
+		resize: (height: number) => ipcRenderer.send(IpcChannels.NAVBAR_RESIZE, height),
+	},
 	notifications: {
 		getList: (): Promise<Notification[]> => ipcRenderer.invoke(IpcChannels.NOTIF_GET_LIST),
 		onListChanged: (callback: (notifications: Notification[]) => void): (() => void) => {

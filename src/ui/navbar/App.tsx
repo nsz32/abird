@@ -3,12 +3,12 @@ import { TabButton } from "./TabButton"
 import { useNavbarState } from "./useNavbarState"
 
 export function App() {
-	const { navState, config, tabs, externalTabIds } = useNavbarState()
+	const { navState, config, tabs, externalTabIds, containerRef } = useNavbarState()
 
 	if (!config) return null
 
 	return (
-		<div className="navigation-bar">
+		<div ref={containerRef} className="navigation-bar">
 			{config.showBackForward && (
 				<>
 					<NavButton onClick={() => window.bird.navigation.back()} disabled={!navState.canGoBack}>
