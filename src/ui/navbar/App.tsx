@@ -1,6 +1,52 @@
-import type { NavBarConfig, NavigationState, TabInfo } from "@shared/types"
-import { ArrowLeft, ArrowRight, HousePlus, LoaderCircle, RotateCw, X } from "lucide-react"
-import { useEffect, useState } from "react"
+import { ArrowLeft, ArrowRight, HousePlus, RotateCw, X } from "lucide-react"
+import { TabButton } from "./TabButton"
+import { useNavbarState } from "./useNavbarState"
+
+export function App() {
+	const { navState, config, tabs, externalTabIds } = useNavbarState()
+
+	if (!config) return null
+
+	return (
+		<div className="navigation-bar">
+			{config.showBackForward && (
+				<>
+					<NavButton onClick={() => window.bird.navigation.back()} disabled={!navState.canGoBack}>
+						<ArrowLeft size={16} />
+					</NavButton>
+					<NavButton onClick={() => window.bird.navigation.forward()} disabled={!navState.canGoForward}>
+						<ArrowRight size={16} />
+					</NavButton>
+				</>
+			)}
+
+			{config.showReload && (
+				<NavButton
+					onClick={() => (navState.isLoading ? window.bird.navigation.stop() : window.bird.navigation.reload())}
+				>
+					{navState.isLoading ? <X size={16} strokeWidth={2.5} /> : <RotateCw size={16} />}
+				</NavButton>
+			)}
+
+			<NavButton onClick={() => window.bird.tabs.create(0)}>
+				<HousePlus size={16} />
+			</NavButton>
+
+			<div className="tabs-list">
+				{tabs.map((tab) => (
+					<TabButton
+						key={tab.id}
+						tab={tab}
+						showClose={tabs.length > 1}
+						showExternalIndicator={externalTabIds.has(tab.id)}
+						onActivate={() => window.bird.tabs.activate(tab.id)}
+						onClose={() => window.bird.tabs.close(tab.id)}
+					/>
+				))}
+			</div>
+		</div>
+	)
+}
 
 interface NavButtonProps {
 	onClick: () => void
@@ -13,89 +59,5 @@ function NavButton({ onClick, disabled, children }: NavButtonProps) {
 		<button type="button" className="nav-button" onClick={onClick} disabled={disabled}>
 			{children}
 		</button>
-	)
-}
-
-export function App() {
-	const [state, setState] = useState<NavigationState>({
-		url: "",
-		title: "",
-		canGoBack: false,
-		canGoForward: false,
-		isLoading: false,
-	})
-
-	const [config, setConfig] = useState<NavBarConfig | null>(null)
-	const [tabs, setTabs] = useState<TabInfo[]>([])
-
-	useEffect(() => {
-		window.bird.config.getNavBar().then(setConfig)
-		window.bird.navigation.getState().then(setState)
-		window.bird.tabs.getList().then(setTabs)
-		const unsubscribeNav = window.bird.navigation.onStateChanged(setState)
-		const unsubscribeTabs = window.bird.tabs.onListChanged(setTabs)
-		return () => {
-			unsubscribeNav()
-			unsubscribeTabs()
-		}
-	}, [])
-
-	if (!config) return null
-
-	return (
-		<div className="navigation-bar">
-			{config.showBackForward && (
-				<>
-					<NavButton onClick={() => window.bird.navigation.back()} disabled={!state.canGoBack}>
-						<ArrowLeft size={16} />
-					</NavButton>
-					<NavButton onClick={() => window.bird.navigation.forward()} disabled={!state.canGoForward}>
-						<ArrowRight size={16} />
-					</NavButton>
-				</>
-			)}
-			{config.showReload &&
-				(state.isLoading ? (
-					<NavButton onClick={() => window.bird.navigation.stop()}>
-						<X size={16} strokeWidth={2.5} />
-					</NavButton>
-				) : (
-					<NavButton onClick={() => window.bird.navigation.reload()}>
-						<RotateCw size={16} />
-					</NavButton>
-				))}
-			<NavButton onClick={() => window.bird.tabs.create(0)}>
-				<HousePlus size={16} />
-			</NavButton>
-			<div className="tabs-list">
-				{tabs.map((tab) => (
-					<button
-						key={tab.id}
-						type="button"
-						className={`tab-button ${tab.isActive ? "active" : ""}`}
-						onClick={() => window.bird.tabs.activate(tab.id)}
-					>
-						{tab.isLoading ? (
-							<LoaderCircle size={16} className="tab-favicon spinning" />
-						) : (
-							tab.favicon && <img className="tab-favicon" src={tab.favicon} alt="" />
-						)}
-						<span className="tab-title">{tab.title || tab.url}</span>
-						{tabs.length > 1 && (
-							<button
-								type="button"
-								className="tab-close"
-								onClick={(e) => {
-									e.stopPropagation()
-									window.bird.tabs.close(tab.id)
-								}}
-							>
-								<X size={16} strokeWidth={2.5} />
-							</button>
-						)}
-					</button>
-				))}
-			</div>
-		</div>
 	)
 }

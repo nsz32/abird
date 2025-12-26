@@ -24,6 +24,19 @@ export interface TabInfo {
 	isLoading: boolean
 }
 
+// Notifications
+export type NotificationType = "info" | "download" | "external-link" | "error"
+
+export interface Notification {
+	id: string
+	type: NotificationType
+	title: string
+	message?: string
+	progress?: number
+	dismissable: boolean
+	createdAt: number
+}
+
 // Canaux IPC (évite les typos, autocomplétion)
 export const IpcChannels = {
 	// Navigation
@@ -40,8 +53,14 @@ export const IpcChannels = {
 	TABS_ACTIVATE: "bird:tabs:activate",
 	TABS_CLOSE: "bird:tabs:close",
 	TABS_CREATE: "bird:tabs:create",
+	TABS_EXTERNAL_OPENED: "bird:tabs:external-opened",
 	// Config
 	CONFIG_GET_NAVBAR: "bird:config:get-navbar",
+	// Notifications
+	NOTIF_LIST_CHANGED: "bird:notif:list-changed",
+	NOTIF_DISMISS: "bird:notif:dismiss",
+	NOTIF_GET_LIST: "bird:notif:get-list",
+	NOTIF_RESIZE: "bird:notif:resize",
 } as const
 
 // Type utilitaire pour les valeurs de IpcChannels
@@ -97,12 +116,19 @@ export interface BirdApi {
 	tabs: {
 		getList: () => Promise<TabInfo[]>
 		onListChanged: (callback: (tabs: TabInfo[]) => void) => () => void
+		onExternalOpened: (callback: (tabId: string) => void) => () => void
 		activate: (id: string) => Promise<void>
 		close: (id: string) => Promise<void>
 		create: (index?: number) => Promise<void>
 	}
 	config: {
 		getNavBar: () => Promise<NavBarConfig>
+	}
+	notifications: {
+		getList: () => Promise<Notification[]>
+		onListChanged: (callback: (notifications: Notification[]) => void) => () => void
+		dismiss: (id: string) => Promise<void>
+		resize: (width: number, height: number) => void
 	}
 }
 

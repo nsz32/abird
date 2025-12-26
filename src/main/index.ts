@@ -16,6 +16,7 @@ function parseCliArgs(): { appName: string | null; configPath: string | null } {
 // XDG compliant userData
 const xdgDataHome = process.env.XDG_DATA_HOME || join(app.getPath("home"), ".local", "share")
 app.setPath("userData", join(xdgDataHome, "bird"))
+app.setName("okbird")
 
 app.whenReady().then(() => {
 	Menu.setApplicationMenu(null)

@@ -42,6 +42,7 @@ export default defineConfig({
 			rollupOptions: {
 				input: {
 					navbar: resolve(__dirname, "src/ui/navbar/index.html"),
+					notifications: resolve(__dirname, "src/ui/notifications/index.html"),
 				},
 			},
 		},

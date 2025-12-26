@@ -1,4 +1,4 @@
-import { type NavBarConfig, type NavigationState, type RoutingConfig, type ThemeMode, defaultNavBarConfig } from "@shared/types"
+import { type NavBarConfig, type NavigationState, type Notification, type RoutingConfig, type ThemeMode, defaultNavBarConfig } from "@shared/types"
 import type { Rectangle } from "electron"
 import { CombinedObservable, StateObservable } from "./api/observable"
 import type { Tab } from "./tabs/Tab"
@@ -50,3 +50,9 @@ export const navbarSync$ = new CombinedObservable([navState$, tabs$, activeTab$]
 	tabs: tabs$.get(),
 	activeTab: activeTab$.get(),
 }))
+
+// Notifications
+export const notifications$ = new StateObservable<Notification[]>([])
+
+// Events
+export const externalOpened$ = new StateObservable<string | null>(null)

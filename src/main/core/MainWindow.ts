@@ -4,6 +4,7 @@ import { tabs$, windowBounds$ } from "../states"
 export class MainWindow {
 	readonly window: BaseWindow
 	private navBarView: WebContentsView | null = null
+	private notificationView: WebContentsView | null = null
 
 	constructor() {
 		this.window = new BaseWindow({
@@ -13,7 +14,6 @@ export class MainWindow {
 			show: false,
 		})
 
-		this.updateBounds()
 		this.window.on("resize", () => this.updateBounds())
 		this.window.on("enter-full-screen", () => this.updateBounds())
 		this.window.on("leave-full-screen", () => this.updateBounds())
@@ -24,7 +24,7 @@ export class MainWindow {
 					this.addView(tab.siteView.view)
 				}
 			}
-			if (this.navBarView) this.bringToFront(this.navBarView)
+			this.bringOverlaysToFront()
 		})
 	}
 
@@ -34,6 +34,7 @@ export class MainWindow {
 
 	show() {
 		this.window.show()
+		this.updateBounds()
 		for (let i = 100; i <= 500; i += 100) setTimeout(() => this.updateBounds(), i)
 	}
 
@@ -44,6 +45,17 @@ export class MainWindow {
 	setNavBar(view: WebContentsView) {
 		this.navBarView = view
 		this.addView(view)
+	}
+
+	setNotificationCenter(view: WebContentsView) {
+		this.notificationView = view
+		this.addView(view)
+		this.bringOverlaysToFront()
+	}
+
+	bringOverlaysToFront() {
+		if (this.navBarView) this.bringToFront(this.navBarView)
+		if (this.notificationView) this.bringToFront(this.notificationView)
 	}
 
 	private bringToFront(view: WebContentsView) {

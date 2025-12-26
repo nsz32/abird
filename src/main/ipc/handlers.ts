@@ -1,7 +1,8 @@
 import type { TabInfo } from "@shared/types"
 import { IpcChannels } from "@shared/types"
 import { ipcMain } from "electron"
-import { activeTab$, navBarConfig$, navState$, tabs$ } from "../states"
+import { dismissNotification } from "../notifications/notify"
+import { activeTab$, navBarConfig$, navState$, notifications$, tabs$ } from "../states"
 import { activateTab, closeTab, createTab } from "../tabs/Tabs"
 
 export function getTabsList(): TabInfo[] {
@@ -31,4 +32,6 @@ export function registerHandlers() {
 	ipcMain.handle(IpcChannels.TABS_CLOSE, (_, id: string) => closeTab(id))
 	ipcMain.handle(IpcChannels.TABS_CREATE, (_, index?: number) => createTab(undefined, true, index))
 	ipcMain.handle(IpcChannels.CONFIG_GET_NAVBAR, () => navBarConfig$.get())
+	ipcMain.handle(IpcChannels.NOTIF_GET_LIST, () => notifications$.get())
+	ipcMain.handle(IpcChannels.NOTIF_DISMISS, (_, id: string) => dismissNotification(id))
 }

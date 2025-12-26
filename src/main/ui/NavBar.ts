@@ -33,6 +33,10 @@ export class NavBar {
 		this.view.webContents.send(IpcChannels.TABS_LIST_CHANGED, tabs)
 	}
 
+	sendExternalOpened(tabId: string) {
+		this.view.webContents.send(IpcChannels.TABS_EXTERNAL_OPENED, tabId)
+	}
+
 	load() {
 		if (process.env.ELECTRON_RENDERER_URL) {
 			this.view.webContents.loadURL(`${process.env.ELECTRON_RENDERER_URL}/navbar/`)

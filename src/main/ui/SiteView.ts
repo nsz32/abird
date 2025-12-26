@@ -2,6 +2,7 @@ import type { NavigationState, RoutingConfig } from "@shared/types"
 import { type Rectangle, WebContentsView, session, shell } from "electron"
 import { shouldHandleUrl } from "../routing/UrlRouter"
 import { resolveUserAgent } from "../utils/userAgents"
+import { SCROLLBAR_CSS } from "./scrollbar.css"
 
 export interface SiteViewCallbacks {
 	onNavStateChanged?: (state: NavigationState) => void
@@ -9,136 +10,68 @@ export interface SiteViewCallbacks {
 	onFirstLoad?: () => void
 	onNewTab?: (url: string, activate: boolean) => void
 	onCloseTab?: () => void
+	onExternalOpened?: (willClose: boolean) => void
 }
 
 export class SiteView {
 	readonly view: WebContentsView
+	private readonly webContents: Electron.WebContents
 
 	constructor(
 		partition: string,
-		private routing: Partial<RoutingConfig> | null,
+		private readonly routing: Partial<RoutingConfig> | null,
 		userAgent: string,
-		private callbacks: SiteViewCallbacks = {},
+		private readonly callbacks: SiteViewCallbacks = {},
 	) {
-		const partitionSession = session.fromPartition(`persist:${partition}`)
-		console.log(`Using partition: ${partition} (${partitionSession.getStoragePath()})`)
-
-		const ua = resolveUserAgent(userAgent)
-		partitionSession.setUserAgent(ua)
-		console.log(`Using User-Agent: ${ua.substring(0, 80)}...`)
+		const sess = session.fromPartition(`persist:${partition}`)
+		sess.setUserAgent(resolveUserAgent(userAgent))
 
 		this.view = new WebContentsView({
 			webPreferences: {
 				nodeIntegration: false,
 				contextIsolation: true,
-				session: partitionSession,
+				session: sess,
 			},
 		})
 		this.view.setBackgroundColor("#202830")
+		this.webContents = this.view.webContents
 
-		this.setupRouting()
-		this.setupListeners()
+		this.setupNavigation()
+		this.setupEventListeners()
 	}
 
-	private setupRouting() {
-		const wc = this.view.webContents
+	// ─── Navigation API ─────────────────────────────────────────────────────────
 
-		wc.on("will-navigate", async (event, url) => {
-			console.log("will-navigate:", url)
-			if (!shouldHandleUrl(url, this.routing)) {
-				event.preventDefault()
-				shell.openExternal(url)
-				if (!wc.navigationHistory.canGoBack()) {
-					const innerTextLength = await wc.executeJavaScript("document.body?.innerText.trim().length || 0")
-					console.log("will-navigate: innerTextLength =", innerTextLength)
-					if (innerTextLength === 0) {
-						this.callbacks.onCloseTab?.()
-					}
-				}
-			}
-		})
-
-		wc.on("will-redirect", (event, url) => {
-			console.log("will-redirect:", url)
-			if (!shouldHandleUrl(url, this.routing)) {
-				event.preventDefault()
-				shell.openExternal(url)
-				if (!wc.navigationHistory.canGoBack()) {
-					this.callbacks.onCloseTab?.()
-				}
-			}
-		})
-
-		wc.setWindowOpenHandler(({ url, disposition }) => {
-			if (shouldHandleUrl(url, this.routing)) {
-				const activate = disposition !== "background-tab"
-				this.callbacks.onNewTab?.(url, activate)
-			} else {
-				shell.openExternal(url)
-			}
-			return { action: "deny" }
-		})
-
-		wc.session.on("will-download", (_event, item) => {
-			console.log(`Download started: ${item.getFilename()} from ${item.getURL()}`)
-		})
+	loadURL(url: string) {
+		this.webContents.loadURL(url)
 	}
 
-	private setupListeners() {
-		const wc = this.view.webContents
-		const emitNavState = () => this.emitNavState()
-		const emitNavStateWithDedup = () => {
-			this.deduplicateHistory()
-			this.emitNavState()
-		}
-
-		wc.on("did-navigate", () => {
-			wc.insertCSS(`
-				::-webkit-scrollbar { width: 10px; height: 10px; }
-				::-webkit-scrollbar-track { background: #1a1a2e; }
-				::-webkit-scrollbar-thumb { background: #3a3a5e; border-radius: 5px; }
-				::-webkit-scrollbar-thumb:hover { background: #5a5a7e; }
-				::-webkit-scrollbar-corner { background: #1a1a2e; }
-			`)
-			emitNavState()
-		})
-
-		wc.once("did-start-loading", () => {
-			this.callbacks.onFirstLoad?.()
-			emitNavState()
-		})
-
-		wc.on("did-navigate-in-page", emitNavStateWithDedup)
-		wc.on("did-start-loading", emitNavState)
-		wc.on("did-stop-loading", emitNavState)
-		wc.on("did-finish-load", emitNavState)
-		wc.on("page-title-updated", emitNavState)
-		wc.on("page-favicon-updated", (_, favicons) => {
-			this.callbacks.onFaviconChanged?.(favicons[0] || null)
-		})
-		wc.on("did-frame-navigate", emitNavState)
+	goTo(url: string) {
+		const normalized = url.trim().startsWith("http") ? url.trim() : `https://${url.trim()}`
+		this.webContents.loadURL(normalized)
 	}
 
-	private emitNavState() {
-		const wc = this.view.webContents
-		this.callbacks.onNavStateChanged?.({
-			url: wc.getURL(),
-			title: wc.getTitle(),
-			canGoBack: wc.navigationHistory.canGoBack(),
-			canGoForward: wc.navigationHistory.canGoForward(),
-			isLoading: wc.isLoading(),
-		})
-	}
-
-	private deduplicateHistory() {
-		const history = this.view.webContents.navigationHistory
-		const activeIndex = history.getActiveIndex()
-		for (let i = activeIndex - 1; i >= Math.max(0, activeIndex - 10); i--) {
-			if (history.getEntryAtIndex(i)?.url === history.getEntryAtIndex(i + 1)?.url) {
-				history.removeEntryAtIndex(i)
-			}
+	back() {
+		if (this.webContents.navigationHistory.canGoBack()) {
+			this.webContents.navigationHistory.goBack()
 		}
 	}
+
+	forward() {
+		if (this.webContents.navigationHistory.canGoForward()) {
+			this.webContents.navigationHistory.goForward()
+		}
+	}
+
+	reload(ignoreCache = false) {
+		ignoreCache ? this.webContents.reloadIgnoringCache() : this.webContents.reload()
+	}
+
+	stop() {
+		this.webContents.stop()
+	}
+
+	// ─── View Management ────────────────────────────────────────────────────────
 
 	setBounds(bounds: Rectangle) {
 		this.view.setBounds(bounds)
@@ -148,39 +81,82 @@ export class SiteView {
 		this.view.setVisible(visible)
 	}
 
-	loadURL(url: string) {
-		this.view.webContents.loadURL(url)
+	// ─── Private Setup ──────────────────────────────────────────────────────────
+
+	private setupNavigation() {
+		this.webContents.on("will-navigate", (event, url) => this.handleUrlNavigation(event, url))
+		this.webContents.on("will-redirect", (event, url) => this.handleUrlNavigation(event, url))
+
+		this.webContents.setWindowOpenHandler(({ url, disposition }) => {
+			if (shouldHandleUrl(url, this.routing)) {
+				this.callbacks.onNewTab?.(url, disposition !== "background-tab")
+			} else {
+				shell.openExternal(url)
+				this.callbacks.onExternalOpened?.(false)
+			}
+			return { action: "deny" }
+		})
 	}
 
-	back() {
-		if (this.view.webContents.navigationHistory.canGoBack()) {
-			this.view.webContents.navigationHistory.goBack()
+	private handleUrlNavigation(event: Electron.Event, url: string) {
+		if (shouldHandleUrl(url, this.routing)) return
+
+		event.preventDefault()
+		shell.openExternal(url)
+
+		const willClose = !this.webContents.navigationHistory.canGoBack()
+		this.callbacks.onExternalOpened?.(willClose)
+
+		if (willClose) {
+			this.callbacks.onCloseTab?.()
 		}
 	}
 
-	forward() {
-		if (this.view.webContents.navigationHistory.canGoForward()) {
-			this.view.webContents.navigationHistory.goForward()
-		}
+	private setupEventListeners() {
+		this.webContents.on("did-navigate", () => {
+			this.webContents.insertCSS(SCROLLBAR_CSS)
+			this.emitNavState()
+		})
+
+		this.webContents.once("did-start-loading", () => {
+			this.callbacks.onFirstLoad?.()
+			this.emitNavState()
+		})
+
+		this.webContents.on("did-navigate-in-page", () => {
+			this.deduplicateHistory()
+			this.emitNavState()
+		})
+
+		this.webContents.on("did-start-loading", () => this.emitNavState())
+		this.webContents.on("did-stop-loading", () => this.emitNavState())
+		this.webContents.on("did-finish-load", () => this.emitNavState())
+		this.webContents.on("page-title-updated", () => this.emitNavState())
+		this.webContents.on("did-frame-navigate", () => this.emitNavState())
+
+		this.webContents.on("page-favicon-updated", (_, favicons) => {
+			this.callbacks.onFaviconChanged?.(favicons[0] ?? null)
+		})
 	}
 
-	reload(ignoreCache = false) {
-		if (ignoreCache) {
-			this.view.webContents.reloadIgnoringCache()
-		} else {
-			this.view.webContents.reload()
-		}
+	private emitNavState() {
+		this.callbacks.onNavStateChanged?.({
+			url: this.webContents.getURL(),
+			title: this.webContents.getTitle(),
+			canGoBack: this.webContents.navigationHistory.canGoBack(),
+			canGoForward: this.webContents.navigationHistory.canGoForward(),
+			isLoading: this.webContents.isLoading(),
+		})
 	}
 
-	stop() {
-		this.view.webContents.stop()
-	}
+	private deduplicateHistory() {
+		const history = this.webContents.navigationHistory
+		const activeIndex = history.getActiveIndex()
 
-	goTo(url: string) {
-		let normalized = url.trim()
-		if (!normalized.startsWith("http://") && !normalized.startsWith("https://")) {
-			normalized = `https://${normalized}`
+		for (let i = activeIndex - 1; i >= Math.max(0, activeIndex - 10); i--) {
+			if (history.getEntryAtIndex(i)?.url === history.getEntryAtIndex(i + 1)?.url) {
+				history.removeEntryAtIndex(i)
+			}
 		}
-		this.view.webContents.loadURL(normalized)
 	}
 }

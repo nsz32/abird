@@ -1,4 +1,4 @@
-import { IpcChannels, type NavBarConfig, type NavigationState, type TabInfo } from "@shared/types"
+import { IpcChannels, type NavBarConfig, type NavigationState, type Notification, type TabInfo } from "@shared/types"
 import { contextBridge, ipcRenderer } from "electron"
 
 // API exposed to UI components
@@ -23,11 +23,26 @@ contextBridge.exposeInMainWorld("bird", {
 			ipcRenderer.on(IpcChannels.TABS_LIST_CHANGED, listener)
 			return () => ipcRenderer.removeListener(IpcChannels.TABS_LIST_CHANGED, listener)
 		},
+		onExternalOpened: (callback: (tabId: string) => void): (() => void) => {
+			const listener = (_event: Electron.IpcRendererEvent, tabId: string) => callback(tabId)
+			ipcRenderer.on(IpcChannels.TABS_EXTERNAL_OPENED, listener)
+			return () => ipcRenderer.removeListener(IpcChannels.TABS_EXTERNAL_OPENED, listener)
+		},
 		activate: (id: string) => ipcRenderer.invoke(IpcChannels.TABS_ACTIVATE, id),
 		close: (id: string) => ipcRenderer.invoke(IpcChannels.TABS_CLOSE, id),
 		create: (index?: number) => ipcRenderer.invoke(IpcChannels.TABS_CREATE, index),
 	},
 	config: {
 		getNavBar: (): Promise<NavBarConfig> => ipcRenderer.invoke(IpcChannels.CONFIG_GET_NAVBAR),
+	},
+	notifications: {
+		getList: (): Promise<Notification[]> => ipcRenderer.invoke(IpcChannels.NOTIF_GET_LIST),
+		onListChanged: (callback: (notifications: Notification[]) => void): (() => void) => {
+			const listener = (_event: Electron.IpcRendererEvent, notifications: Notification[]) => callback(notifications)
+			ipcRenderer.on(IpcChannels.NOTIF_LIST_CHANGED, listener)
+			return () => ipcRenderer.removeListener(IpcChannels.NOTIF_LIST_CHANGED, listener)
+		},
+		dismiss: (id: string) => ipcRenderer.invoke(IpcChannels.NOTIF_DISMISS, id),
+		resize: (width: number, height: number) => ipcRenderer.send(IpcChannels.NOTIF_RESIZE, width, height),
 	},
 })
