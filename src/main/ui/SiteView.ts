@@ -1,5 +1,6 @@
 import type { NavigationState, RoutingConfig, TabOrigin } from "@shared/types"
 import { type Rectangle, WebContentsView, session, shell } from "electron"
+import { registerAppShortcuts } from "../keyboard/shortcuts"
 import { shouldHandleUrl } from "../routing/UrlRouter"
 import { resolveUserAgent } from "../utils/userAgents"
 import { SCROLLBAR_CSS } from "./scrollbar.css"
@@ -36,6 +37,7 @@ export class SiteView {
 		})
 		this.view.setBackgroundColor("#202830")
 		this.webContents = this.view.webContents
+		registerAppShortcuts(this.webContents)
 
 		this.setupNavigation()
 		this.setupEventListeners()

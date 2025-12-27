@@ -4,7 +4,7 @@ import { externalOpened$, tabs$ } from "../states"
 import { SiteView } from "../ui/SiteView"
 import { closeTab, createTab, getTabIndex } from "./Tabs"
 
-const CHECK_DELAYS = [100, 300, 600, 1000, 1500, 2000]
+const CHECK_DELAYS = [100, 200, 300, 400, 500, 600, 750, 1000, 1250, 1500, 1750, 2000]
 
 let nextId = 1
 
