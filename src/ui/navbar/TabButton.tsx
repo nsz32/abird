@@ -36,7 +36,7 @@ function TabFavicon({ tab }: { tab: TabInfo }) {
 	if (tab.favicon) {
 		return <img className="tab-favicon" src={tab.favicon} alt="" />
 	}
-	return null
+	return <span className="tab-favicon" />
 }
 
 interface TabActionProps {

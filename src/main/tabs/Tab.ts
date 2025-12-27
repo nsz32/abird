@@ -4,7 +4,8 @@ import { externalOpened$, tabs$ } from "../states"
 import { SiteView } from "../ui/SiteView"
 import { closeTab, createTab, getTabIndex } from "./Tabs"
 
-const CHECK_DELAYS = [100, 200, 300, 400, 500, 600, 750, 1000, 1250, 1500, 1750, 2000]
+const CHECK_INTERVAL = 50
+const CHECK_MAX_TIME = 4000
 
 let nextId = 1
 
@@ -26,6 +27,7 @@ export class Tab {
 
 	private readonly createdAt = Date.now()
 	private onProperCallback?: () => void
+	private destroyed = false
 
 	constructor(partition: string, routing: Partial<RoutingConfig> | null, url: string, userAgent: string, parentId: string | null = null) {
 		this.id = `tab-${nextId++}`
@@ -34,6 +36,8 @@ export class Tab {
 
 		this.siteView = new SiteView(partition, routing, userAgent, this.createCallbacks())
 		this.siteView.loadURL(url)
+
+		console.log("CREATE TAB", this.id)
 	}
 
 	onProper(callback: () => void) {
@@ -41,6 +45,8 @@ export class Tab {
 	}
 
 	destroy() {
+		console.log("DESTROY TAB", this.id)
+		this.destroyed = true
 		this.siteView.destroy()
 	}
 
@@ -48,7 +54,7 @@ export class Tab {
 		return {
 			onNavStateChanged: (state: NavigationState) => this.navState$.emit(state),
 			onFaviconChanged: (favicon: string | null) => this.updateFavicon(favicon),
-			onFirstLoad: () => this.scheduleProperCheck(),
+			onFirstLoad: () => {},
 			onNewTab: (url: string, origin: TabOrigin) => this.openChildTab(url, origin),
 			onCloseTab: () => closeTab(this.id),
 			onExternalOpened: (willClose: boolean) => this.emitExternalOpened(willClose),
@@ -58,35 +64,32 @@ export class Tab {
 
 	private updateFavicon(favicon: string | null) {
 		this.favicon = favicon
+		tabs$.emit([...tabs$.get()])
 	}
 
 	scheduleProperCheck() {
 		if (this.proper) return
-		this.checkProperAt(0)
+		this.runProperCheck()
 	}
 
-	private checkProperAt(index: number) {
-		const delay = CHECK_DELAYS[index]
-		if (delay === undefined) {
+	private async runProperCheck() {
+		if (this.proper || this.destroyed) return
+
+		const elapsed = Date.now() - this.createdAt
+		if (elapsed >= CHECK_MAX_TIME) {
 			this.setProper()
 			return
 		}
 
-		const elapsed = Date.now() - this.createdAt
-		const remaining = delay - elapsed
-
-		setTimeout(async () => {
-			if (this.proper) return
-			console.log("proper check", index)
-			if (await this.isTabProper()) {
-				this.setProper()
-			} else {
-				this.checkProperAt(index + 1)
-			}
-		}, Math.max(0, remaining))
+		if (await this.isTabProper()) {
+			this.setProper()
+		} else {
+			setTimeout(() => this.runProperCheck(), CHECK_INTERVAL)
+		}
 	}
 
 	private setProper() {
+		console.log(`[${this.id}] setProper`)
 		this.proper = true
 		this.onProperCallback?.()
 	}
@@ -102,14 +105,23 @@ export class Tab {
 	}
 
 	private async isTabProper(): Promise<boolean> {
-		if (tabs$.get().length <= 1) return true
-		if (this.siteView.hasNavigationHistory()) return true
-		return this.siteView.hasVisibleContent()
+		const tabCount = tabs$.get().length
+		if (tabCount <= 1) {
+			console.log(`[${this.id}] isTabProper: true (only ${tabCount} tab)`)
+			return true
+		}
+		const hasContent = await this.siteView.hasVisibleContent()
+		console.log(`[${this.id}] isTabProper: ${hasContent} (hasContent=${hasContent})`)
+		return hasContent
 	}
 
 	private async shouldCloseOnExternalLink(): Promise<boolean> {
-		if (tabs$.get().length <= 1) return false
-		if (this.siteView.hasNavigationHistory()) return false
-		return !(await this.siteView.hasVisibleContent())
+		if (tabs$.get().length <= 1) {
+			console.log(`[${this.id}] shouldCloseOnExternalLink: false (last tab)`)
+			return false
+		}
+		const hasContent = await this.siteView.hasVisibleContent()
+		console.log(`[${this.id}] shouldCloseOnExternalLink: ${!hasContent} (hasContent=${hasContent})`)
+		return !hasContent
 	}
 }

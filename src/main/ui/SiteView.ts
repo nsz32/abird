@@ -91,14 +91,21 @@ export class SiteView {
 	}
 
 	async hasVisibleContent(): Promise<boolean> {
-		return this.webContents.executeJavaScript(`(function(){
-			if(document.querySelector('meta[http-equiv="refresh"]'))return false;
-			if(document.body.querySelector('iframe'))return true;
-			const s=new Set(["SCRIPT","STYLE","NOSCRIPT","TEMPLATE"]);
-			const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{acceptNode:n=>s.has(n.parentElement?.tagName)?2:1});
-			let l=0;while(w.nextNode()&&l<100)l+=w.currentNode.textContent.trim().length;
-			return l>=100;
-		})()`)
+		try {
+			const timeout = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 500))
+			const check = this.webContents.executeJavaScript(`(function(){
+				if(!document.body)return false;
+				if(document.querySelector('meta[http-equiv="refresh"]'))return false;
+				if(document.body.querySelector('iframe,img,video,audio,canvas,svg,embed,object'))return true;
+				const s=new Set(["SCRIPT","STYLE","NOSCRIPT","TEMPLATE"]);
+				const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{acceptNode:n=>s.has(n.parentElement?.tagName)?2:1});
+				let l=0;while(w.nextNode()&&l<100)l+=w.currentNode.textContent.trim().length;
+				return l>=100;
+			})()`)
+			return await Promise.race([check, timeout])
+		} catch {
+			return false
+		}
 	}
 
 	private setupNavigation() {
@@ -120,10 +127,12 @@ export class SiteView {
 	private handleUrlNavigation(event: Electron.Event, url: string) {
 		if (shouldHandleUrl(url, this.routing)) return
 
+		console.log(`[SiteView] handleUrlNavigation: external URL ${url}`)
 		event.preventDefault()
 		shell.openExternal(url)
 
 		this.callbacks.shouldCloseTab().then((willClose) => {
+			console.log(`[SiteView] shouldCloseTab resolved: willClose=${willClose}`)
 			this.callbacks.onExternalOpened(willClose)
 			if (willClose) this.callbacks.onCloseTab()
 		})
@@ -136,6 +145,7 @@ export class SiteView {
 		})
 
 		this.webContents.once("did-start-loading", () => {
+			console.log("[SiteView] did-start-loading (once) -> onFirstLoad")
 			this.callbacks.onFirstLoad()
 			this.emitNavState()
 		})

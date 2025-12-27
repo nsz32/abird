@@ -6,9 +6,11 @@ import { activeTab$, navBarConfig$, navState$, notifications$, tabs$ } from "../
 import { activateTab, closeTab, createTab } from "../tabs/Tabs"
 
 export function getTabsList(): TabInfo[] {
+	const allTabs = tabs$.get()
 	const activeId = activeTab$.get()?.id
-	return tabs$
-		.get()
+	const hasNonProperChild = (id: string) => allTabs.some((t) => !t.proper && t.parentId === id)
+
+	return allTabs
 		.filter((t) => t.proper)
 		.map((t) => ({
 			id: t.id,
@@ -16,7 +18,7 @@ export function getTabsList(): TabInfo[] {
 			url: t.navState$.get().url || t.initialUrl,
 			favicon: t.favicon,
 			isActive: t.id === activeId,
-			isLoading: t.navState$.get().isLoading,
+			isLoading: t.navState$.get().isLoading || hasNonProperChild(t.id),
 		}))
 }
 

@@ -6,6 +6,7 @@ let unsubscribeNavState: (() => void) | null = null
 let pendingActivationId: string | null = null
 
 export function createTab(url?: string, origin: TabOrigin = "user", index?: number, parentId?: string): Tab {
+	console.log(`[Tabs] createTab origin=${origin}`)
 	const tab = new Tab(
 		partition$.get(),
 		routing$.get(),
@@ -21,6 +22,7 @@ export function createTab(url?: string, origin: TabOrigin = "user", index?: numb
 	if (origin === "blank") {
 		pendingActivationId = tab.id
 		tab.onProper(() => handleTabProper(tab))
+		tab.scheduleProperCheck()
 	} else {
 		tab.proper = true
 		if (origin === "user") {
