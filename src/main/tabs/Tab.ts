@@ -54,7 +54,6 @@ export class Tab {
 		return {
 			onNavStateChanged: (state: NavigationState) => this.navState$.emit(state),
 			onFaviconChanged: (favicon: string | null) => this.updateFavicon(favicon),
-			onFirstLoad: () => {},
 			onNewTab: (url: string, origin: TabOrigin) => this.openChildTab(url, origin),
 			onCloseTab: () => closeTab(this.id),
 			onExternalOpened: (willClose: boolean) => this.emitExternalOpened(willClose),

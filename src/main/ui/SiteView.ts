@@ -8,7 +8,6 @@ import { SCROLLBAR_CSS } from "./scrollbar.css"
 export interface SiteViewCallbacks {
 	onNavStateChanged: (state: NavigationState) => void
 	onFaviconChanged: (favicon: string | null) => void
-	onFirstLoad: () => void
 	onNewTab: (url: string, origin: TabOrigin) => void
 	onCloseTab: () => void
 	onExternalOpened: (willClose: boolean) => void
@@ -86,10 +85,6 @@ export class SiteView {
 		this.webContents.close()
 	}
 
-	hasNavigationHistory(): boolean {
-		return this.webContents.navigationHistory.length() > 1
-	}
-
 	async hasVisibleContent(): Promise<boolean> {
 		try {
 			const timeout = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 500))
@@ -145,8 +140,6 @@ export class SiteView {
 		})
 
 		this.webContents.once("did-start-loading", () => {
-			console.log("[SiteView] did-start-loading (once) -> onFirstLoad")
-			this.callbacks.onFirstLoad()
 			this.emitNavState()
 		})
 
