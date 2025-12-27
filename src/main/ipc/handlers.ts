@@ -9,7 +9,7 @@ export function getTabsList(): TabInfo[] {
 	const activeId = activeTab$.get()?.id
 	return tabs$
 		.get()
-		.filter((t) => t.ready)
+		.filter((t) => t.proper)
 		.map((t) => ({
 			id: t.id,
 			title: t.navState$.get().title,
@@ -30,7 +30,7 @@ export function registerHandlers() {
 	ipcMain.handle(IpcChannels.TABS_GET_LIST, () => getTabsList())
 	ipcMain.handle(IpcChannels.TABS_ACTIVATE, (_, id: string) => activateTab(id))
 	ipcMain.handle(IpcChannels.TABS_CLOSE, (_, id: string) => closeTab(id))
-	ipcMain.handle(IpcChannels.TABS_CREATE, (_, index?: number) => createTab(undefined, true, index))
+	ipcMain.handle(IpcChannels.TABS_CREATE, (_, index?: number) => createTab(undefined, "user", index))
 	ipcMain.handle(IpcChannels.CONFIG_GET_NAVBAR, () => navBarConfig$.get())
 	ipcMain.handle(IpcChannels.NOTIF_GET_LIST, () => notifications$.get())
 	ipcMain.handle(IpcChannels.NOTIF_DISMISS, (_, id: string) => dismissNotification(id))

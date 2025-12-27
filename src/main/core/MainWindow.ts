@@ -40,6 +40,11 @@ export class MainWindow {
 		this.bringOverlaysToFront()
 	}
 
+	bringViewToFront(view: WebContentsView) {
+		this.bringToFront(view)
+		this.bringOverlaysToFront()
+	}
+
 	bringOverlaysToFront() {
 		if (this.navBarView) this.bringToFront(this.navBarView)
 		if (this.notificationView) this.bringToFront(this.notificationView)

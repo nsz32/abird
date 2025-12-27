@@ -1,10 +1,10 @@
-import type { NavigationState, RoutingConfig } from "@shared/types"
+import type { NavigationState, RoutingConfig, TabOrigin } from "@shared/types"
 import { StateObservable } from "../api/observable"
-import { externalOpened$ } from "../states"
+import { externalOpened$, tabs$ } from "../states"
 import { SiteView } from "../ui/SiteView"
 import { closeTab, createTab, getTabIndex } from "./Tabs"
 
-const MIN_READY_DELAY = 150
+const CHECK_DELAYS = [100, 300, 600, 1000, 1500, 2000]
 
 let nextId = 1
 
@@ -14,7 +14,7 @@ export class Tab {
 	readonly initialUrl: string
 	readonly parentId: string | null
 
-	ready = false
+	proper = false
 	favicon: string | null = null
 	readonly navState$ = new StateObservable<NavigationState>({
 		url: "",
@@ -25,7 +25,7 @@ export class Tab {
 	})
 
 	private readonly createdAt = Date.now()
-	private onReadyCallback?: () => void
+	private onProperCallback?: () => void
 
 	constructor(partition: string, routing: Partial<RoutingConfig> | null, url: string, userAgent: string, parentId: string | null = null) {
 		this.id = `tab-${nextId++}`
@@ -36,49 +36,80 @@ export class Tab {
 		this.siteView.loadURL(url)
 	}
 
-	onReady(callback: () => void) {
-		this.onReadyCallback = callback
+	onProper(callback: () => void) {
+		this.onProperCallback = callback
+	}
+
+	destroy() {
+		this.siteView.destroy()
 	}
 
 	private createCallbacks() {
 		return {
 			onNavStateChanged: (state: NavigationState) => this.navState$.emit(state),
 			onFaviconChanged: (favicon: string | null) => this.updateFavicon(favicon),
-			onFirstLoad: () => this.scheduleReady(),
-			onNewTab: (url: string, activate: boolean) => this.openChildTab(url, activate),
+			onFirstLoad: () => this.scheduleProperCheck(),
+			onNewTab: (url: string, origin: TabOrigin) => this.openChildTab(url, origin),
 			onCloseTab: () => closeTab(this.id),
 			onExternalOpened: (willClose: boolean) => this.emitExternalOpened(willClose),
+			shouldCloseTab: () => this.shouldCloseOnExternalLink(),
 		}
 	}
 
 	private updateFavicon(favicon: string | null) {
 		this.favicon = favicon
-		this.onReadyCallback?.()
 	}
 
-	private scheduleReady() {
-		const elapsed = Date.now() - this.createdAt
-		const remaining = MIN_READY_DELAY - elapsed
+	scheduleProperCheck() {
+		if (this.proper) return
+		this.checkProperAt(0)
+	}
 
-		if (remaining <= 0) {
-			this.setReady()
-		} else {
-			setTimeout(() => this.setReady(), remaining)
+	private checkProperAt(index: number) {
+		const delay = CHECK_DELAYS[index]
+		if (delay === undefined) {
+			this.setProper()
+			return
 		}
+
+		const elapsed = Date.now() - this.createdAt
+		const remaining = delay - elapsed
+
+		setTimeout(async () => {
+			if (this.proper) return
+			console.log("proper check", index)
+			if (await this.isTabProper()) {
+				this.setProper()
+			} else {
+				this.checkProperAt(index + 1)
+			}
+		}, Math.max(0, remaining))
 	}
 
-	private setReady() {
-		this.ready = true
-		this.onReadyCallback?.()
+	private setProper() {
+		this.proper = true
+		this.onProperCallback?.()
 	}
 
-	private openChildTab(url: string, activate: boolean) {
+	private openChildTab(url: string, origin: TabOrigin) {
 		const parentIndex = getTabIndex(this.id)
-		createTab(url, activate, parentIndex + 1, this.id)
+		createTab(url, origin, parentIndex + 1, this.id)
 	}
 
 	private emitExternalOpened(willClose: boolean) {
 		const targetId = willClose && this.parentId ? this.parentId : this.id
 		externalOpened$.emit(targetId)
+	}
+
+	private async isTabProper(): Promise<boolean> {
+		if (tabs$.get().length <= 1) return true
+		if (this.siteView.hasNavigationHistory()) return true
+		return this.siteView.hasVisibleContent()
+	}
+
+	private async shouldCloseOnExternalLink(): Promise<boolean> {
+		if (tabs$.get().length <= 1) return false
+		if (this.siteView.hasNavigationHistory()) return false
+		return !(await this.siteView.hasVisibleContent())
 	}
 }

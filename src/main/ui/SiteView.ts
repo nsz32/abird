@@ -1,16 +1,17 @@
-import type { NavigationState, RoutingConfig } from "@shared/types"
+import type { NavigationState, RoutingConfig, TabOrigin } from "@shared/types"
 import { type Rectangle, WebContentsView, session, shell } from "electron"
 import { shouldHandleUrl } from "../routing/UrlRouter"
 import { resolveUserAgent } from "../utils/userAgents"
 import { SCROLLBAR_CSS } from "./scrollbar.css"
 
 export interface SiteViewCallbacks {
-	onNavStateChanged?: (state: NavigationState) => void
-	onFaviconChanged?: (favicon: string | null) => void
-	onFirstLoad?: () => void
-	onNewTab?: (url: string, activate: boolean) => void
-	onCloseTab?: () => void
-	onExternalOpened?: (willClose: boolean) => void
+	onNavStateChanged: (state: NavigationState) => void
+	onFaviconChanged: (favicon: string | null) => void
+	onFirstLoad: () => void
+	onNewTab: (url: string, origin: TabOrigin) => void
+	onCloseTab: () => void
+	onExternalOpened: (willClose: boolean) => void
+	shouldCloseTab: () => Promise<boolean>
 }
 
 export class SiteView {
@@ -21,7 +22,7 @@ export class SiteView {
 		partition: string,
 		private readonly routing: Partial<RoutingConfig> | null,
 		userAgent: string,
-		private readonly callbacks: SiteViewCallbacks = {},
+		private readonly callbacks: SiteViewCallbacks,
 	) {
 		const sess = session.fromPartition(`persist:${partition}`)
 		sess.setUserAgent(resolveUserAgent(userAgent))
@@ -71,8 +72,6 @@ export class SiteView {
 		this.webContents.stop()
 	}
 
-	// ─── View Management ────────────────────────────────────────────────────────
-
 	setBounds(bounds: Rectangle) {
 		this.view.setBounds(bounds)
 	}
@@ -81,7 +80,24 @@ export class SiteView {
 		this.view.setVisible(visible)
 	}
 
-	// ─── Private Setup ──────────────────────────────────────────────────────────
+	destroy() {
+		this.webContents.close()
+	}
+
+	hasNavigationHistory(): boolean {
+		return this.webContents.navigationHistory.length() > 1
+	}
+
+	async hasVisibleContent(): Promise<boolean> {
+		return this.webContents.executeJavaScript(`(function(){
+			if(document.querySelector('meta[http-equiv="refresh"]'))return false;
+			if(document.body.querySelector('iframe'))return true;
+			const s=new Set(["SCRIPT","STYLE","NOSCRIPT","TEMPLATE"]);
+			const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{acceptNode:n=>s.has(n.parentElement?.tagName)?2:1});
+			let l=0;while(w.nextNode()&&l<100)l+=w.currentNode.textContent.trim().length;
+			return l>=100;
+		})()`)
+	}
 
 	private setupNavigation() {
 		this.webContents.on("will-navigate", (event, url) => this.handleUrlNavigation(event, url))
@@ -89,10 +105,11 @@ export class SiteView {
 
 		this.webContents.setWindowOpenHandler(({ url, disposition }) => {
 			if (shouldHandleUrl(url, this.routing)) {
-				this.callbacks.onNewTab?.(url, disposition !== "background-tab")
+				const origin: TabOrigin = disposition === "background-tab" ? "background" : "blank"
+				this.callbacks.onNewTab(url, origin)
 			} else {
 				shell.openExternal(url)
-				this.callbacks.onExternalOpened?.(false)
+				this.callbacks.onExternalOpened(false)
 			}
 			return { action: "deny" }
 		})
@@ -104,12 +121,10 @@ export class SiteView {
 		event.preventDefault()
 		shell.openExternal(url)
 
-		const willClose = !this.webContents.navigationHistory.canGoBack()
-		this.callbacks.onExternalOpened?.(willClose)
-
-		if (willClose) {
-			this.callbacks.onCloseTab?.()
-		}
+		this.callbacks.shouldCloseTab().then((willClose) => {
+			this.callbacks.onExternalOpened(willClose)
+			if (willClose) this.callbacks.onCloseTab()
+		})
 	}
 
 	private setupEventListeners() {
@@ -119,7 +134,7 @@ export class SiteView {
 		})
 
 		this.webContents.once("did-start-loading", () => {
-			this.callbacks.onFirstLoad?.()
+			this.callbacks.onFirstLoad()
 			this.emitNavState()
 		})
 
@@ -135,12 +150,12 @@ export class SiteView {
 		this.webContents.on("did-frame-navigate", () => this.emitNavState())
 
 		this.webContents.on("page-favicon-updated", (_, favicons) => {
-			this.callbacks.onFaviconChanged?.(favicons[0] ?? null)
+			this.callbacks.onFaviconChanged(favicons[0] ?? null)
 		})
 	}
 
 	private emitNavState() {
-		this.callbacks.onNavStateChanged?.({
+		this.callbacks.onNavStateChanged({
 			url: this.webContents.getURL(),
 			title: this.webContents.getTitle(),
 			canGoBack: this.webContents.navigationHistory.canGoBack(),

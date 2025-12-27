@@ -5,6 +5,12 @@
 // Theme mode
 export type ThemeMode = "system" | "light" | "dark"
 
+// Tab origin - determines how a tab should behave
+// "user": Created by user action (Home+, first tab) → always proper, activate immediately
+// "background": Created in background (middle-click) → always proper, don't activate
+// "blank": Created by _blank/JS → must be checked for content before becoming proper
+export type TabOrigin = "user" | "background" | "blank"
+
 // État de navigation (envoyé aux overlays)
 export interface NavigationState {
 	url: string

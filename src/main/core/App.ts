@@ -1,6 +1,7 @@
 import { nativeTheme } from "electron"
 import { getTabsList, registerHandlers } from "../ipc/handlers"
 import { activeTab$, contentBounds$, externalOpened$, navBarBounds$, navBarConfig$, navbarSync$, notifications$, tabs$, theme$, windowBounds$ } from "../states"
+import type { Tab } from "../tabs/Tab"
 import { createTab } from "../tabs/Tabs"
 import { NavBar } from "../ui/NavBar"
 import { NotificationCenter } from "../ui/NotificationCenter"
@@ -37,12 +38,11 @@ function setupSubscriptions() {
 	windowBounds$.subscribe((bounds) => notificationCenter.setBounds(bounds))
 
 	activeTab$.subscribe((activeTab) => {
-		for (const t of tabs$.get()) {
-			const isActive = t.id === activeTab?.id
-			t.siteView.setVisible(isActive && t.ready)
-			if (isActive) t.siteView.setBounds(contentBounds$.get())
-		}
-		mainWindow.bringOverlaysToFront()
+		updateTabsVisibility(activeTab)
+	})
+
+	tabs$.subscribe(() => {
+		updateTabsVisibility(activeTab$.get())
 	})
 
 	navbarSync$.subscribe(() => {
@@ -69,4 +69,17 @@ function launch() {
 		mainWindow.show()
 		createTab()
 	})
+}
+
+function updateTabsVisibility(activeTab: Tab | null) {
+	for (const tab of tabs$.get()) {
+		const isActive = tab.id === activeTab?.id
+		// Non-proper tabs stay visible (loading in background)
+		// Proper tabs are only visible when active
+		tab.siteView.setVisible(isActive || !tab.proper)
+		if (isActive) {
+			tab.siteView.setBounds(contentBounds$.get())
+			mainWindow.bringViewToFront(tab.siteView.view)
+		}
+	}
 }

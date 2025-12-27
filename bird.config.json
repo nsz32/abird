@@ -30,6 +30,20 @@
 			"routing": {
 				"internal": "^https://[^/]*\\.google\\.com"
 			}
+		},
+		"test1": {
+			"partition": "test",
+			"startUrl": "https://the-internet.herokuapp.com/",
+			"routing": {
+				"internal": "https://the-internet.herokuapp.com"
+			}
+		},
+		"test2": {
+			"partition": "test",
+			"startUrl": "https://testpages.herokuapp.com/styled/index.html",
+			"routing": {
+				"internal": "https://testpages.herokuapp.com"
+			}
 		}
 	}
 }
