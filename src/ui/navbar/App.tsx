@@ -1,11 +1,25 @@
 import { ArrowLeft, ArrowRight, HousePlus, RotateCw, X } from "lucide-react"
+import type { KeyboardEvent } from "react"
 import { TabButton } from "./TabButton"
 import { useNavbarState } from "./useNavbarState"
 
 export function App() {
-	const { navState, config, tabs, externalTabIds, containerRef } = useNavbarState()
+	const { navState, config, tabs, externalTabIds, containerRef, isUrlMode, urlInputRef, exitUrlMode } =
+		useNavbarState()
 
 	if (!config) return null
+
+	const handleUrlKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === "Escape") {
+			exitUrlMode()
+		} else if (e.key === "Enter") {
+			const url = urlInputRef.current?.value.trim()
+			if (url) {
+				window.bird.navigation.goTo(url)
+			}
+			exitUrlMode()
+		}
+	}
 
 	return (
 		<div ref={containerRef} className="navigation-bar">
@@ -32,18 +46,29 @@ export function App() {
 				<HousePlus size={16} />
 			</NavButton>
 
-			<div className="tabs-list">
-				{tabs.map((tab) => (
-					<TabButton
-						key={tab.id}
-						tab={tab}
-						showClose={tabs.length > 1}
-						showExternalIndicator={externalTabIds.has(tab.id)}
-						onActivate={() => window.bird.tabs.activate(tab.id)}
-						onClose={() => window.bird.tabs.close(tab.id)}
-					/>
-				))}
-			</div>
+			{isUrlMode && config.urlEditable ? (
+				<input
+					ref={urlInputRef}
+					type="text"
+					className="url-input"
+					defaultValue={navState.url}
+					onKeyDown={handleUrlKeyDown}
+					onBlur={exitUrlMode}
+				/>
+			) : (
+				<div className="tabs-list">
+					{tabs.map((tab) => (
+						<TabButton
+							key={tab.id}
+							tab={tab}
+							showClose={tabs.length > 1}
+							showExternalIndicator={externalTabIds.has(tab.id)}
+							onActivate={() => window.bird.tabs.activate(tab.id)}
+							onClose={() => window.bird.tabs.close(tab.id)}
+						/>
+					))}
+				</div>
+			)}
 		</div>
 	)
 }

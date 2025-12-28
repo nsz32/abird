@@ -1,5 +1,6 @@
-import { nativeTheme } from "electron"
+import { app, nativeTheme } from "electron"
 import { getTabsList, registerHandlers } from "../ipc/handlers"
+import { registerGlobalShortcuts, unregisterGlobalShortcuts } from "../keyboard/shortcuts"
 import { activeTab$, contentBounds$, externalOpened$, navBarBounds$, navBarConfig$, navbarSync$, notifications$, tabs$, theme$, windowBounds$ } from "../states"
 import type { Tab } from "../tabs/Tab"
 import { createTab } from "../tabs/Tabs"
@@ -61,6 +62,14 @@ function setupSubscriptions() {
 
 function launch() {
 	registerHandlers()
+	registerGlobalShortcuts({
+		isWindowFocused: () => mainWindow.window.isFocused(),
+		onFocusUrl: () => navBar.sendFocusUrl(),
+	})
+
+	app.on("will-quit", () => {
+		unregisterGlobalShortcuts()
+	})
 
 	navBar.load()
 	notificationCenter.load()

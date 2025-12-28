@@ -38,6 +38,13 @@ contextBridge.exposeInMainWorld("bird", {
 	navbar: {
 		resize: (height: number) => ipcRenderer.send(IpcChannels.NAVBAR_RESIZE, height),
 	},
+	commands: {
+		onFocusUrl: (callback: () => void): (() => void) => {
+			const listener = () => callback()
+			ipcRenderer.on(IpcChannels.COMMAND_FOCUS_URL, listener)
+			return () => ipcRenderer.removeListener(IpcChannels.COMMAND_FOCUS_URL, listener)
+		},
+	},
 	notifications: {
 		getList: (): Promise<Notification[]> => ipcRenderer.invoke(IpcChannels.NOTIF_GET_LIST),
 		onListChanged: (callback: (notifications: Notification[]) => void): (() => void) => {

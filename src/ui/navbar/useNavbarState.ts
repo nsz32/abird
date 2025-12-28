@@ -1,5 +1,5 @@
 import type { NavBarConfig, NavigationState, TabInfo } from "@shared/types"
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 const EXTERNAL_INDICATOR_DURATION = 800
 
@@ -14,7 +14,21 @@ export function useNavbarState() {
 	const [config, setConfig] = useState<NavBarConfig | null>(null)
 	const [tabs, setTabs] = useState<TabInfo[]>([])
 	const [externalTabIds, setExternalTabIds] = useState<Set<string>>(new Set())
+	const [isUrlMode, setIsUrlMode] = useState(false)
 	const containerRef = useRef<HTMLDivElement>(null)
+	const urlInputRef = useRef<HTMLInputElement>(null)
+
+	const enterUrlMode = useCallback(() => {
+		setIsUrlMode(true)
+		setTimeout(() => {
+			urlInputRef.current?.focus()
+			urlInputRef.current?.select()
+		}, 100)
+	}, [])
+
+	const exitUrlMode = useCallback(() => {
+		setIsUrlMode(false)
+	}, [])
 
 	useEffect(() => {
 		window.bird.config.getNavBar().then(setConfig)
@@ -33,13 +47,15 @@ export function useNavbarState() {
 				})
 			}, EXTERNAL_INDICATOR_DURATION)
 		})
+		const unsubscribeFocusUrl = window.bird.commands.onFocusUrl(enterUrlMode)
 
 		return () => {
 			unsubscribeNav()
 			unsubscribeTabs()
 			unsubscribeExternal()
+			unsubscribeFocusUrl()
 		}
-	}, [])
+	}, [enterUrlMode])
 
 	useEffect(() => {
 		if (!containerRef.current) return
@@ -53,5 +69,5 @@ export function useNavbarState() {
 		return () => observer.disconnect()
 	})
 
-	return { navState, config, tabs, externalTabIds, containerRef }
+	return { navState, config, tabs, externalTabIds, containerRef, isUrlMode, urlInputRef, exitUrlMode }
 }

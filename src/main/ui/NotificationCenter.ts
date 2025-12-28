@@ -2,7 +2,6 @@ import { join } from "node:path"
 import type { Notification } from "@shared/types"
 import { IpcChannels } from "@shared/types"
 import { type Rectangle, WebContentsView, ipcMain } from "electron"
-import { registerAppShortcuts } from "../keyboard/shortcuts"
 
 const MARGIN = 16
 
@@ -20,7 +19,6 @@ export class NotificationCenter {
 			},
 		})
 		this.view.setBackgroundColor("#00000000")
-		registerAppShortcuts(this.view.webContents)
 
 		ipcMain.on(IpcChannels.NOTIF_RESIZE, (_, width: number, height: number) => {
 			console.log("📐 NotificationCenter resize:", width, "x", height)

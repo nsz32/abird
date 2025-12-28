@@ -69,6 +69,8 @@ export const IpcChannels = {
 	NOTIF_RESIZE: "bird:notif:resize",
 	// Navbar
 	NAVBAR_RESIZE: "bird:navbar:resize",
+	// Commands
+	COMMAND_FOCUS_URL: "bird:command:focus-url",
 } as const
 
 // Type utilitaire pour les valeurs de IpcChannels
@@ -134,6 +136,9 @@ export interface BirdApi {
 	}
 	navbar: {
 		resize: (height: number) => void
+	}
+	commands: {
+		onFocusUrl: (callback: () => void) => () => void
 	}
 	notifications: {
 		getList: () => Promise<Notification[]>

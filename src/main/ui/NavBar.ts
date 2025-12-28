@@ -2,7 +2,6 @@ import { join } from "node:path"
 import type { NavigationState, TabInfo } from "@shared/types"
 import { IpcChannels } from "@shared/types"
 import { type Rectangle, WebContentsView, ipcMain } from "electron"
-import { registerAppShortcuts } from "../keyboard/shortcuts"
 import { navBarHeight$ } from "../states"
 
 export class NavBar {
@@ -17,7 +16,6 @@ export class NavBar {
 			},
 		})
 		this.view.setBackgroundColor("#1a1a2e")
-		registerAppShortcuts(this.view.webContents)
 
 		ipcMain.on(IpcChannels.NAVBAR_RESIZE, (_, height: number) => {
 			navBarHeight$.emit(height)
@@ -42,6 +40,11 @@ export class NavBar {
 
 	sendExternalOpened(tabId: string) {
 		this.view.webContents.send(IpcChannels.TABS_EXTERNAL_OPENED, tabId)
+	}
+
+	sendFocusUrl() {
+		this.view.webContents.focus()
+		this.view.webContents.send(IpcChannels.COMMAND_FOCUS_URL)
 	}
 
 	load() {
