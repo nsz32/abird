@@ -1,16 +1,16 @@
 import { join } from "node:path"
-import type { Notification } from "@shared/types"
 import { IpcChannels } from "@shared/types"
 import { type Rectangle, WebContentsView, ipcMain } from "electron"
 
 const MARGIN = 16
+const PANEL_WIDTH = 320
 
-export class NotificationCenter {
+export class DownloadPanel {
 	readonly view: WebContentsView
 	private windowBounds: Rectangle = { x: 0, y: 0, width: 0, height: 0 }
-	private contentSize = { width: 0, height: 0 }
 	private navBarPosition: "top" | "bottom" = "top"
 	private navBarHeight = 0
+	private contentHeight = 0
 
 	constructor() {
 		this.view = new WebContentsView({
@@ -22,9 +22,8 @@ export class NotificationCenter {
 		})
 		this.view.setBackgroundColor("#00000000")
 
-		ipcMain.on(IpcChannels.NOTIF_RESIZE, (_, width: number, height: number) => {
-			console.log("📐 NotificationCenter resize:", width, "x", height)
-			this.contentSize = { width, height }
+		ipcMain.on(IpcChannels.DOWNLOADS_PANEL_RESIZE, (_, _width: number, height: number) => {
+			this.contentHeight = height
 			this.updateViewBounds()
 		})
 	}
@@ -41,20 +40,24 @@ export class NotificationCenter {
 	}
 
 	private updateViewBounds() {
-		const { width, height } = this.contentSize
-		if (width === 0 || height === 0) {
+		if (this.contentHeight === 0) {
 			this.view.setBounds({ x: 0, y: 0, width: 10, height: 10 })
 			return
 		}
-		// Position opposite to navbar to avoid overlap
+
+		const maxHeight = this.windowBounds.height - this.navBarHeight - MARGIN * 2
+		const height = Math.min(this.contentHeight, maxHeight)
+
+		// Position below navbar (top) or above navbar (bottom)
 		const y =
 			this.navBarPosition === "top"
-				? this.windowBounds.height - height - MARGIN // Navbar top → notifications bottom
-				: this.navBarHeight + MARGIN // Navbar bottom → notifications top
+				? this.navBarHeight + MARGIN // Navbar top → panel below
+				: MARGIN // Navbar bottom → panel at top
+
 		this.view.setBounds({
-			x: this.windowBounds.width - width - MARGIN,
+			x: this.windowBounds.width - PANEL_WIDTH - MARGIN,
 			y,
-			width,
+			width: PANEL_WIDTH,
 			height,
 		})
 	}
@@ -63,16 +66,11 @@ export class NotificationCenter {
 		this.view.setVisible(visible)
 	}
 
-	sendNotifications(notifications: Notification[]) {
-		this.view.webContents.send(IpcChannels.NOTIF_LIST_CHANGED, notifications)
-		this.setVisible(notifications.length > 0)
-	}
-
 	load() {
 		if (process.env.ELECTRON_RENDERER_URL) {
-			this.view.webContents.loadURL(`${process.env.ELECTRON_RENDERER_URL}/notifications/`)
+			this.view.webContents.loadURL(`${process.env.ELECTRON_RENDERER_URL}/downloads/`)
 		} else {
-			this.view.webContents.loadFile(join(__dirname, "../renderer/notifications/index.html"))
+			this.view.webContents.loadFile(join(__dirname, "../renderer/downloads/index.html"))
 		}
 	}
 

@@ -43,6 +43,8 @@ export default defineConfig({
 				input: {
 					navbar: resolve(__dirname, "src/ui/navbar/index.html"),
 					notifications: resolve(__dirname, "src/ui/notifications/index.html"),
+					downloads: resolve(__dirname, "src/ui/downloads/index.html"),
+					findbar: resolve(__dirname, "src/ui/findbar/index.html"),
 				},
 			},
 		},

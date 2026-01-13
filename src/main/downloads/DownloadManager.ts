@@ -1,15 +1,53 @@
 import { closeSync, existsSync, openSync, readSync, statSync, unlinkSync } from "node:fs"
 import { basename, dirname, extname, join } from "node:path"
-import type { DownloadConfig, ResolvedDownloadConfig } from "@shared/types"
+import type { ActiveDownload, DownloadConfig, DownloadHistoryItem, DownloadStatus, ResolvedDownloadConfig } from "@shared/types"
 import type { Session } from "electron"
 import { app } from "electron"
 import { fileTypeFromFile } from "file-type"
 import { addNotification, dismissNotification, updateNotification } from "../notifications/notify"
+import { activeDownloads$, downloadEvents$, downloadHistory$ } from "../states"
 import { parseSize } from "../utils/parseSize"
 import { getFileMd5, openFile } from "../utils/platform"
 import { type ExecutableCheckResult, MIN_BYTES_FOR_MAGIC, checkOfficeMacroWarning, isExecutableByMagic } from "./executableDetection"
 
 const MIN_BYTES_FOR_DETECTION = 4096
+
+let nextDownloadId = 1
+
+function generateDownloadId(): string {
+	return `dl-${nextDownloadId++}`
+}
+
+function addActiveDownload(id: string, filename: string, totalBytes: number): void {
+	const download: ActiveDownload = {
+		id,
+		filename,
+		receivedBytes: 0,
+		totalBytes,
+		startedAt: Date.now(),
+	}
+	activeDownloads$.emit([download, ...activeDownloads$.get()])
+	downloadEvents$.emit({ type: "started", id })
+}
+
+function updateActiveDownload(id: string, receivedBytes: number, totalBytes: number): void {
+	const downloads = activeDownloads$.get()
+	const updated = downloads.map((d) => (d.id === id ? { ...d, receivedBytes, totalBytes } : d))
+	activeDownloads$.emit(updated)
+
+	const progress = totalBytes > 0 ? Math.round((receivedBytes / totalBytes) * 100) : 0
+	downloadEvents$.emit({ type: "progress", id, progress })
+}
+
+function removeActiveDownload(id: string): void {
+	activeDownloads$.emit(activeDownloads$.get().filter((d) => d.id !== id))
+}
+
+function addToHistory(id: string, filename: string, status: DownloadStatus, message?: string): void {
+	const item: DownloadHistoryItem = { id, filename, status, message, completedAt: Date.now() }
+	downloadHistory$.emit([item, ...downloadHistory$.get()])
+	downloadEvents$.emit({ type: status, id })
+}
 
 export function resolveDownloadConfig(config: DownloadConfig): ResolvedDownloadConfig {
 	return {
@@ -62,9 +100,13 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 	const downloadDir = config.directory || app.getPath("downloads")
 
 	session.on("will-download", (_event, item) => {
+		const downloadId = generateDownloadId()
 		const filename = item.getFilename()
 		const { path: savePath, originalPath } = getDownloadUniquePath(join(downloadDir, filename))
 		item.setSavePath(savePath)
+
+		// Add to active downloads
+		addActiveDownload(downloadId, filename, item.getTotalBytes())
 
 		const notifId = addNotification("download", filename, "Téléchargement en cours...", {
 			dismissable: false,
@@ -78,6 +120,9 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 			if (state === "progressing" && !item.isPaused()) {
 				const received = item.getReceivedBytes()
 				const total = item.getTotalBytes()
+
+				// Update active download progress
+				updateActiveDownload(downloadId, received, total)
 
 				// Early executable detection with retry
 				if (!config.allowExecutablesDownload && !earlyDetectionResult && received >= MIN_BYTES_FOR_DETECTION) {
@@ -95,6 +140,8 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 								message: `Fichier exécutable détecté (${result.executable.name})`,
 								dismissable: true,
 							})
+							removeActiveDownload(downloadId)
+							addToHistory(downloadId, filename, "blocked", `Exécutable (${result.executable.name})`)
 						}
 						return result
 					})
@@ -106,9 +153,11 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 		})
 
 		item.once("done", (_e, state) => {
+			removeActiveDownload(downloadId)
+
 			if (state === "completed") {
 				dismissNotification(notifId)
-				handleCompletedDownload(savePath, filename, item.getTotalBytes(), config, earlyDetectionResult, originalPath)
+				handleCompletedDownload(downloadId, savePath, filename, item.getTotalBytes(), config, earlyDetectionResult, originalPath)
 			} else if (state === "cancelled") {
 				// Notification already handled if blocked as executable
 				if (!wasBlockedAsExecutable) {
@@ -116,6 +165,7 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 						title: `${filename} - Annulé`,
 						dismissable: true,
 					})
+					addToHistory(downloadId, filename, "cancelled")
 				}
 			} else {
 				updateNotification(notifId, {
@@ -123,6 +173,7 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 					message: "Interrompu",
 					dismissable: true,
 				})
+				addToHistory(downloadId, filename, "failed", "Interrompu")
 			}
 		})
 	})
@@ -177,6 +228,7 @@ async function detectFinal(savePath: string): Promise<DetectionResult> {
 }
 
 async function handleCompletedDownload(
+	downloadId: string,
 	savePath: string,
 	filename: string,
 	size: number,
@@ -199,11 +251,13 @@ async function handleCompletedDownload(
 				dismissable: true,
 				autoDismiss: 5000,
 			})
+			addToHistory(downloadId, filename, "blocked", `Exécutable (${result.executable.name})`)
 		} else {
 			addNotification("download", filename, `Téléchargement terminé (${result.executable.name} détecté)`, {
 				dismissable: true,
 				autoDismiss: 5000,
 			})
+			addToHistory(downloadId, filename, "completed", `Exécutable (${result.executable.name})`)
 		}
 		return
 	}
@@ -224,6 +278,8 @@ async function handleCompletedDownload(
 			return
 		}
 	}
+
+	addToHistory(downloadId, filename, "completed")
 
 	if (shouldAutoOpen(result, size, config)) {
 		openFile(savePath).then((error) => {

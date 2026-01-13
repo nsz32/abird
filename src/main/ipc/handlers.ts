@@ -2,7 +2,18 @@ import type { TabInfo } from "@shared/types"
 import { IpcChannels } from "@shared/types"
 import { ipcMain } from "electron"
 import { dismissNotification } from "../notifications/notify"
-import { activeTab$, navBarConfig$, navState$, notifications$, tabs$ } from "../states"
+import {
+	activeDownloads$,
+	activeTab$,
+	downloadHistory$,
+	downloadPanelVisible$,
+	findBarVisible$,
+	findState$,
+	navBarConfig$,
+	navState$,
+	notifications$,
+	tabs$,
+} from "../states"
 import { activateTab, closeTab, createTab } from "../tabs/Tabs"
 
 export function getTabsList(): TabInfo[] {
@@ -36,4 +47,22 @@ export function registerHandlers() {
 	ipcMain.handle(IpcChannels.CONFIG_GET_NAVBAR, () => navBarConfig$.get())
 	ipcMain.handle(IpcChannels.NOTIF_GET_LIST, () => notifications$.get())
 	ipcMain.handle(IpcChannels.NOTIF_DISMISS, (_, id: string) => dismissNotification(id))
+	ipcMain.handle(IpcChannels.DOWNLOADS_TOGGLE, () => downloadPanelVisible$.emit(!downloadPanelVisible$.get()))
+	ipcMain.handle(IpcChannels.DOWNLOADS_GET_HISTORY, () => downloadHistory$.get())
+	ipcMain.handle(IpcChannels.DOWNLOADS_GET_ACTIVE, () => activeDownloads$.get())
+	// Find in page
+	ipcMain.handle(IpcChannels.FIND_SEARCH, (_, text: string) => {
+		activeTab$.get()?.siteView.findInPage(text)
+	})
+	ipcMain.handle(IpcChannels.FIND_NEXT, () => {
+		activeTab$.get()?.siteView.findNext()
+	})
+	ipcMain.handle(IpcChannels.FIND_PREV, () => {
+		activeTab$.get()?.siteView.findPrev()
+	})
+	ipcMain.handle(IpcChannels.FIND_CLOSE, () => {
+		activeTab$.get()?.siteView.stopFind()
+		findBarVisible$.emit(false)
+		findState$.emit({ text: "", activeMatch: 0, totalMatches: 0 })
+	})
 }

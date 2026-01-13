@@ -7,6 +7,8 @@ export class MainWindow {
 	readonly window: BaseWindow
 	private navBarView: WebContentsView | null = null
 	private notificationView: WebContentsView | null = null
+	private downloadPanelView: WebContentsView | null = null
+	private findBarView: WebContentsView | null = null
 
 	constructor() {
 		this.window = new BaseWindow({
@@ -40,6 +42,18 @@ export class MainWindow {
 		this.bringOverlaysToFront()
 	}
 
+	setDownloadPanel(view: WebContentsView) {
+		this.downloadPanelView = view
+		this.addView(view)
+		this.bringOverlaysToFront()
+	}
+
+	setFindBar(view: WebContentsView) {
+		this.findBarView = view
+		this.addView(view)
+		this.bringOverlaysToFront()
+	}
+
 	bringViewToFront(view: WebContentsView) {
 		this.bringToFront(view)
 		this.bringOverlaysToFront()
@@ -47,6 +61,8 @@ export class MainWindow {
 
 	bringOverlaysToFront() {
 		if (this.navBarView) this.bringToFront(this.navBarView)
+		if (this.findBarView) this.bringToFront(this.findBarView)
+		if (this.downloadPanelView) this.bringToFront(this.downloadPanelView)
 		if (this.notificationView) this.bringToFront(this.notificationView)
 	}
 

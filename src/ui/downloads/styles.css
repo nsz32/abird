@@ -1,0 +1,157 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+	width: 100%;
+	height: 100%;
+	background: transparent;
+	overflow: hidden;
+}
+
+.download-panel {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	background: rgba(30, 30, 50, 0.95);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	border-radius: 10px;
+	border: 1px solid rgba(255, 255, 255, 0.15);
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+	overflow: hidden;
+	animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+	from {
+		opacity: 0;
+		transform: translateY(-10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.download-header {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 12px 14px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	color: #ccc;
+	font-size: 13px;
+	font-weight: 500;
+}
+
+.download-empty {
+	padding: 24px 14px;
+	text-align: center;
+	color: #666;
+	font-size: 13px;
+}
+
+.download-list {
+	max-height: 320px;
+	overflow-y: auto;
+}
+
+.download-item {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	padding: 10px 14px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.download-item:last-child {
+	border-bottom: none;
+}
+
+.download-icon {
+	flex-shrink: 0;
+	margin-top: 2px;
+	color: #6bffb8;
+}
+
+.download-item.cancelled .download-icon,
+.download-item.failed .download-icon {
+	color: #888;
+}
+
+.download-item.blocked .download-icon {
+	color: #ff6b6b;
+}
+
+.download-content {
+	flex: 1;
+	min-width: 0;
+}
+
+.download-filename {
+	font-size: 13px;
+	color: #eee;
+	word-break: break-word;
+}
+
+.download-status {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	margin-top: 4px;
+	font-size: 11px;
+	color: #6bffb8;
+}
+
+.download-item.cancelled .download-status,
+.download-item.failed .download-status {
+	color: #888;
+}
+
+.download-item.blocked .download-status {
+	color: #ff6b6b;
+}
+
+/* Active downloads */
+.download-item.active {
+	background: rgba(107, 255, 184, 0.05);
+}
+
+.download-item.active .download-icon {
+	color: #6bffb8;
+}
+
+.download-item.active .download-status {
+	color: #6bffb8;
+}
+
+.download-icon.spinning {
+	animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.download-progress-bar {
+	height: 4px;
+	background: rgba(255, 255, 255, 0.1);
+	border-radius: 2px;
+	margin-top: 6px;
+	overflow: hidden;
+}
+
+.download-progress-fill {
+	height: 100%;
+	background: #6bffb8;
+	border-radius: 2px;
+	transition: width 0.2s ease;
+}

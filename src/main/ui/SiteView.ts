@@ -1,4 +1,4 @@
-import type { NavigationState, RoutingConfig, TabOrigin } from "@shared/types"
+import type { FindState, NavigationState, RoutingConfig, TabOrigin } from "@shared/types"
 import { type Rectangle, WebContentsView, session, shell } from "electron"
 import { setupDownloads } from "../downloads/DownloadManager"
 import { shouldHandleUrl } from "../routing/UrlRouter"
@@ -13,6 +13,7 @@ export interface SiteViewCallbacks {
 	onCloseTab: () => void
 	onExternalOpened: (willClose: boolean) => void
 	shouldCloseTab: () => Promise<boolean>
+	onFindResult: (state: FindState) => void
 }
 
 export class SiteView {
@@ -86,6 +87,44 @@ export class SiteView {
 		this.webContents.close()
 	}
 
+	// ─── Find in Page API ──────────────────────────────────────────────────────
+
+	private currentFindText = ""
+
+	findInPage(text: string) {
+		// Stop previous search before starting a new one
+		if (this.currentFindText) {
+			this.webContents.stopFindInPage("clearSelection")
+		}
+		if (!text) {
+			this.currentFindText = ""
+			this.callbacks.onFindResult({ text: "", activeMatch: 0, totalMatches: 0 })
+			return
+		}
+		this.currentFindText = text
+		this.webContents.findInPage(text)
+	}
+
+	findNext() {
+		if (this.currentFindText) {
+			this.webContents.findInPage(this.currentFindText, { findNext: true, forward: true })
+		}
+	}
+
+	findPrev() {
+		if (this.currentFindText) {
+			this.webContents.findInPage(this.currentFindText, { findNext: true, forward: false })
+		}
+	}
+
+	stopFind() {
+		if (this.currentFindText) {
+			this.webContents.stopFindInPage("clearSelection")
+		}
+		this.currentFindText = ""
+		this.callbacks.onFindResult({ text: "", activeMatch: 0, totalMatches: 0 })
+	}
+
 	async hasVisibleContent(): Promise<boolean> {
 		try {
 			const timeout = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 500))
@@ -157,6 +196,14 @@ export class SiteView {
 
 		this.webContents.on("page-favicon-updated", (_, favicons) => {
 			this.callbacks.onFaviconChanged(favicons[0] ?? null)
+		})
+
+		this.webContents.on("found-in-page", (_, result) => {
+			this.callbacks.onFindResult({
+				text: this.currentFindText,
+				activeMatch: result.activeMatchOrdinal,
+				totalMatches: result.matches,
+			})
 		})
 	}
 

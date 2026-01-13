@@ -1,3 +1,5 @@
+import type { WebContents } from "electron"
+
 type Listener<T> = (value: T) => void
 // biome-ignore lint/suspicious/noExplicitAny: necessary for type inference
 type Combined<T extends readonly StateObservable<any>[]> = { [K in keyof T]: T[K] extends StateObservable<infer U> ? U : never }
@@ -30,6 +32,49 @@ export class StateObservable<T> {
 	}
 	get() {
 		return this.state
+	}
+}
+
+export class BroadcastObservable<T> extends StateObservable<T> {
+	private webContents = new Set<WebContents>()
+
+	constructor(
+		state: T,
+		private channel: string,
+	) {
+		super(state)
+	}
+
+	register(wc: WebContents) {
+		this.webContents.add(wc)
+		wc.once("destroyed", () => this.webContents.delete(wc))
+		// Envoie l'état initial
+		if (!wc.isDestroyed()) wc.send(this.channel, this.get())
+	}
+
+	override emit(state: T) {
+		super.emit(state)
+		for (const wc of this.webContents) {
+			if (!wc.isDestroyed()) wc.send(this.channel, state)
+		}
+	}
+}
+
+// Event broadcaster (no state, just broadcasts events)
+export class BroadcastEvent<T> {
+	private webContents = new Set<WebContents>()
+
+	constructor(private channel: string) {}
+
+	register(wc: WebContents) {
+		this.webContents.add(wc)
+		wc.once("destroyed", () => this.webContents.delete(wc))
+	}
+
+	emit(event: T) {
+		for (const wc of this.webContents) {
+			if (!wc.isDestroyed()) wc.send(this.channel, event)
+		}
 	}
 }
 

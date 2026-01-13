@@ -1,4 +1,14 @@
-import { IpcChannels, type NavBarConfig, type NavigationState, type Notification, type TabInfo } from "@shared/types"
+import {
+	type ActiveDownload,
+	type DownloadEvent,
+	type DownloadHistoryItem,
+	type FindState,
+	IpcChannels,
+	type NavBarConfig,
+	type NavigationState,
+	type Notification,
+	type TabInfo,
+} from "@shared/types"
 import { contextBridge, ipcRenderer } from "electron"
 
 // API exposed to UI components
@@ -54,5 +64,43 @@ contextBridge.exposeInMainWorld("bird", {
 		},
 		dismiss: (id: string) => ipcRenderer.invoke(IpcChannels.NOTIF_DISMISS, id),
 		resize: (width: number, height: number) => ipcRenderer.send(IpcChannels.NOTIF_RESIZE, width, height),
+	},
+	downloads: {
+		toggle: () => ipcRenderer.invoke(IpcChannels.DOWNLOADS_TOGGLE),
+		getHistory: (): Promise<DownloadHistoryItem[]> => ipcRenderer.invoke(IpcChannels.DOWNLOADS_GET_HISTORY),
+		getActive: (): Promise<ActiveDownload[]> => ipcRenderer.invoke(IpcChannels.DOWNLOADS_GET_ACTIVE),
+		onHistoryChanged: (callback: (items: DownloadHistoryItem[]) => void): (() => void) => {
+			const listener = (_event: Electron.IpcRendererEvent, items: DownloadHistoryItem[]) => callback(items)
+			ipcRenderer.on(IpcChannels.DOWNLOADS_HISTORY_CHANGED, listener)
+			return () => ipcRenderer.removeListener(IpcChannels.DOWNLOADS_HISTORY_CHANGED, listener)
+		},
+		onActiveChanged: (callback: (items: ActiveDownload[]) => void): (() => void) => {
+			const listener = (_event: Electron.IpcRendererEvent, items: ActiveDownload[]) => callback(items)
+			ipcRenderer.on(IpcChannels.DOWNLOADS_ACTIVE_CHANGED, listener)
+			return () => ipcRenderer.removeListener(IpcChannels.DOWNLOADS_ACTIVE_CHANGED, listener)
+		},
+		onEvent: (callback: (event: DownloadEvent) => void): (() => void) => {
+			const listener = (_event: Electron.IpcRendererEvent, event: DownloadEvent) => callback(event)
+			ipcRenderer.on(IpcChannels.DOWNLOADS_EVENT, listener)
+			return () => ipcRenderer.removeListener(IpcChannels.DOWNLOADS_EVENT, listener)
+		},
+		panelResize: (width: number, height: number) => ipcRenderer.send(IpcChannels.DOWNLOADS_PANEL_RESIZE, width, height),
+	},
+	find: {
+		search: (text: string) => ipcRenderer.invoke(IpcChannels.FIND_SEARCH, text),
+		next: () => ipcRenderer.invoke(IpcChannels.FIND_NEXT),
+		prev: () => ipcRenderer.invoke(IpcChannels.FIND_PREV),
+		close: () => ipcRenderer.invoke(IpcChannels.FIND_CLOSE),
+		onOpen: (callback: () => void): (() => void) => {
+			const listener = () => callback()
+			ipcRenderer.on(IpcChannels.FIND_OPEN, listener)
+			return () => ipcRenderer.removeListener(IpcChannels.FIND_OPEN, listener)
+		},
+		onStateChanged: (callback: (state: FindState) => void): (() => void) => {
+			const listener = (_event: Electron.IpcRendererEvent, state: FindState) => callback(state)
+			ipcRenderer.on(IpcChannels.FIND_STATE_CHANGED, listener)
+			return () => ipcRenderer.removeListener(IpcChannels.FIND_STATE_CHANGED, listener)
+		},
+		panelResize: (width: number, height: number) => ipcRenderer.send(IpcChannels.FIND_PANEL_RESIZE, width, height),
 	},
 })

@@ -1,4 +1,9 @@
 import {
+	type ActiveDownload,
+	type DownloadEvent,
+	type DownloadHistoryItem,
+	type FindState,
+	IpcChannels,
 	type NavBarConfig,
 	type NavigationState,
 	type Notification,
@@ -8,7 +13,7 @@ import {
 	defaultNavBarConfig,
 } from "@shared/types"
 import type { Rectangle } from "electron"
-import { CombinedObservable, StateObservable } from "./api/observable"
+import { BroadcastEvent, BroadcastObservable, CombinedObservable, StateObservable } from "./api/observable"
 import type { Tab } from "./tabs/Tab"
 
 // Config
@@ -66,6 +71,16 @@ export const navbarSync$ = new CombinedObservable([navState$, tabs$, activeTab$]
 
 // Notifications
 export const notifications$ = new StateObservable<Notification[]>([])
+
+// Downloads - broadcast to all registered views
+export const activeDownloads$ = new BroadcastObservable<ActiveDownload[]>([], IpcChannels.DOWNLOADS_ACTIVE_CHANGED)
+export const downloadHistory$ = new BroadcastObservable<DownloadHistoryItem[]>([], IpcChannels.DOWNLOADS_HISTORY_CHANGED)
+export const downloadEvents$ = new BroadcastEvent<DownloadEvent>(IpcChannels.DOWNLOADS_EVENT)
+export const downloadPanelVisible$ = new StateObservable<boolean>(false)
+
+// Find in page
+export const findBarVisible$ = new StateObservable<boolean>(false)
+export const findState$ = new BroadcastObservable<FindState>({ text: "", activeMatch: 0, totalMatches: 0 }, IpcChannels.FIND_STATE_CHANGED)
 
 // Events
 export const externalOpened$ = new StateObservable<string | null>(null)

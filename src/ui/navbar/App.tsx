@@ -1,10 +1,31 @@
-import { ArrowLeft, ArrowRight, HousePlus, RotateCw, X } from "lucide-react"
-import type { KeyboardEvent } from "react"
+import { ArrowLeft, ArrowRight, Download, HousePlus, Loader2, RotateCw, X } from "lucide-react"
+import { type KeyboardEvent, useEffect, useState } from "react"
 import { TabButton } from "./TabButton"
 import { useNavbarState } from "./useNavbarState"
 
 export function App() {
 	const { navState, config, tabs, externalTabIds, containerRef, isUrlMode, urlInputRef, exitUrlMode } = useNavbarState()
+	const [hasDownloads, setHasDownloads] = useState(false)
+	const [hasActiveDownloads, setHasActiveDownloads] = useState(false)
+
+	useEffect(() => {
+		// Check for any downloads (active or history)
+		Promise.all([window.bird.downloads.getActive(), window.bird.downloads.getHistory()]).then(([active, history]) => {
+			setHasActiveDownloads(active.length > 0)
+			setHasDownloads(active.length > 0 || history.length > 0)
+		})
+		const unsubActive = window.bird.downloads.onActiveChanged((items) => {
+			setHasActiveDownloads(items.length > 0)
+			if (items.length > 0) setHasDownloads(true)
+		})
+		const unsubHistory = window.bird.downloads.onHistoryChanged((items) => {
+			if (items.length > 0) setHasDownloads(true)
+		})
+		return () => {
+			unsubActive()
+			unsubHistory()
+		}
+	}, [])
 
 	if (!config) return null
 
@@ -58,6 +79,12 @@ export function App() {
 						/>
 					))}
 				</div>
+			)}
+
+			{hasDownloads && (
+				<NavButton onClick={() => window.bird.downloads.toggle()}>
+					{hasActiveDownloads ? <Loader2 size={16} className="spinning" /> : <Download size={16} />}
+				</NavButton>
 			)}
 		</div>
 	)

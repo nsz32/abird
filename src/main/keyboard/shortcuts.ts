@@ -5,10 +5,11 @@ import { closeTab } from "../tabs/Tabs"
 interface ShortcutCallbacks {
 	isWindowFocused: () => boolean
 	onFocusUrl: () => void
+	onOpenFind: () => void
 }
 
 export function registerGlobalShortcuts(callbacks: ShortcutCallbacks) {
-	const { isWindowFocused, onFocusUrl } = callbacks
+	const { isWindowFocused, onFocusUrl, onOpenFind } = callbacks
 
 	globalShortcut.register("CommandOrControl+W", () => {
 		if (!isWindowFocused()) return
@@ -28,6 +29,11 @@ export function registerGlobalShortcuts(callbacks: ShortcutCallbacks) {
 	globalShortcut.register("CommandOrControl+L", () => {
 		if (!isWindowFocused()) return
 		onFocusUrl()
+	})
+
+	globalShortcut.register("CommandOrControl+F", () => {
+		if (!isWindowFocused()) return
+		onOpenFind()
 	})
 }
 

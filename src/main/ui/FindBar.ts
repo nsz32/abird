@@ -1,16 +1,18 @@
 import { join } from "node:path"
-import type { Notification } from "@shared/types"
+import type { FindState } from "@shared/types"
 import { IpcChannels } from "@shared/types"
-import { type Rectangle, WebContentsView, ipcMain } from "electron"
+import { type Rectangle, WebContentsView } from "electron"
 
-const MARGIN = 16
+const MARGIN = 8
+const DEFAULT_WIDTH = 350
+const DEFAULT_HEIGHT = 48
 
-export class NotificationCenter {
+export class FindBar {
 	readonly view: WebContentsView
 	private windowBounds: Rectangle = { x: 0, y: 0, width: 0, height: 0 }
-	private contentSize = { width: 0, height: 0 }
 	private navBarPosition: "top" | "bottom" = "top"
 	private navBarHeight = 0
+	private contentSize = { width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT }
 
 	constructor() {
 		this.view = new WebContentsView({
@@ -21,12 +23,6 @@ export class NotificationCenter {
 			},
 		})
 		this.view.setBackgroundColor("#00000000")
-
-		ipcMain.on(IpcChannels.NOTIF_RESIZE, (_, width: number, height: number) => {
-			console.log("📐 NotificationCenter resize:", width, "x", height)
-			this.contentSize = { width, height }
-			this.updateViewBounds()
-		})
 	}
 
 	setBounds(windowBounds: Rectangle) {
@@ -42,17 +38,15 @@ export class NotificationCenter {
 
 	private updateViewBounds() {
 		const { width, height } = this.contentSize
-		if (width === 0 || height === 0) {
-			this.view.setBounds({ x: 0, y: 0, width: 10, height: 10 })
-			return
-		}
-		// Position opposite to navbar to avoid overlap
+
+		// Position on the left, just below/above navbar
 		const y =
 			this.navBarPosition === "top"
-				? this.windowBounds.height - height - MARGIN // Navbar top → notifications bottom
-				: this.navBarHeight + MARGIN // Navbar bottom → notifications top
+				? this.navBarHeight + MARGIN // Below navbar
+				: this.windowBounds.height - this.navBarHeight - height - MARGIN // Above navbar
+
 		this.view.setBounds({
-			x: this.windowBounds.width - width - MARGIN,
+			x: MARGIN,
 			y,
 			width,
 			height,
@@ -63,16 +57,20 @@ export class NotificationCenter {
 		this.view.setVisible(visible)
 	}
 
-	sendNotifications(notifications: Notification[]) {
-		this.view.webContents.send(IpcChannels.NOTIF_LIST_CHANGED, notifications)
-		this.setVisible(notifications.length > 0)
+	sendFindState(state: FindState) {
+		this.view.webContents.send(IpcChannels.FIND_STATE_CHANGED, state)
+	}
+
+	sendOpen() {
+		this.view.webContents.focus()
+		this.view.webContents.send(IpcChannels.FIND_OPEN)
 	}
 
 	load() {
 		if (process.env.ELECTRON_RENDERER_URL) {
-			this.view.webContents.loadURL(`${process.env.ELECTRON_RENDERER_URL}/notifications/`)
+			this.view.webContents.loadURL(`${process.env.ELECTRON_RENDERER_URL}/findbar/`)
 		} else {
-			this.view.webContents.loadFile(join(__dirname, "../renderer/notifications/index.html"))
+			this.view.webContents.loadFile(join(__dirname, "../renderer/findbar/index.html"))
 		}
 	}
 

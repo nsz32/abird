@@ -43,6 +43,42 @@ export interface Notification {
 	createdAt: number
 }
 
+// Téléchargements actifs
+export interface ActiveDownload {
+	id: string
+	filename: string
+	receivedBytes: number
+	totalBytes: number // 0 si inconnu
+	startedAt: number
+}
+
+// Historique des téléchargements (session uniquement)
+export type DownloadStatus = "completed" | "cancelled" | "failed" | "blocked"
+
+export interface DownloadHistoryItem {
+	id: string
+	filename: string
+	status: DownloadStatus
+	message?: string
+	completedAt: number
+}
+
+// Events de téléchargement (notifications légères)
+export type DownloadEventType = "started" | "progress" | "completed" | "cancelled" | "failed" | "blocked"
+
+export interface DownloadEvent {
+	type: DownloadEventType
+	id: string
+	progress?: number // 0-100, pour "progress"
+}
+
+// État de la recherche dans la page
+export interface FindState {
+	text: string
+	activeMatch: number // 1-based, 0 si aucun résultat
+	totalMatches: number
+}
+
 // Canaux IPC (évite les typos, autocomplétion)
 export const IpcChannels = {
 	// Navigation
@@ -71,6 +107,22 @@ export const IpcChannels = {
 	NAVBAR_RESIZE: "bird:navbar:resize",
 	// Commands
 	COMMAND_FOCUS_URL: "bird:command:focus-url",
+	// Downloads panel
+	DOWNLOADS_TOGGLE: "bird:downloads:toggle",
+	DOWNLOADS_GET_HISTORY: "bird:downloads:get-history",
+	DOWNLOADS_HISTORY_CHANGED: "bird:downloads:history-changed",
+	DOWNLOADS_GET_ACTIVE: "bird:downloads:get-active",
+	DOWNLOADS_ACTIVE_CHANGED: "bird:downloads:active-changed",
+	DOWNLOADS_EVENT: "bird:downloads:event",
+	DOWNLOADS_PANEL_RESIZE: "bird:downloads:panel-resize",
+	// Find in page
+	FIND_OPEN: "bird:find:open",
+	FIND_SEARCH: "bird:find:search",
+	FIND_NEXT: "bird:find:next",
+	FIND_PREV: "bird:find:prev",
+	FIND_CLOSE: "bird:find:close",
+	FIND_STATE_CHANGED: "bird:find:state-changed",
+	FIND_PANEL_RESIZE: "bird:find:panel-resize",
 } as const
 
 // Type utilitaire pour les valeurs de IpcChannels
@@ -167,6 +219,24 @@ export interface BirdApi {
 		onListChanged: (callback: (notifications: Notification[]) => void) => () => void
 		dismiss: (id: string) => Promise<void>
 		resize: (width: number, height: number) => void
+	}
+	downloads: {
+		toggle: () => Promise<void>
+		getHistory: () => Promise<DownloadHistoryItem[]>
+		getActive: () => Promise<ActiveDownload[]>
+		onHistoryChanged: (callback: (items: DownloadHistoryItem[]) => void) => () => void
+		onActiveChanged: (callback: (items: ActiveDownload[]) => void) => () => void
+		onEvent: (callback: (event: DownloadEvent) => void) => () => void
+		panelResize: (width: number, height: number) => void
+	}
+	find: {
+		search: (text: string) => Promise<void>
+		next: () => Promise<void>
+		prev: () => Promise<void>
+		close: () => Promise<void>
+		onOpen: (callback: () => void) => () => void
+		onStateChanged: (callback: (state: FindState) => void) => () => void
+		panelResize: (width: number, height: number) => void
 	}
 }
 

@@ -1,6 +1,6 @@
-import type { NavigationState, RoutingConfig, TabOrigin } from "@shared/types"
+import type { FindState, NavigationState, RoutingConfig, TabOrigin } from "@shared/types"
 import { StateObservable } from "../api/observable"
-import { externalOpened$, tabs$ } from "../states"
+import { activeTab$, externalOpened$, findState$, tabs$ } from "../states"
 import { SiteView } from "../ui/SiteView"
 import { closeTab, createTab, getTabIndex } from "./Tabs"
 
@@ -58,6 +58,14 @@ export class Tab {
 			onCloseTab: () => closeTab(this.id),
 			onExternalOpened: (willClose: boolean) => this.emitExternalOpened(willClose),
 			shouldCloseTab: () => this.shouldCloseOnExternalLink(),
+			onFindResult: (state: FindState) => this.emitFindResult(state),
+		}
+	}
+
+	private emitFindResult(state: FindState) {
+		// Only emit if this tab is active
+		if (activeTab$.get()?.id === this.id) {
+			findState$.emit(state)
 		}
 	}
 
