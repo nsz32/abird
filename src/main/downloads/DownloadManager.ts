@@ -1,12 +1,12 @@
 import { closeSync, existsSync, openSync, readSync, statSync, unlinkSync } from "node:fs"
-import { join } from "node:path"
+import { basename, dirname, extname, join } from "node:path"
 import type { DownloadConfig, ResolvedDownloadConfig } from "@shared/types"
 import type { Session } from "electron"
 import { app } from "electron"
 import { fileTypeFromFile } from "file-type"
 import { addNotification, dismissNotification, updateNotification } from "../notifications/notify"
 import { parseSize } from "../utils/parseSize"
-import { openFile } from "../utils/platform"
+import { getFileMd5, openFile } from "../utils/platform"
 import { type ExecutableCheckResult, MIN_BYTES_FOR_MAGIC, checkOfficeMacroWarning, isExecutableByMagic } from "./executableDetection"
 
 const MIN_BYTES_FOR_DETECTION = 4096
@@ -16,11 +16,45 @@ export function resolveDownloadConfig(config: DownloadConfig): ResolvedDownloadC
 		directory: config.directory || null,
 		autoOpenMaxSize: parseSize(config.autoOpenMaxSize),
 		autoOpenMimeTypes: config.autoOpenMimeTypes || [],
-		blockExecutables: config.blockExecutables ?? false,
+		allowExecutablesDownload: config.allowExecutablesDownload ?? false,
+		preventDuplicateDownloads: config.preventDuplicateDownloads ?? false,
 	}
 }
 
 const configuredSessions = new WeakSet<Session>()
+
+interface UniquePathResult {
+	path: string
+	originalPath: string | null // null if no rename needed
+}
+
+function getDownloadUniquePath(basePath: string): UniquePathResult {
+	if (!existsSync(basePath)) return { path: basePath, originalPath: null }
+
+	const ext = extname(basePath)
+	const name = basename(basePath, ext)
+	const dir = dirname(basePath)
+
+	let counter = 1
+	let newPath: string
+	do {
+		newPath = join(dir, `${name} (${counter})${ext}`)
+		counter++
+	} while (existsSync(newPath))
+
+	return { path: newPath, originalPath: basePath }
+}
+
+async function isDuplicateOf(newPath: string, originalPath: string): Promise<boolean> {
+	// Quick size check first - if sizes differ, files are different
+	const newSize = statSync(newPath).size
+	const originalSize = statSync(originalPath).size
+	if (newSize !== originalSize) return false
+
+	// Same size, compare MD5
+	const [newMd5, originalMd5] = await Promise.all([getFileMd5(newPath), getFileMd5(originalPath)])
+	return newMd5 === originalMd5
+}
 
 export function setupDownloads(session: Session, config: ResolvedDownloadConfig) {
 	if (configuredSessions.has(session)) return
@@ -29,7 +63,7 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 
 	session.on("will-download", (_event, item) => {
 		const filename = item.getFilename()
-		const savePath = join(downloadDir, filename)
+		const { path: savePath, originalPath } = getDownloadUniquePath(join(downloadDir, filename))
 		item.setSavePath(savePath)
 
 		const notifId = addNotification("download", filename, "Téléchargement en cours...", {
@@ -38,6 +72,7 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 
 		// Shared result: null = not checked yet
 		let earlyDetectionResult: Promise<DetectionResult> | null = null
+		let wasBlockedAsExecutable = false
 
 		item.on("updated", (_e, state) => {
 			if (state === "progressing" && !item.isPaused()) {
@@ -45,10 +80,11 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 				const total = item.getTotalBytes()
 
 				// Early executable detection with retry
-				if (config.blockExecutables && !earlyDetectionResult && received >= MIN_BYTES_FOR_DETECTION) {
+				if (!config.allowExecutablesDownload && !earlyDetectionResult && received >= MIN_BYTES_FOR_DETECTION) {
 					earlyDetectionResult = detectWithRetry(savePath).then((result) => {
 						if (result.executable.isExecutable) {
 							console.log(`[Download] blocking executable: ${result.executable.name}`)
+							wasBlockedAsExecutable = true
 							item.cancel()
 							console.log(`[Download] aborted: ${filename}`)
 							try {
@@ -72,10 +108,10 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 		item.once("done", (_e, state) => {
 			if (state === "completed") {
 				dismissNotification(notifId)
-				handleCompletedDownload(savePath, filename, item.getTotalBytes(), config, earlyDetectionResult)
+				handleCompletedDownload(savePath, filename, item.getTotalBytes(), config, earlyDetectionResult, originalPath)
 			} else if (state === "cancelled") {
-				// Notification already handled if it was an executable block
-				if (!earlyDetectionResult) {
+				// Notification already handled if blocked as executable
+				if (!wasBlockedAsExecutable) {
 					updateNotification(notifId, {
 						title: `${filename} - Annulé`,
 						dismissable: true,
@@ -146,6 +182,7 @@ async function handleCompletedDownload(
 	size: number,
 	config: ResolvedDownloadConfig,
 	earlyDetectionResult: Promise<DetectionResult> | null,
+	originalPath: string | null,
 ) {
 	// Reuse early detection result if available, otherwise detect now
 	const result = earlyDetectionResult ? await earlyDetectionResult : await detectFinal(savePath)
@@ -154,7 +191,7 @@ async function handleCompletedDownload(
 	checkOfficeMacroWarning(result.mime)
 
 	if (result.executable.isExecutable) {
-		if (config.blockExecutables) {
+		if (!config.allowExecutablesDownload) {
 			try {
 				unlinkSync(savePath)
 			} catch {}
@@ -169,6 +206,23 @@ async function handleCompletedDownload(
 			})
 		}
 		return
+	}
+
+	// Check for duplicate files (only if file was renamed during save)
+	if (config.preventDuplicateDownloads && originalPath) {
+		if (await isDuplicateOf(savePath, originalPath)) {
+			console.log(`[Download] duplicate detected: ${savePath} = ${originalPath}`)
+			try {
+				unlinkSync(savePath)
+			} catch {}
+			if (shouldAutoOpen(result, size, config)) {
+				openFile(originalPath).then((error) => {
+					if (error) console.error(`[Download] openFile failed: ${error}`)
+					else console.log(`[Download] opened original: ${originalPath}`)
+				})
+			}
+			return
+		}
 	}
 
 	if (shouldAutoOpen(result, size, config)) {

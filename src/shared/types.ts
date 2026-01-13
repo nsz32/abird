@@ -108,7 +108,8 @@ export interface DownloadConfig {
 	directory?: string // Si absent → dossier Downloads système
 	autoOpenMaxSize?: number | string // Bytes ou "512k", "10M" (0 = désactivé)
 	autoOpenMimeTypes?: string[] // Ex: ["image/*", "application/pdf"]
-	blockExecutables?: boolean // Annuler et supprimer les exécutables détectés
+	allowExecutablesDownload?: boolean // Si true, autorise le téléchargement d'exécutables (défaut: false)
+	preventDuplicateDownloads?: boolean // Si true, supprime les doublons MD5 (défaut: false)
 }
 
 export const defaultDownloadConfig: DownloadConfig = {}
@@ -118,7 +119,8 @@ export interface ResolvedDownloadConfig {
 	directory: string | null
 	autoOpenMaxSize: number
 	autoOpenMimeTypes: string[]
-	blockExecutables: boolean
+	allowExecutablesDownload: boolean
+	preventDuplicateDownloads: boolean
 }
 
 // Configuration d'une app (site web isolé)
