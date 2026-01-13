@@ -2,7 +2,8 @@
 	"theme": "dark",
 	"downloads": {
 		"autoOpenMaxSize": "1M",
-		"autoOpenExtensions": [".pdf", ".png", ".jpg", ".docx"]
+		"autoOpenMimeTypes": ["image/*", "application/pdf", "video/*"],
+		"blockExecutables": true
 	},
 	"navBar": {
 		"position": "bottom",
