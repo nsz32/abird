@@ -1,4 +1,5 @@
 import type { TabOrigin } from "@shared/types"
+import { app } from "electron"
 import { activeTab$, navState$, partition$, routing$, startUrl$, tabs$, userAgent$ } from "../states"
 import { Tab } from "./Tab"
 
@@ -41,6 +42,11 @@ export function closeTab(id: string) {
 
 	if (activeTab$.get()?.id === id) {
 		selectNextTab(removedIndex)
+	}
+
+	const hasProperTabs = tabs$.get().some((t) => t.proper)
+	if (!hasProperTabs) {
+		app.quit()
 	}
 }
 

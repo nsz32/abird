@@ -84,6 +84,7 @@ export interface NavBarConfig {
 	urlEditable: boolean
 	showBackForward: boolean
 	showReload: boolean
+	allowSingleTabClose: boolean
 }
 
 export const defaultNavBarConfig: NavBarConfig = {
@@ -93,6 +94,7 @@ export const defaultNavBarConfig: NavBarConfig = {
 	urlEditable: true,
 	showBackForward: true,
 	showReload: true,
+	allowSingleTabClose: false,
 }
 
 // Configuration du routage des URLs

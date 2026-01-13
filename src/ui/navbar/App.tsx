@@ -61,7 +61,7 @@ export function App() {
 						<TabButton
 							key={tab.id}
 							tab={tab}
-							showClose={tabs.length > 1}
+							showClose={config.allowSingleTabClose || tabs.length > 1}
 							showExternalIndicator={externalTabIds.has(tab.id)}
 							onActivate={() => window.bird.tabs.activate(tab.id)}
 							onClose={() => window.bird.tabs.close(tab.id)}
