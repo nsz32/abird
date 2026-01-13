@@ -1,8 +1,9 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { homedir } from "node:os"
 import { dirname, join } from "node:path"
-import { type AppConfig, type NavBarConfig, type ThemeMode, defaultNavBarConfig } from "@shared/types"
-import { navBarConfig$, partition$, routing$, startUrl$, theme$, userAgent$ } from "../states"
+import { type AppConfig, type DownloadConfig, type NavBarConfig, type ThemeMode, defaultDownloadConfig, defaultNavBarConfig } from "@shared/types"
+import { resolveDownloadConfig } from "../downloads/DownloadManager"
+import { downloadConfig$, navBarConfig$, partition$, routing$, startUrl$, theme$, userAgent$ } from "../states"
 
 const CONFIG_DIR = join(homedir(), ".config", "bird")
 const DEFAULT_CONFIG_FILE = join(CONFIG_DIR, "config.json")
@@ -10,12 +11,14 @@ const DEFAULT_CONFIG_FILE = join(CONFIG_DIR, "config.json")
 interface GlobalConfig {
 	theme: ThemeMode
 	navBar: NavBarConfig
+	downloads: DownloadConfig
 	apps: Record<string, AppConfig>
 }
 
 const defaultGlobalConfig: GlobalConfig = {
 	theme: "system",
 	navBar: defaultNavBarConfig,
+	downloads: defaultDownloadConfig,
 	apps: {},
 }
 
@@ -73,6 +76,7 @@ function mergeWithDefaults(loaded: Partial<GlobalConfig>): GlobalConfig {
 		...loaded,
 		theme: loaded.theme || defaultGlobalConfig.theme,
 		navBar: { ...defaultNavBarConfig, ...loaded.navBar },
+		downloads: { ...defaultDownloadConfig, ...loaded.downloads },
 		apps: { ...defaultGlobalConfig.apps, ...loaded.apps },
 	}
 }
@@ -99,4 +103,5 @@ function emitAppConfig(app: AppConfig) {
 	partition$.emit(app.partition || "default")
 	theme$.emit(app.theme || globalConfig.theme)
 	userAgent$.emit(app.userAgentRaw || app.userAgent || "desktop:bird")
+	downloadConfig$.emit(resolveDownloadConfig(globalConfig.downloads))
 }

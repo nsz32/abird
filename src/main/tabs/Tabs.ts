@@ -8,13 +8,7 @@ let pendingActivationId: string | null = null
 
 export function createTab(url?: string, origin: TabOrigin = "user", index?: number, parentId?: string): Tab {
 	console.log(`[Tabs] createTab origin=${origin}`)
-	const tab = new Tab(
-		partition$.get(),
-		routing$.get(),
-		url || startUrl$.get(),
-		userAgent$.get(),
-		parentId ?? null,
-	)
+	const tab = new Tab(partition$.get(), routing$.get(), url || startUrl$.get(), userAgent$.get(), parentId ?? null)
 
 	insertTab(tab, index)
 

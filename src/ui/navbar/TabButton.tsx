@@ -10,21 +10,13 @@ interface TabButtonProps {
 }
 
 export function TabButton({ tab, showClose, showExternalIndicator, onActivate, onClose }: TabButtonProps) {
-	const classes = [
-		"tab-button",
-		tab.isActive && "active",
-		showExternalIndicator && "external-wave",
-	].filter(Boolean).join(" ")
+	const classes = ["tab-button", tab.isActive && "active", showExternalIndicator && "external-wave"].filter(Boolean).join(" ")
 
 	return (
 		<button type="button" className={classes} onClick={onActivate}>
 			<TabFavicon tab={tab} />
 			<span className="tab-title">{tab.title || tab.url}</span>
-			<TabAction
-				showExternalIndicator={showExternalIndicator}
-				showClose={showClose}
-				onClose={onClose}
-			/>
+			<TabAction showExternalIndicator={showExternalIndicator} showClose={showClose} onClose={onClose} />
 		</button>
 	)
 }

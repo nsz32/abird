@@ -103,6 +103,22 @@ export interface RoutingConfig {
 	download?: string | string[] // URLs autorisées pour downloads
 }
 
+// Configuration des téléchargements
+export interface DownloadConfig {
+	directory?: string // Si absent → dossier Downloads système
+	autoOpenMaxSize?: number | string // Bytes ou "512k", "10M" (0 = désactivé)
+	autoOpenExtensions?: string[] // Ex: [".pdf", ".jpg"]
+}
+
+export const defaultDownloadConfig: DownloadConfig = {}
+
+// Config résolue (valeurs parsées pour runtime)
+export interface ResolvedDownloadConfig {
+	directory: string | null
+	autoOpenMaxSize: number
+	autoOpenExtensions: string[]
+}
+
 // Configuration d'une app (site web isolé)
 export interface AppConfig {
 	partition: string // Nom de la partition (données isolées)

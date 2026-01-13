@@ -1,5 +1,9 @@
 {
 	"theme": "dark",
+	"downloads": {
+		"autoOpenMaxSize": "1M",
+		"autoOpenExtensions": [".pdf", ".png", ".jpg", ".docx"]
+	},
 	"navBar": {
 		"position": "bottom",
 		"visible": true,

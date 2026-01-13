@@ -1,4 +1,12 @@
-import { type NavBarConfig, type NavigationState, type Notification, type RoutingConfig, type ThemeMode, defaultNavBarConfig } from "@shared/types"
+import {
+	type NavBarConfig,
+	type NavigationState,
+	type Notification,
+	type ResolvedDownloadConfig,
+	type RoutingConfig,
+	type ThemeMode,
+	defaultNavBarConfig,
+} from "@shared/types"
 import type { Rectangle } from "electron"
 import { CombinedObservable, StateObservable } from "./api/observable"
 import type { Tab } from "./tabs/Tab"
@@ -10,6 +18,11 @@ export const startUrl$ = new StateObservable<string>("about:blank")
 export const partition$ = new StateObservable<string>("default")
 export const theme$ = new StateObservable<ThemeMode>("system")
 export const userAgent$ = new StateObservable<string>("desktop:bird")
+export const downloadConfig$ = new StateObservable<ResolvedDownloadConfig>({
+	directory: null,
+	autoOpenMaxSize: 0,
+	autoOpenExtensions: [],
+})
 
 // Window
 export const windowBounds$ = new StateObservable<Rectangle>({ x: 0, y: 0, width: 0, height: 0 })
@@ -32,15 +45,13 @@ export const navState$ = new StateObservable<NavigationState>({
 const DEFAULT_NAVBAR_HEIGHT = 40
 
 export const navBarBounds$ = new CombinedObservable([windowBounds$, navBarConfig$, navBarHeight$], (windowBounds, navBarConfig, navBarHeight) => {
-	const height = navBarConfig.visible ? (navBarHeight || DEFAULT_NAVBAR_HEIGHT) : 0
+	const height = navBarConfig.visible ? navBarHeight || DEFAULT_NAVBAR_HEIGHT : 0
 	const width = windowBounds.width || 1
-	return navBarConfig.position === "top"
-		? { x: 0, y: 0, width, height }
-		: { x: 0, y: windowBounds.height - height, width, height }
+	return navBarConfig.position === "top" ? { x: 0, y: 0, width, height } : { x: 0, y: windowBounds.height - height, width, height }
 })
 
 export const contentBounds$ = new CombinedObservable([windowBounds$, navBarConfig$, navBarHeight$], (windowBounds, navBarConfig, navBarHeight) => {
-	const navHeight = navBarConfig.visible ? (navBarHeight || DEFAULT_NAVBAR_HEIGHT) : 0
+	const navHeight = navBarConfig.visible ? navBarHeight || DEFAULT_NAVBAR_HEIGHT : 0
 	return navBarConfig.position === "top"
 		? { x: 0, y: navHeight, width: windowBounds.width, height: windowBounds.height - navHeight }
 		: { x: 0, y: 0, width: windowBounds.width, height: windowBounds.height - navHeight }

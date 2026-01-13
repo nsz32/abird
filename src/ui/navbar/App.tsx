@@ -4,8 +4,7 @@ import { TabButton } from "./TabButton"
 import { useNavbarState } from "./useNavbarState"
 
 export function App() {
-	const { navState, config, tabs, externalTabIds, containerRef, isUrlMode, urlInputRef, exitUrlMode } =
-		useNavbarState()
+	const { navState, config, tabs, externalTabIds, containerRef, isUrlMode, urlInputRef, exitUrlMode } = useNavbarState()
 
 	if (!config) return null
 
@@ -35,9 +34,7 @@ export function App() {
 			)}
 
 			{config.showReload && (
-				<NavButton
-					onClick={() => (navState.isLoading ? window.bird.navigation.stop() : window.bird.navigation.reload())}
-				>
+				<NavButton onClick={() => (navState.isLoading ? window.bird.navigation.stop() : window.bird.navigation.reload())}>
 					{navState.isLoading ? <X size={16} strokeWidth={2.5} /> : <RotateCw size={16} />}
 				</NavButton>
 			)}
@@ -47,14 +44,7 @@ export function App() {
 			</NavButton>
 
 			{isUrlMode && config.urlEditable ? (
-				<input
-					ref={urlInputRef}
-					type="text"
-					className="url-input"
-					defaultValue={navState.url}
-					onKeyDown={handleUrlKeyDown}
-					onBlur={exitUrlMode}
-				/>
+				<input ref={urlInputRef} type="text" className="url-input" defaultValue={navState.url} onKeyDown={handleUrlKeyDown} onBlur={exitUrlMode} />
 			) : (
 				<div className="tabs-list">
 					{tabs.map((tab) => (

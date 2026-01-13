@@ -1,6 +1,8 @@
 import type { NavigationState, RoutingConfig, TabOrigin } from "@shared/types"
 import { type Rectangle, WebContentsView, session, shell } from "electron"
+import { setupDownloads } from "../downloads/DownloadManager"
 import { shouldHandleUrl } from "../routing/UrlRouter"
+import { downloadConfig$ } from "../states"
 import { resolveUserAgent } from "../utils/userAgents"
 import { SCROLLBAR_CSS } from "./scrollbar.css"
 
@@ -25,6 +27,7 @@ export class SiteView {
 	) {
 		const sess = session.fromPartition(`persist:${partition}`)
 		sess.setUserAgent(resolveUserAgent(userAgent))
+		setupDownloads(sess, downloadConfig$.get())
 
 		this.view = new WebContentsView({
 			webPreferences: {
