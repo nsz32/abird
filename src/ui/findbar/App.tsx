@@ -18,6 +18,7 @@ export function App() {
 
 		const unsubState = window.bird.find.onStateChanged((state) => {
 			setFindState(state)
+			setInputValue(state.text)
 		})
 
 		return () => {
