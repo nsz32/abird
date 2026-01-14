@@ -12,6 +12,7 @@ import {
 	navBarConfig$,
 	navState$,
 	notifications$,
+	startUrl$,
 	tabs$,
 } from "../states"
 import { activateTab, closeTab, createTab } from "../tabs/Tabs"
@@ -40,6 +41,7 @@ export function registerHandlers() {
 	ipcMain.handle(IpcChannels.NAVIGATION_RELOAD, (_, ignoreCache?: boolean) => activeTab$.get()?.siteView.reload(ignoreCache))
 	ipcMain.handle(IpcChannels.NAVIGATION_STOP, () => activeTab$.get()?.siteView.stop())
 	ipcMain.handle(IpcChannels.NAVIGATION_GO_TO, (_, url: string) => activeTab$.get()?.siteView.goTo(url))
+	ipcMain.handle(IpcChannels.NAVIGATION_GO_HOME, () => activeTab$.get()?.siteView.goTo(startUrl$.get()))
 	ipcMain.handle(IpcChannels.TABS_GET_LIST, () => getTabsList())
 	ipcMain.handle(IpcChannels.TABS_ACTIVATE, (_, id: string) => activateTab(id))
 	ipcMain.handle(IpcChannels.TABS_CLOSE, (_, id: string) => closeTab(id))

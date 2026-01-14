@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, Download, HousePlus, Loader2, RotateCw, X } from "lucide-react"
+import { ArrowLeft, ArrowRight, Download, Home, HousePlus, Loader2, RotateCw, X } from "lucide-react"
 import { type KeyboardEvent, useEffect, useState } from "react"
 import { TabButton } from "./TabButton"
 import { useNavbarState } from "./useNavbarState"
@@ -7,6 +7,7 @@ export function App() {
 	const { navState, config, tabs, externalTabIds, containerRef, isUrlMode, urlInputRef, exitUrlMode } = useNavbarState()
 	const [hasDownloads, setHasDownloads] = useState(false)
 	const [hasActiveDownloads, setHasActiveDownloads] = useState(false)
+	const [ctrlPressed, setCtrlPressed] = useState(false)
 
 	useEffect(() => {
 		// Check for any downloads (active or history)
@@ -25,6 +26,10 @@ export function App() {
 			unsubActive()
 			unsubHistory()
 		}
+	}, [])
+
+	useEffect(() => {
+		return window.bird.keyboard.onCtrlChanged(setCtrlPressed)
 	}, [])
 
 	if (!config) return null
@@ -60,8 +65,8 @@ export function App() {
 				</NavButton>
 			)}
 
-			<NavButton onClick={() => window.bird.tabs.create(0)}>
-				<HousePlus size={16} />
+			<NavButton onClick={() => (ctrlPressed ? window.bird.navigation.goHome() : window.bird.tabs.create(0))}>
+				{ctrlPressed ? <Home size={16} /> : <HousePlus size={16} />}
 			</NavButton>
 
 			{isUrlMode && config.urlEditable ? (

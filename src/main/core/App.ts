@@ -6,6 +6,7 @@ import {
 	activeDownloads$,
 	activeTab$,
 	contentBounds$,
+	ctrlPressed$,
 	downloadEvents$,
 	downloadHistory$,
 	downloadPanelVisible$,
@@ -64,6 +65,7 @@ export function startApp() {
 	downloadEvents$.register(navBar.view.webContents)
 	downloadEvents$.register(downloadPanel.view.webContents)
 	findState$.register(findBar.view.webContents)
+	ctrlPressed$.register(navBar.view.webContents)
 
 	// Setup subscriptions
 	setupSubscriptions()

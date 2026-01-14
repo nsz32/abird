@@ -84,3 +84,6 @@ export const findState$ = new BroadcastObservable<FindState>({ text: "", activeM
 
 // Events
 export const externalOpened$ = new StateObservable<string | null>(null)
+
+// Keyboard
+export const ctrlPressed$ = new BroadcastObservable<boolean>(false, IpcChannels.CTRL_PRESSED)

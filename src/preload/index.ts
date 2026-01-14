@@ -19,6 +19,7 @@ contextBridge.exposeInMainWorld("bird", {
 		reload: (ignoreCache?: boolean) => ipcRenderer.invoke(IpcChannels.NAVIGATION_RELOAD, ignoreCache),
 		stop: () => ipcRenderer.invoke(IpcChannels.NAVIGATION_STOP),
 		goTo: (url: string) => ipcRenderer.invoke(IpcChannels.NAVIGATION_GO_TO, url),
+		goHome: () => ipcRenderer.invoke(IpcChannels.NAVIGATION_GO_HOME),
 		getState: (): Promise<NavigationState> => ipcRenderer.invoke(IpcChannels.NAVIGATION_GET_STATE),
 		onStateChanged: (callback: (state: NavigationState) => void): (() => void) => {
 			const listener = (_event: Electron.IpcRendererEvent, state: NavigationState) => callback(state)
@@ -102,5 +103,12 @@ contextBridge.exposeInMainWorld("bird", {
 			return () => ipcRenderer.removeListener(IpcChannels.FIND_STATE_CHANGED, listener)
 		},
 		panelResize: (width: number, height: number) => ipcRenderer.send(IpcChannels.FIND_PANEL_RESIZE, width, height),
+	},
+	keyboard: {
+		onCtrlChanged: (callback: (pressed: boolean) => void): (() => void) => {
+			const listener = (_event: Electron.IpcRendererEvent, pressed: boolean) => callback(pressed)
+			ipcRenderer.on(IpcChannels.CTRL_PRESSED, listener)
+			return () => ipcRenderer.removeListener(IpcChannels.CTRL_PRESSED, listener)
+		},
 	},
 })

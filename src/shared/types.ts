@@ -87,6 +87,7 @@ export const IpcChannels = {
 	NAVIGATION_RELOAD: "bird:navigation:reload",
 	NAVIGATION_STOP: "bird:navigation:stop",
 	NAVIGATION_GO_TO: "bird:navigation:go-to",
+	NAVIGATION_GO_HOME: "bird:navigation:go-home",
 	NAVIGATION_GET_STATE: "bird:navigation:get-state",
 	NAVIGATION_STATE_CHANGED: "bird:navigation:state-changed",
 	// Tabs
@@ -123,6 +124,8 @@ export const IpcChannels = {
 	FIND_CLOSE: "bird:find:close",
 	FIND_STATE_CHANGED: "bird:find:state-changed",
 	FIND_PANEL_RESIZE: "bird:find:panel-resize",
+	// Keyboard
+	CTRL_PRESSED: "bird:keyboard:ctrl-pressed",
 } as const
 
 // Type utilitaire pour les valeurs de IpcChannels
@@ -194,6 +197,7 @@ export interface BirdApi {
 		reload: (ignoreCache?: boolean) => Promise<void>
 		stop: () => Promise<void>
 		goTo: (url: string) => Promise<void>
+		goHome: () => Promise<void>
 		getState: () => Promise<NavigationState>
 		onStateChanged: (callback: (state: NavigationState) => void) => () => void
 	}
@@ -237,6 +241,9 @@ export interface BirdApi {
 		onOpen: (callback: () => void) => () => void
 		onStateChanged: (callback: (state: FindState) => void) => () => void
 		panelResize: (width: number, height: number) => void
+	}
+	keyboard: {
+		onCtrlChanged: (callback: (pressed: boolean) => void) => () => void
 	}
 }
 
