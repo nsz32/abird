@@ -1,5 +1,5 @@
 import { join } from "node:path"
-import { Menu, app } from "electron"
+import { app } from "electron"
 import { startApp } from "./core/App"
 import { getAvailableApps, loadConfig, selectApp } from "./core/Config"
 
@@ -19,7 +19,6 @@ app.setPath("userData", join(xdgDataHome, "bird"))
 app.setName("okbird")
 
 app.whenReady().then(() => {
-	Menu.setApplicationMenu(null)
 
 	const { appName, configPath } = parseCliArgs()
 	loadConfig(configPath)

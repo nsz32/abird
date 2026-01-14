@@ -16,6 +16,7 @@ export class MainWindow {
 			height: 800,
 			backgroundColor: "#202830",
 			show: false,
+			autoHideMenuBar: true,
 		})
 
 		this.setupEventListeners()

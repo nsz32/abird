@@ -1,6 +1,7 @@
-import { app, nativeTheme } from "electron"
+import { Menu, app, nativeTheme } from "electron"
 import { getTabsList, registerHandlers } from "../ipc/handlers"
-import { registerGlobalShortcuts, unregisterGlobalShortcuts } from "../keyboard/shortcuts"
+import { setupInputListener } from "../keyboard/inputListener"
+import { createAppMenu } from "../keyboard/menu"
 import {
 	activeDownloads$,
 	activeTab$,
@@ -35,12 +36,11 @@ let downloadPanel: DownloadPanel
 let findBar: FindBar
 
 export function startApp() {
-	initializeComponents()
-	setupSubscriptions()
-	launch()
-}
+	// Must be first to capture all WebContents
+	setupInputListener()
+	registerHandlers()
 
-function initializeComponents() {
+	// Initialize components
 	mainWindow = new MainWindow()
 	navBar = new NavBar()
 	notificationCenter = new NotificationCenter()
@@ -64,6 +64,27 @@ function initializeComponents() {
 	downloadEvents$.register(navBar.view.webContents)
 	downloadEvents$.register(downloadPanel.view.webContents)
 	findState$.register(findBar.view.webContents)
+
+	// Setup subscriptions
+	setupSubscriptions()
+
+	// Setup menu
+	Menu.setApplicationMenu(
+		createAppMenu({
+			onFocusUrl: () => navBar.sendFocusUrl(),
+		}),
+	)
+
+	// Load and show
+	navBar.load()
+	notificationCenter.load()
+	downloadPanel.load()
+	findBar.load()
+
+	navBar.onReady(() => {
+		mainWindow.show()
+		createTab()
+	})
 }
 
 function setupSubscriptions() {
@@ -120,29 +141,6 @@ function setupSubscriptions() {
 		if (visible) {
 			findBar.sendOpen()
 		}
-	})
-}
-
-function launch() {
-	registerHandlers()
-	registerGlobalShortcuts({
-		isWindowFocused: () => mainWindow.window.isFocused(),
-		onFocusUrl: () => navBar.sendFocusUrl(),
-		onOpenFind: () => findBarVisible$.emit(true),
-	})
-
-	app.on("will-quit", () => {
-		unregisterGlobalShortcuts()
-	})
-
-	navBar.load()
-	notificationCenter.load()
-	downloadPanel.load()
-	findBar.load()
-
-	navBar.onReady(() => {
-		mainWindow.show()
-		createTab()
 	})
 }
 
