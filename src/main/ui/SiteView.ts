@@ -1,7 +1,7 @@
 import type { FindState, NavigationState, RoutingConfig, TabOrigin } from "@shared/types"
 import { type Rectangle, WebContentsView, session, shell } from "electron"
 import { setupDownloads } from "../downloads/DownloadManager"
-import { shouldHandleUrl } from "../routing/UrlRouter"
+import { shouldHandleUrl } from "../core/UrlRouter"
 import { config$ } from "../states"
 import { resolveUserAgent } from "../utils/userAgents"
 import { SCROLLBAR_CSS } from "./scrollbar.css"

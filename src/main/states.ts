@@ -10,7 +10,7 @@ import {
 	defaultNavBarConfig,
 } from "@shared/types"
 import type { Rectangle } from "electron"
-import { BroadcastEvent, BroadcastObservable, CombinedObservable, StateObservable } from "./api/observable"
+import { BroadcastEvent, BroadcastObservable, CombinedObservable, StateObservable } from "./utils/observable"
 import type { Tab } from "./tabs/Tab"
 
 // Config - single source of truth

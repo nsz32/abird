@@ -8,7 +8,7 @@ import { addNotification, dismissNotification, updateNotification } from "../not
 import { activeDownloads$, downloadEvents$, downloadHistory$ } from "../states"
 import { parseSize } from "../utils/parseSize"
 import { getFileMd5, openFile } from "../utils/platform"
-import { type ExecutableCheckResult, MIN_BYTES_FOR_MAGIC, checkOfficeMacroWarning, isExecutableByMagic } from "./executableDetection"
+import { type ExecutableCheckResult, MIN_BYTES_FOR_MAGIC, checkOfficeMacroWarning, isExecutableByMagic } from "../utils/executableDetection"
 
 const MIN_BYTES_FOR_DETECTION = 4096
 
