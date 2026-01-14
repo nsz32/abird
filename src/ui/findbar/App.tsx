@@ -2,10 +2,13 @@ import type { FindState } from "@shared/types"
 import { ChevronDown, ChevronUp, X } from "lucide-react"
 import { type KeyboardEvent, useEffect, useRef, useState } from "react"
 
+const DEBOUNCE_MS = 250
+
 export function App() {
 	const [findState, setFindState] = useState<FindState>({ text: "", activeMatch: 0, totalMatches: 0 })
 	const [inputValue, setInputValue] = useState("")
 	const inputRef = useRef<HTMLInputElement>(null)
+	const debounceRef = useRef<ReturnType<typeof setTimeout>>(null)
 
 	useEffect(() => {
 		const unsubOpen = window.bird.find.onOpen(() => {
@@ -25,7 +28,8 @@ export function App() {
 
 	const handleSearch = (text: string) => {
 		setInputValue(text)
-		window.bird.find.search(text)
+		if (debounceRef.current) clearTimeout(debounceRef.current)
+		debounceRef.current = setTimeout(() => window.bird.find.search(text), DEBOUNCE_MS)
 	}
 
 	const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -41,8 +45,13 @@ export function App() {
 	}
 
 	const handleClose = () => {
+		if (debounceRef.current) clearTimeout(debounceRef.current)
 		setInputValue("")
 		window.bird.find.close()
+	}
+
+	const handleBlur = () => {
+		if (!inputValue) handleClose()
 	}
 
 	// Don't show results until search for current text is complete
@@ -60,6 +69,7 @@ export function App() {
 				value={inputValue}
 				onChange={(e) => handleSearch(e.target.value)}
 				onKeyDown={handleKeyDown}
+				onBlur={handleBlur}
 			/>
 			<span className={`find-count ${noResults ? "no-results" : ""}`}>
 				{inputValue.length > 0 && !isStale ? (hasResults ? `${findState.activeMatch} / ${findState.totalMatches}` : "0") : ""}

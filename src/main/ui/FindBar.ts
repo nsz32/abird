@@ -3,9 +3,8 @@ import type { FindState } from "@shared/types"
 import { IpcChannels } from "@shared/types"
 import { type Rectangle, WebContentsView } from "electron"
 
-const MARGIN = 8
 const DEFAULT_WIDTH = 350
-const DEFAULT_HEIGHT = 48
+const DEFAULT_HEIGHT = 36
 
 export class FindBar {
 	readonly view: WebContentsView
@@ -39,14 +38,14 @@ export class FindBar {
 	private updateViewBounds() {
 		const { width, height } = this.contentSize
 
-		// Position on the left, just below/above navbar
+		// Always at bottom, flush with window edge or navbar
 		const y =
 			this.navBarPosition === "top"
-				? this.navBarHeight + MARGIN // Below navbar
-				: this.windowBounds.height - this.navBarHeight - height - MARGIN // Above navbar
+				? this.windowBounds.height - height // Bottom of window
+				: this.windowBounds.height - this.navBarHeight - height // Just above navbar
 
 		this.view.setBounds({
-			x: MARGIN,
+			x: 0,
 			y,
 			width,
 			height,
