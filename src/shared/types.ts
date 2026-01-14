@@ -1,9 +1,17 @@
 /**
  * Types partagés entre main, preload et renderer
+ * Types de config inférés depuis Zod (export type = pas d'exécution du module)
  */
 
-// Theme mode
-export type ThemeMode = "system" | "light" | "dark"
+// Config types (inférés depuis Zod)
+export type {
+	ThemeMode,
+	NavBarConfig,
+	RoutingConfig,
+	DownloadConfig,
+	AppConfig,
+	GlobalConfig,
+} from "./config.schema"
 
 // Tab origin - determines how a tab should behave
 // "user": Created by user action (Home+, first tab) → always proper, activate immediately
@@ -131,16 +139,8 @@ export const IpcChannels = {
 // Type utilitaire pour les valeurs de IpcChannels
 export type IpcChannel = (typeof IpcChannels)[keyof typeof IpcChannels]
 
-// Configuration de la barre de navigation
-export interface NavBarConfig {
-	position: "top" | "bottom"
-	visible: boolean
-	autoHide: boolean // Pour plus tard
-	urlEditable: boolean
-	showBackForward: boolean
-	showReload: boolean
-	allowSingleTabClose: boolean
-}
+// Valeurs par défaut (définies ici pour éviter d'importer zod dans preload)
+import type { DownloadConfig, NavBarConfig } from "./config.schema"
 
 export const defaultNavBarConfig: NavBarConfig = {
 	position: "top",
@@ -152,21 +152,6 @@ export const defaultNavBarConfig: NavBarConfig = {
 	allowSingleTabClose: false,
 }
 
-// Configuration du routage des URLs
-export interface RoutingConfig {
-	internal: string | string[] // URLs internes (regex ^... ou baseUrl)
-	download?: string | string[] // URLs autorisées pour downloads
-}
-
-// Configuration des téléchargements
-export interface DownloadConfig {
-	directory?: string // Si absent → dossier Downloads système
-	autoOpenMaxSize?: number | string // Bytes ou "512k", "10M" (0 = désactivé)
-	autoOpenMimeTypes?: string[] // Ex: ["image/*", "application/pdf"]
-	allowExecutablesDownload?: boolean // Si true, autorise le téléchargement d'exécutables (défaut: false)
-	preventDuplicateDownloads?: boolean // Si true, supprime les doublons MD5 (défaut: false)
-}
-
 export const defaultDownloadConfig: DownloadConfig = {}
 
 // Config résolue (valeurs parsées pour runtime)
@@ -176,17 +161,6 @@ export interface ResolvedDownloadConfig {
 	autoOpenMimeTypes: string[]
 	allowExecutablesDownload: boolean
 	preventDuplicateDownloads: boolean
-}
-
-// Configuration d'une app (site web isolé)
-export interface AppConfig {
-	partition: string // Nom de la partition (données isolées)
-	startUrl: string
-	theme?: ThemeMode
-	userAgent?: string // Shortcode: "mobile:chrome", "desktop:firefox:linux"
-	userAgentRaw?: string // UA custom brut (prioritaire sur userAgent)
-	navBar?: Partial<NavBarConfig>
-	routing?: Partial<RoutingConfig>
 }
 
 // API Bird exposée aux overlays via contextBridge

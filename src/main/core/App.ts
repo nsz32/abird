@@ -1,4 +1,4 @@
-import { Menu, app, nativeTheme } from "electron"
+import { Menu, nativeTheme } from "electron"
 import { getTabsList, registerHandlers } from "../ipc/handlers"
 import { setupInputListener } from "../keyboard/inputListener"
 import { createAppMenu } from "../keyboard/menu"
@@ -74,6 +74,7 @@ export function startApp() {
 	Menu.setApplicationMenu(
 		createAppMenu({
 			onFocusUrl: () => navBar.sendFocusUrl(),
+			onNavbarDevTools: () => navBar.openDevTools(),
 		}),
 	)
 

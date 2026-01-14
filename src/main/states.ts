@@ -26,7 +26,9 @@ export const userAgent$ = new StateObservable<string>("desktop:bird")
 export const downloadConfig$ = new StateObservable<ResolvedDownloadConfig>({
 	directory: null,
 	autoOpenMaxSize: 0,
-	autoOpenExtensions: [],
+	autoOpenMimeTypes: [],
+	allowExecutablesDownload: false,
+	preventDuplicateDownloads: false,
 })
 
 // Window

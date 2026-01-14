@@ -4,10 +4,11 @@ import { closeTab, createTab } from "../tabs/Tabs"
 
 interface MenuCallbacks {
 	onFocusUrl: () => void
+	onNavbarDevTools: () => void
 }
 
 export function createAppMenu(callbacks: MenuCallbacks): Menu {
-	const { onFocusUrl } = callbacks
+	const { onFocusUrl, onNavbarDevTools } = callbacks
 
 	return Menu.buildFromTemplate([
 		{
@@ -52,6 +53,15 @@ export function createAppMenu(callbacks: MenuCallbacks): Menu {
 					label: "Rechercher",
 					accelerator: "CmdOrCtrl+F",
 					click: () => findBarVisible$.emit(true),
+				},
+			],
+		},
+		{
+			label: "Développeur",
+			submenu: [
+				{
+					label: "DevTools Navbar",
+					click: () => onNavbarDevTools(),
 				},
 			],
 		},

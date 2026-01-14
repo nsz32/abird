@@ -19,7 +19,6 @@ app.setPath("userData", join(xdgDataHome, "bird"))
 app.setName("okbird")
 
 app.whenReady().then(() => {
-
 	const { appName, configPath } = parseCliArgs()
 	loadConfig(configPath)
 
