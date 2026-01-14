@@ -1,7 +1,7 @@
 import type { FindState, NavigationState, RoutingConfig, TabOrigin } from "@shared/types"
 import { type Rectangle, WebContentsView, session, shell } from "electron"
-import { setupDownloads } from "../downloads/DownloadManager"
 import { shouldHandleUrl } from "../core/UrlRouter"
+import { setupDownloads } from "../downloads/DownloadManager"
 import { config$ } from "../states"
 import { resolveUserAgent } from "../utils/userAgents"
 import { SCROLLBAR_CSS } from "./scrollbar.css"
@@ -37,7 +37,7 @@ export class SiteView {
 				session: sess,
 			},
 		})
-		this.view.setBackgroundColor("#202830")
+		this.view.setBackgroundColor("#00000000")
 		this.webContents = this.view.webContents
 
 		this.setupNavigation()

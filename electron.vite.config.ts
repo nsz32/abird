@@ -45,6 +45,7 @@ export default defineConfig({
 					notifications: resolve(__dirname, "src/ui/notifications/index.html"),
 					downloads: resolve(__dirname, "src/ui/downloads/index.html"),
 					findbar: resolve(__dirname, "src/ui/findbar/index.html"),
+					watermark: resolve(__dirname, "src/ui/watermark/index.html"),
 				},
 			},
 		},

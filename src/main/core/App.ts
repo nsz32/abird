@@ -27,9 +27,11 @@ import { DownloadPanel } from "../ui/DownloadPanel"
 import { FindBar } from "../ui/FindBar"
 import { NavBar } from "../ui/NavBar"
 import { NotificationCenter } from "../ui/NotificationCenter"
+import { Watermark } from "../ui/Watermark"
 import { MainWindow } from "./MainWindow"
 
 let mainWindow: MainWindow
+let watermark: Watermark
 let navBar: NavBar
 let notificationCenter: NotificationCenter
 let downloadPanel: DownloadPanel
@@ -42,11 +44,13 @@ export function startApp() {
 
 	// Initialize components
 	mainWindow = new MainWindow()
+	watermark = new Watermark()
 	navBar = new NavBar()
 	notificationCenter = new NotificationCenter()
 	downloadPanel = new DownloadPanel()
 	findBar = new FindBar()
 
+	mainWindow.setWatermark(watermark.view)
 	mainWindow.setNavBar(navBar.view)
 	mainWindow.setNotificationCenter(notificationCenter.view)
 	mainWindow.setDownloadPanel(downloadPanel.view)
@@ -78,6 +82,7 @@ export function startApp() {
 	)
 
 	// Load and show
+	watermark.load()
 	navBar.load()
 	notificationCenter.load()
 	downloadPanel.load()
@@ -97,6 +102,7 @@ function setupSubscriptions() {
 	navBarBounds$.subscribe((bounds) => navBar.setBounds(bounds))
 	contentBounds$.subscribe((bounds) => activeTab$.get()?.siteView.setBounds(bounds))
 	windowBounds$.subscribe((bounds) => {
+		watermark.setBounds(bounds)
 		notificationCenter.setBounds(bounds)
 		downloadPanel.setBounds(bounds)
 		findBar.setBounds(bounds)

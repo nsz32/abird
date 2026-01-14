@@ -1,10 +1,11 @@
 import { BaseWindow, type WebContentsView } from "electron"
 import { tabs$, windowBounds$ } from "../states"
 
-const BOUNDS_UPDATE_DELAYS = [100, 200, 300, 400, 500]
+const BOUNDS_UPDATE_DELAYS = [100, 200, 300, 400, 500, 750, 1000, 1500, 2000]
 
 export class MainWindow {
 	readonly window: BaseWindow
+	private watermarkView: WebContentsView | null = null
 	private navBarView: WebContentsView | null = null
 	private notificationView: WebContentsView | null = null
 	private downloadPanelView: WebContentsView | null = null
@@ -30,6 +31,12 @@ export class MainWindow {
 
 	addView(view: WebContentsView) {
 		this.window.contentView.addChildView(view)
+	}
+
+	setWatermark(view: WebContentsView) {
+		this.watermarkView = view
+		this.addView(view)
+		this.bringToFront(this.watermarkView)
 	}
 
 	setNavBar(view: WebContentsView) {

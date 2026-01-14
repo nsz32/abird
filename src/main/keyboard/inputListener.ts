@@ -1,3 +1,4 @@
+import { app } from "electron"
 import { UiohookKey, uIOhook } from "uiohook-napi"
 import { ctrlPressed$ } from "../states"
 
@@ -15,4 +16,9 @@ export function setupInputListener() {
 	})
 
 	uIOhook.start()
+
+	app.on("will-quit", () => {
+		console.log("stopping uiokook")
+		uIOhook.stop()
+	})
 }
