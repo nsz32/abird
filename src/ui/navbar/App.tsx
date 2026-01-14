@@ -98,7 +98,7 @@ interface NavButtonProps {
 
 function NavButton({ onClick, disabled, children }: NavButtonProps) {
 	return (
-		<button type="button" className="nav-button" onClick={onClick} disabled={disabled} tabIndex={-1}>
+		<button type="button" className="nav-button" onClick={onClick} disabled={disabled}>
 			{children}
 		</button>
 	)
