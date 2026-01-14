@@ -34,6 +34,8 @@ export function App() {
 
 	if (!config) return null
 
+	const { navBar } = config
+
 	const handleUrlKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === "Escape") {
 			exitUrlMode()
@@ -48,28 +50,28 @@ export function App() {
 
 	return (
 		<div ref={containerRef} className="navigation-bar">
-			{config.showBackForward && (
+			{navBar.showBackForward && (
 				<>
 					<NavButton onClick={() => window.bird.navigation.back()} disabled={!navState.canGoBack}>
-						<ArrowLeft size={16} />
+						<ArrowLeft />
 					</NavButton>
 					<NavButton onClick={() => window.bird.navigation.forward()} disabled={!navState.canGoForward}>
-						<ArrowRight size={16} />
+						<ArrowRight />
 					</NavButton>
 				</>
 			)}
 
-			{config.showReload && (
+			{navBar.showReload && (
 				<NavButton onClick={() => (navState.isLoading ? window.bird.navigation.stop() : window.bird.navigation.reload())}>
-					{navState.isLoading ? <X size={16} strokeWidth={2.5} /> : <RotateCw size={16} />}
+					{navState.isLoading ? <X strokeWidth={2.5} /> : <RotateCw />}
 				</NavButton>
 			)}
 
 			<NavButton onClick={() => (ctrlPressed ? window.bird.navigation.goHome() : window.bird.tabs.create(0))}>
-				{ctrlPressed ? <Home size={16} /> : <HousePlus size={16} />}
+				{ctrlPressed ? <Home /> : <HousePlus />}
 			</NavButton>
 
-			{isUrlMode && config.urlEditable ? (
+			{isUrlMode && navBar.urlEditable ? (
 				<input ref={urlInputRef} type="text" className="url-input" defaultValue={navState.url} onKeyDown={handleUrlKeyDown} onBlur={exitUrlMode} />
 			) : (
 				<div className="tabs-list">
@@ -77,7 +79,7 @@ export function App() {
 						<TabButton
 							key={tab.id}
 							tab={tab}
-							showClose={config.allowSingleTabClose || tabs.length > 1}
+							showClose={navBar.allowSingleTabClose || tabs.length > 1}
 							showExternalIndicator={externalTabIds.has(tab.id)}
 							onActivate={() => window.bird.tabs.activate(tab.id)}
 							onClose={() => window.bird.tabs.close(tab.id)}
@@ -87,9 +89,7 @@ export function App() {
 			)}
 
 			{hasDownloads && (
-				<NavButton onClick={() => window.bird.downloads.toggle()}>
-					{hasActiveDownloads ? <Loader2 size={16} className="spinning" /> : <Download size={16} />}
-				</NavButton>
+				<NavButton onClick={() => window.bird.downloads.toggle()}>{hasActiveDownloads ? <Loader2 className="spinning" /> : <Download />}</NavButton>
 			)}
 		</div>
 	)

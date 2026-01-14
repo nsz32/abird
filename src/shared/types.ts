@@ -106,7 +106,7 @@ export const IpcChannels = {
 	TABS_CREATE: "bird:tabs:create",
 	TABS_EXTERNAL_OPENED: "bird:tabs:external-opened",
 	// Config
-	CONFIG_GET_NAVBAR: "bird:config:get-navbar",
+	CONFIG_GET: "bird:config:get",
 	// Notifications
 	NOTIF_LIST_CHANGED: "bird:notif:list-changed",
 	NOTIF_DISMISS: "bird:notif:dismiss",
@@ -140,7 +140,7 @@ export const IpcChannels = {
 export type IpcChannel = (typeof IpcChannels)[keyof typeof IpcChannels]
 
 // Valeurs par défaut (définies ici pour éviter d'importer zod dans preload)
-import type { DownloadConfig, NavBarConfig } from "./config.schema"
+import type { DownloadConfig, NavBarConfig, RoutingConfig, ThemeMode } from "./config.schema"
 
 export const defaultNavBarConfig: NavBarConfig = {
 	position: "top",
@@ -161,6 +161,17 @@ export interface ResolvedDownloadConfig {
 	autoOpenMimeTypes: string[]
 	allowExecutablesDownload: boolean
 	preventDuplicateDownloads: boolean
+}
+
+// Config app complète et résolue (tous champs required)
+export interface ResolvedAppConfig {
+	startUrl: string
+	partition: string
+	theme: ThemeMode
+	userAgent: string
+	navBar: NavBarConfig
+	routing: Partial<RoutingConfig> | null
+	downloads: ResolvedDownloadConfig
 }
 
 // API Bird exposée aux overlays via contextBridge
@@ -184,7 +195,7 @@ export interface BirdApi {
 		create: (index?: number) => Promise<void>
 	}
 	config: {
-		getNavBar: () => Promise<NavBarConfig>
+		get: () => Promise<ResolvedAppConfig>
 	}
 	navbar: {
 		resize: (height: number) => void

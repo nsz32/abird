@@ -1,10 +1,11 @@
 import { Menu, nativeTheme } from "electron"
-import { getTabsList, registerHandlers } from "../ipc/handlers"
+import { registerHandlers } from "../ipc/handlers"
 import { setupInputListener } from "../keyboard/inputListener"
 import { createAppMenu } from "../keyboard/menu"
 import {
 	activeDownloads$,
 	activeTab$,
+	config$,
 	contentBounds$,
 	ctrlPressed$,
 	downloadEvents$,
@@ -14,16 +15,14 @@ import {
 	findBarVisible$,
 	findState$,
 	navBarBounds$,
-	navBarConfig$,
 	navBarHeight$,
 	navbarSync$,
 	notifications$,
 	tabs$,
-	theme$,
 	windowBounds$,
 } from "../states"
 import type { Tab } from "../tabs/Tab"
-import { createTab } from "../tabs/Tabs"
+import { createTab, getTabsList } from "../tabs/Tabs"
 import { DownloadPanel } from "../ui/DownloadPanel"
 import { FindBar } from "../ui/FindBar"
 import { NavBar } from "../ui/NavBar"
@@ -53,7 +52,7 @@ export function startApp() {
 	mainWindow.setDownloadPanel(downloadPanel.view)
 	mainWindow.setFindBar(findBar.view)
 	navBar.setBounds(navBarBounds$.get())
-	navBar.setVisible(navBarConfig$.get().visible)
+	navBar.setVisible(config$.get().navBar.visible)
 	downloadPanel.setVisible(false)
 	findBar.setVisible(false)
 
@@ -91,8 +90,8 @@ export function startApp() {
 }
 
 function setupSubscriptions() {
-	theme$.subscribe((theme) => {
-		nativeTheme.themeSource = theme
+	config$.subscribe((config) => {
+		nativeTheme.themeSource = config.theme
 	})
 
 	navBarBounds$.subscribe((bounds) => navBar.setBounds(bounds))
@@ -105,13 +104,13 @@ function setupSubscriptions() {
 
 	// Update panels position when navbar config or height changes
 	const updatePanelsNavBar = () => {
-		const { position, visible } = navBarConfig$.get()
-		const height = visible ? navBarHeight$.get() : 0
-		notificationCenter.setNavBar(position, height)
-		downloadPanel.setNavBar(position, height)
-		findBar.setNavBar(position, height)
+		const { navBar: navBarConfig } = config$.get()
+		const height = navBarConfig.visible ? navBarHeight$.get() : 0
+		notificationCenter.setNavBar(navBarConfig.position, height)
+		downloadPanel.setNavBar(navBarConfig.position, height)
+		findBar.setNavBar(navBarConfig.position, height)
 	}
-	navBarConfig$.subscribe(updatePanelsNavBar)
+	config$.subscribe(updatePanelsNavBar)
 	navBarHeight$.subscribe(updatePanelsNavBar)
 
 	activeTab$.subscribe((activeTab) => {

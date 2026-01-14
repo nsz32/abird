@@ -1,4 +1,4 @@
-import type { NavBarConfig, NavigationState, TabInfo } from "@shared/types"
+import type { NavigationState, ResolvedAppConfig, TabInfo } from "@shared/types"
 import { useCallback, useEffect, useRef, useState } from "react"
 
 const EXTERNAL_INDICATOR_DURATION = 800
@@ -11,7 +11,7 @@ export function useNavbarState() {
 		canGoForward: false,
 		isLoading: false,
 	})
-	const [config, setConfig] = useState<NavBarConfig | null>(null)
+	const [config, setConfig] = useState<ResolvedAppConfig | null>(null)
 	const [tabs, setTabs] = useState<TabInfo[]>([])
 	const [externalTabIds, setExternalTabIds] = useState<Set<string>>(new Set())
 	const [isUrlMode, setIsUrlMode] = useState(false)
@@ -31,7 +31,7 @@ export function useNavbarState() {
 	}, [])
 
 	useEffect(() => {
-		window.bird.config.getNavBar().then(setConfig)
+		window.bird.config.get().then(setConfig)
 		window.bird.navigation.getState().then(setNavState)
 		window.bird.tabs.getList().then(setTabs)
 

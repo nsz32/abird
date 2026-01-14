@@ -4,32 +4,33 @@ import {
 	type DownloadHistoryItem,
 	type FindState,
 	IpcChannels,
-	type NavBarConfig,
 	type NavigationState,
 	type Notification,
-	type ResolvedDownloadConfig,
-	type RoutingConfig,
-	type ThemeMode,
+	type ResolvedAppConfig,
 	defaultNavBarConfig,
 } from "@shared/types"
 import type { Rectangle } from "electron"
 import { BroadcastEvent, BroadcastObservable, CombinedObservable, StateObservable } from "./api/observable"
 import type { Tab } from "./tabs/Tab"
 
-// Config
-export const navBarConfig$ = new StateObservable<NavBarConfig>(defaultNavBarConfig)
-export const routing$ = new StateObservable<Partial<RoutingConfig> | null>(null)
-export const startUrl$ = new StateObservable<string>("about:blank")
-export const partition$ = new StateObservable<string>("default")
-export const theme$ = new StateObservable<ThemeMode>("system")
-export const userAgent$ = new StateObservable<string>("desktop:bird")
-export const downloadConfig$ = new StateObservable<ResolvedDownloadConfig>({
-	directory: null,
-	autoOpenMaxSize: 0,
-	autoOpenMimeTypes: [],
-	allowExecutablesDownload: false,
-	preventDuplicateDownloads: false,
-})
+// Config - single source of truth
+const DEFAULT_CONFIG: ResolvedAppConfig = {
+	startUrl: "about:blank",
+	partition: "default",
+	theme: "system",
+	userAgent: "desktop:bird",
+	navBar: defaultNavBarConfig,
+	routing: null,
+	downloads: {
+		directory: null,
+		autoOpenMaxSize: 0,
+		autoOpenMimeTypes: [],
+		allowExecutablesDownload: false,
+		preventDuplicateDownloads: false,
+	},
+}
+
+export const config$ = new StateObservable<ResolvedAppConfig>(DEFAULT_CONFIG)
 
 // Window
 export const windowBounds$ = new StateObservable<Rectangle>({ x: 0, y: 0, width: 0, height: 0 })
@@ -51,15 +52,17 @@ export const navState$ = new StateObservable<NavigationState>({
 // Bounds dérivés
 const DEFAULT_NAVBAR_HEIGHT = 40
 
-export const navBarBounds$ = new CombinedObservable([windowBounds$, navBarConfig$, navBarHeight$], (windowBounds, navBarConfig, navBarHeight) => {
-	const height = navBarConfig.visible ? navBarHeight || DEFAULT_NAVBAR_HEIGHT : 0
+export const navBarBounds$ = new CombinedObservable([windowBounds$, config$, navBarHeight$], (windowBounds, config, navBarHeight) => {
+	const { navBar } = config
+	const height = navBar.visible ? navBarHeight || DEFAULT_NAVBAR_HEIGHT : 0
 	const width = windowBounds.width || 1
-	return navBarConfig.position === "top" ? { x: 0, y: 0, width, height } : { x: 0, y: windowBounds.height - height, width, height }
+	return navBar.position === "top" ? { x: 0, y: 0, width, height } : { x: 0, y: windowBounds.height - height, width, height }
 })
 
-export const contentBounds$ = new CombinedObservable([windowBounds$, navBarConfig$, navBarHeight$], (windowBounds, navBarConfig, navBarHeight) => {
-	const navHeight = navBarConfig.visible ? navBarHeight || DEFAULT_NAVBAR_HEIGHT : 0
-	return navBarConfig.position === "top"
+export const contentBounds$ = new CombinedObservable([windowBounds$, config$, navBarHeight$], (windowBounds, config, navBarHeight) => {
+	const { navBar } = config
+	const navHeight = navBar.visible ? navBarHeight || DEFAULT_NAVBAR_HEIGHT : 0
+	return navBar.position === "top"
 		? { x: 0, y: navHeight, width: windowBounds.width, height: windowBounds.height - navHeight }
 		: { x: 0, y: 0, width: windowBounds.width, height: windowBounds.height - navHeight }
 })

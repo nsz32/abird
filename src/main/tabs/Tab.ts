@@ -17,6 +17,8 @@ export class Tab {
 
 	proper = false
 	favicon: string | null = null
+	findState: FindState = { text: "", activeMatch: 0, totalMatches: 0 }
+	findBarVisible = false
 	readonly navState$ = new StateObservable<NavigationState>({
 		url: "",
 		title: "",
@@ -63,6 +65,7 @@ export class Tab {
 	}
 
 	private emitFindResult(state: FindState) {
+		this.findState = state
 		// Only emit if this tab is active
 		if (activeTab$.get()?.id === this.id) {
 			findState$.emit(state)

@@ -1,10 +1,10 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { homedir } from "node:os"
 import { dirname, join } from "node:path"
-import { type AppConfig, type GlobalConfig, defaultDownloadConfig, defaultNavBarConfig } from "@shared/types"
 import { validateConfig } from "@shared/config.schema"
+import { type AppConfig, type GlobalConfig, type ResolvedAppConfig, defaultDownloadConfig, defaultNavBarConfig } from "@shared/types"
 import { resolveDownloadConfig } from "../downloads/DownloadManager"
-import { downloadConfig$, navBarConfig$, partition$, routing$, startUrl$, theme$, userAgent$ } from "../states"
+import { config$ } from "../states"
 
 const CONFIG_DIR = join(homedir(), ".config", "bird")
 const DEFAULT_CONFIG_FILE = join(CONFIG_DIR, "config.json")
@@ -85,11 +85,14 @@ function writeConfigFile() {
 }
 
 function emitAppConfig(app: AppConfig) {
-	navBarConfig$.emit({ ...defaultNavBarConfig, ...globalConfig.navBar, ...app.navBar })
-	routing$.emit(app.routing || null)
-	startUrl$.emit(app.startUrl)
-	partition$.emit(app.partition || "default")
-	theme$.emit(app.theme || globalConfig.theme)
-	userAgent$.emit(app.userAgentRaw || app.userAgent || "desktop:bird")
-	downloadConfig$.emit(resolveDownloadConfig({ ...defaultDownloadConfig, ...globalConfig.downloads }))
+	const resolved: ResolvedAppConfig = {
+		startUrl: app.startUrl,
+		partition: app.partition || "default",
+		theme: app.theme || globalConfig.theme,
+		userAgent: app.userAgentRaw || app.userAgent || "desktop:bird",
+		navBar: { ...defaultNavBarConfig, ...globalConfig.navBar, ...app.navBar },
+		routing: app.routing || null,
+		downloads: resolveDownloadConfig({ ...defaultDownloadConfig, ...globalConfig.downloads }),
+	}
+	config$.emit(resolved)
 }

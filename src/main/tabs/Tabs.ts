@@ -1,6 +1,6 @@
-import type { TabOrigin } from "@shared/types"
+import type { TabInfo, TabOrigin } from "@shared/types"
 import { app } from "electron"
-import { activeTab$, navState$, partition$, routing$, startUrl$, tabs$, userAgent$ } from "../states"
+import { activeTab$, config$, findBarVisible$, findState$, navState$, tabs$ } from "../states"
 import { Tab } from "./Tab"
 
 let unsubscribeNavState: (() => void) | null = null
@@ -8,7 +8,8 @@ let pendingActivationId: string | null = null
 
 export function createTab(url?: string, origin: TabOrigin = "user", index?: number, parentId?: string): Tab {
 	console.log(`[Tabs] createTab origin=${origin}`)
-	const tab = new Tab(partition$.get(), routing$.get(), url || startUrl$.get(), userAgent$.get(), parentId ?? null)
+	const config = config$.get()
+	const tab = new Tab(config.partition, config.routing, url || config.startUrl, config.userAgent, parentId ?? null)
 
 	insertTab(tab, index)
 
@@ -51,10 +52,31 @@ export function activateTab(id: string) {
 	pendingActivationId = null
 	subscribeToNavState(tab)
 	activeTab$.emit(tab)
+
+	// Restore find state for this tab
+	findBarVisible$.emit(tab.findBarVisible)
+	findState$.emit(tab.findState)
 }
 
 export function getTabIndex(id: string): number {
 	return tabs$.get().findIndex((t) => t.id === id)
+}
+
+export function getTabsList(): TabInfo[] {
+	const allTabs = tabs$.get()
+	const activeId = activeTab$.get()?.id
+	const hasNonProperChild = (id: string) => allTabs.some((t) => !t.proper && t.parentId === id)
+
+	return allTabs
+		.filter((t) => t.proper)
+		.map((t) => ({
+			id: t.id,
+			title: t.navState$.get().title,
+			url: t.navState$.get().url || t.initialUrl,
+			favicon: t.favicon,
+			isActive: t.id === activeId,
+			isLoading: t.navState$.get().isLoading || hasNonProperChild(t.id),
+		}))
 }
 
 function insertTab(tab: Tab, index?: number) {

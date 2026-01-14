@@ -54,6 +54,10 @@ body,
 	cursor: default;
 }
 
+.nav-button svg {
+	width: 47.59cqh;
+}
+
 .url-input {
 	flex: 1;
 	min-width: 0;
@@ -110,10 +114,14 @@ body,
 	border-radius: 6px;
 	background: rgba(255, 255, 255, 0.08);
 	color: #aaa;
-	font-size: 12px;
+	font-size: 40.29cqh;
 	cursor: pointer;
 	flex: 1;
 	min-width: 0;
+}
+
+.tab-button svg {
+	width: 47.59cqh;
 }
 
 .tab-button > * {
@@ -148,8 +156,8 @@ body,
 }
 
 .tab-favicon {
-	width: 16px;
-	height: 16px;
+	width: 47.59cqh;
+	height: 47.59cqh;
 	flex-shrink: 0;
 }
 

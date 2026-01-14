@@ -4,9 +4,9 @@ import {
 	type DownloadHistoryItem,
 	type FindState,
 	IpcChannels,
-	type NavBarConfig,
 	type NavigationState,
 	type Notification,
+	type ResolvedAppConfig,
 	type TabInfo,
 } from "@shared/types"
 import { contextBridge, ipcRenderer } from "electron"
@@ -44,7 +44,7 @@ contextBridge.exposeInMainWorld("bird", {
 		create: (index?: number) => ipcRenderer.invoke(IpcChannels.TABS_CREATE, index),
 	},
 	config: {
-		getNavBar: (): Promise<NavBarConfig> => ipcRenderer.invoke(IpcChannels.CONFIG_GET_NAVBAR),
+		get: (): Promise<ResolvedAppConfig> => ipcRenderer.invoke(IpcChannels.CONFIG_GET),
 	},
 	navbar: {
 		resize: (height: number) => ipcRenderer.send(IpcChannels.NAVBAR_RESIZE, height),

@@ -1,53 +1,52 @@
 export const SCROLLBAR_CSS = `
-/* Base - applies to both themes */
+/* Base */
+:root {
+  scrollbar-width: thin;
+}
 ::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-corner {
-  background: transparent;
+  width: 8px;
+  height: 8px;
 }
 
 /* Dark theme */
 @media (prefers-color-scheme: dark) {
+  ::-webkit-scrollbar-track {
+    background: #202020;
+  }
   ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.25);
-    border: 3px solid transparent;
-    background-clip: padding-box;
-    border-radius: 6px;
+    background: #5a5a5a;
+    border: 2px solid #202020;
+    border-radius: 4px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.4);
-    border: 3px solid transparent;
-    background-clip: padding-box;
+    background: #787878;
   }
   ::-webkit-scrollbar-thumb:active {
-    background: rgba(255, 255, 255, 0.5);
-    border: 3px solid transparent;
-    background-clip: padding-box;
+    background: #8a8a8a;
+  }
+  ::-webkit-scrollbar-corner {
+    background: #202020;
   }
 }
 
 /* Light theme */
 @media (prefers-color-scheme: light) {
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
   ::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.25);
-    border: 3px solid transparent;
-    background-clip: padding-box;
-    border-radius: 6px;
+    background: #c1c1c1;
+    border: 2px solid #f1f1f1;
+    border-radius: 4px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.4);
-    border: 3px solid transparent;
-    background-clip: padding-box;
+    background: #a8a8a8;
   }
   ::-webkit-scrollbar-thumb:active {
-    background: rgba(0, 0, 0, 0.5);
-    border: 3px solid transparent;
-    background-clip: padding-box;
+    background: #787878;
+  }
+  ::-webkit-scrollbar-corner {
+    background: #f1f1f1;
   }
 }
 `

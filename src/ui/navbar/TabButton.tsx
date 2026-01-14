@@ -23,7 +23,7 @@ export function TabButton({ tab, showClose, showExternalIndicator, onActivate, o
 
 function TabFavicon({ tab }: { tab: TabInfo }) {
 	if (tab.isLoading) {
-		return <LoaderCircle size={16} className="tab-favicon spinning" />
+		return <LoaderCircle className="tab-favicon spinning" />
 	}
 	if (tab.favicon) {
 		return <img className="tab-favicon" src={tab.favicon} alt="" />
@@ -39,7 +39,7 @@ interface TabActionProps {
 
 function TabAction({ showExternalIndicator, showClose, onClose }: TabActionProps) {
 	if (showExternalIndicator) {
-		return <ChevronsRight size={16} className="tab-external-indicator" />
+		return <ChevronsRight className="tab-external-indicator" />
 	}
 
 	if (showClose) {
@@ -52,7 +52,7 @@ function TabAction({ showExternalIndicator, showClose, onClose }: TabActionProps
 					onClose()
 				}}
 			>
-				<X size={16} strokeWidth={2.5} />
+				<X strokeWidth={2.5} />
 			</button>
 		)
 	}
