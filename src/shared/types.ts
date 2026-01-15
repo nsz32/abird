@@ -134,6 +134,9 @@ export const IpcChannels = {
 	FIND_PANEL_RESIZE: "bird:find:panel-resize",
 	// Keyboard
 	CTRL_PRESSED: "bird:keyboard:ctrl-pressed",
+	// User config (raw JSON)
+	USERCONFIG_READ: "userconfig:read",
+	USERCONFIG_WRITE: "userconfig:write",
 } as const
 
 // Type utilitaire pour les valeurs de IpcChannels
@@ -172,6 +175,7 @@ export interface ResolvedAppConfig {
 	navBar: NavBarConfig
 	routing: Partial<RoutingConfig> | null
 	downloads: ResolvedDownloadConfig
+	preload?: string
 }
 
 // API Bird exposée aux overlays via contextBridge
@@ -229,6 +233,12 @@ export interface BirdApi {
 	}
 	keyboard: {
 		onCtrlChanged: (callback: (pressed: boolean) => void) => () => void
+	}
+	settings: {
+		userconfig: {
+			read: () => Promise<{ path: string; content: unknown }>
+			write: (content: unknown) => Promise<{ success: boolean; errors?: string[] }>
+		}
 	}
 }
 

@@ -97,6 +97,39 @@ function emitAppConfig(app: AppConfig) {
 	config$.emit(resolved)
 }
 
+export interface RawUserConfig {
+	path: string
+	content: unknown
+}
+
+export function readRawConfig(): RawUserConfig {
+	if (!existsSync(configFilePath)) {
+		return { path: configFilePath, content: {} }
+	}
+	try {
+		const content = readFileSync(configFilePath, "utf-8")
+		return { path: configFilePath, content: JSON.parse(content) }
+	} catch {
+		return { path: configFilePath, content: {} }
+	}
+}
+
+export function writeRawConfig(content: unknown): { success: boolean; errors?: string[] } {
+	const result = validateConfig(content)
+	if (!result.success) {
+		return { success: false, errors: result.errors }
+	}
+
+	ensureConfigDir()
+	try {
+		writeFileSync(configFilePath, JSON.stringify(content, null, "\t"))
+		globalConfig = result.data
+		return { success: true }
+	} catch (err) {
+		return { success: false, errors: [(err as Error).message] }
+	}
+}
+
 export function selectConfigMode() {
 	currentAppName = "config"
 	const startUrl = process.env.ELECTRON_RENDERER_URL
@@ -110,6 +143,7 @@ export function selectConfigMode() {
 		navBar: { ...defaultNavBarConfig },
 		routing: { internal: "^bird://" },
 		downloads: resolveDownloadConfig({ ...defaultDownloadConfig }),
+		preload: "../preload/index.js",
 	}
 	config$.emit(resolved)
 }

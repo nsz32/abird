@@ -31,12 +31,12 @@ export class Tab {
 	private onProperCallback?: () => void
 	private destroyed = false
 
-	constructor(partition: string, routing: Partial<RoutingConfig> | null, url: string, userAgent: string, parentId: string | null = null) {
+	constructor(partition: string, routing: Partial<RoutingConfig> | null, url: string, userAgent: string, parentId: string | null = null, preload?: string) {
 		this.id = `tab-${nextId++}`
 		this.initialUrl = url
 		this.parentId = parentId
 
-		this.siteView = new SiteView(partition, routing, userAgent, this.createCallbacks())
+		this.siteView = new SiteView(partition, routing, userAgent, this.createCallbacks(), preload)
 		this.siteView.loadURL(url)
 
 		this.siteView.view.webContents.openDevTools()

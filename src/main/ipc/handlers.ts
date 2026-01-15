@@ -1,5 +1,6 @@
 import { IpcChannels } from "@shared/types"
 import { ipcMain } from "electron"
+import { readRawConfig, writeRawConfig } from "../core/Config"
 import { dismissNotification } from "../notifications/notify"
 import {
 	activeDownloads$,
@@ -58,4 +59,7 @@ export function registerHandlers() {
 		findBarVisible$.emit(false)
 		findState$.emit({ text: "", activeMatch: 0, totalMatches: 0 })
 	})
+	// User config (raw JSON)
+	ipcMain.handle(IpcChannels.USERCONFIG_READ, () => readRawConfig())
+	ipcMain.handle(IpcChannels.USERCONFIG_WRITE, (_, content: unknown) => writeRawConfig(content))
 }

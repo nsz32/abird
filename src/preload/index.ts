@@ -111,4 +111,10 @@ contextBridge.exposeInMainWorld("bird", {
 			return () => ipcRenderer.removeListener(IpcChannels.CTRL_PRESSED, listener)
 		},
 	},
+	settings: {
+		userconfig: {
+			read: () => ipcRenderer.invoke(IpcChannels.USERCONFIG_READ),
+			write: (content: unknown) => ipcRenderer.invoke(IpcChannels.USERCONFIG_WRITE, content),
+		},
+	},
 })

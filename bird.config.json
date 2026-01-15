@@ -3,13 +3,18 @@
 	"theme": "dark",
 	"downloads": {
 		"autoOpenMaxSize": "1M",
-		"autoOpenMimeTypes": ["image/*", "application/pdf", "video/*", "audio/*"],
+		"autoOpenMimeTypes": [
+			"image/*",
+			"application/pdf",
+			"video/*",
+			"audio/*"
+		],
 		"preventDuplicateDownloads": true
 	},
 	"navBar": {
 		"position": "bottom",
 		"visible": true,
-		"autoHide": false,
+		"autoHide": true,
 		"urlEditable": true,
 		"showBackForward": true,
 		"showReload": true

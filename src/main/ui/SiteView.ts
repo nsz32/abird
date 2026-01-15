@@ -1,3 +1,4 @@
+import { join } from "node:path"
 import type { FindState, NavigationState, RoutingConfig, TabOrigin } from "@shared/types"
 import { type Rectangle, WebContentsView, session, shell } from "electron"
 import { shouldHandleUrl } from "../core/UrlRouter"
@@ -25,6 +26,7 @@ export class SiteView {
 		private readonly routing: Partial<RoutingConfig> | null,
 		userAgent: string,
 		private readonly callbacks: SiteViewCallbacks,
+		preload?: string,
 	) {
 		const sess = partition ? session.fromPartition(`persist:${partition}`) : session.defaultSession
 		sess.setUserAgent(resolveUserAgent(userAgent))
@@ -35,6 +37,7 @@ export class SiteView {
 				nodeIntegration: false,
 				contextIsolation: true,
 				session: sess,
+				preload: preload ? join(__dirname, preload) : undefined,
 			},
 		})
 		this.view.setBackgroundColor("#00000000")
