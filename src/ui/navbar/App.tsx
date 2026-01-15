@@ -50,26 +50,29 @@ export function App() {
 
 	return (
 		<div ref={containerRef} className="navigation-bar">
-			{navBar.showBackForward && (
-				<>
-					<NavButton onClick={() => window.bird.navigation.back()} disabled={!navState.canGoBack}>
-						<ArrowLeft />
-					</NavButton>
-					<NavButton onClick={() => window.bird.navigation.forward()} disabled={!navState.canGoForward}>
-						<ArrowRight />
-					</NavButton>
-				</>
+			{navBar.showBackButton && (
+				<NavButton onClick={() => window.bird.navigation.back()} disabled={!navState.canGoBack}>
+					<ArrowLeft />
+				</NavButton>
 			)}
 
-			{navBar.showReload && (
+			{navBar.showNextButton && (
+				<NavButton onClick={() => window.bird.navigation.forward()} disabled={!navState.canGoForward}>
+					<ArrowRight />
+				</NavButton>
+			)}
+
+			{navBar.showRefreshButton && (
 				<NavButton onClick={() => (navState.isLoading ? window.bird.navigation.stop() : window.bird.navigation.reload())}>
 					{navState.isLoading ? <X strokeWidth={2.5} /> : <RotateCw />}
 				</NavButton>
 			)}
 
-			<NavButton onClick={() => (ctrlPressed ? window.bird.navigation.goHome() : window.bird.tabs.create(0))}>
-				{ctrlPressed ? <Home /> : <HousePlus />}
-			</NavButton>
+			{navBar.showHomeButton && (
+				<NavButton onClick={() => (ctrlPressed ? window.bird.navigation.goHome() : window.bird.tabs.create(0))}>
+					{ctrlPressed ? <Home /> : <HousePlus />}
+				</NavButton>
+			)}
 
 			{isUrlMode && navBar.urlEditable ? (
 				<input ref={urlInputRef} type="text" className="url-input" defaultValue={navState.url} onKeyDown={handleUrlKeyDown} onBlur={exitUrlMode} />

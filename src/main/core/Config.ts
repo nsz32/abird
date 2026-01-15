@@ -2,7 +2,15 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { homedir } from "node:os"
 import { dirname, join } from "node:path"
 import { validateConfig } from "@shared/config.schema"
-import { type AppConfig, type GlobalConfig, type ResolvedAppConfig, defaultDownloadConfig, defaultNavBarConfig } from "@shared/types"
+import {
+	type AppConfig,
+	type GlobalConfig,
+	type NavBarConfig,
+	type ResolvedAppConfig,
+	type ResolvedNavBarConfig,
+	defaultDownloadConfig,
+	defaultNavBarConfig,
+} from "@shared/types"
 import { resolveDownloadConfig } from "../downloads/DownloadManager"
 import { config$ } from "../states"
 
@@ -84,13 +92,28 @@ function writeConfigFile() {
 	}
 }
 
+function resolveNavBarConfig(merged: NavBarConfig): ResolvedNavBarConfig {
+	return {
+		position: merged.position,
+		visible: merged.visible,
+		autoHide: merged.autoHide,
+		urlEditable: merged.urlEditable,
+		allowSingleTabClose: merged.allowSingleTabClose,
+		showBackButton: merged.showBackForward,
+		showNextButton: merged.showBackForward,
+		showRefreshButton: merged.showReload,
+		showHomeButton: true,
+	}
+}
+
 function emitAppConfig(app: AppConfig) {
+	const mergedNavBar: NavBarConfig = { ...defaultNavBarConfig, ...globalConfig.navBar, ...app.navBar }
 	const resolved: ResolvedAppConfig = {
 		startUrl: app.startUrl,
 		partition: app.partition || "default",
 		theme: app.theme || globalConfig.theme,
 		userAgent: app.userAgentRaw || app.userAgent || "desktop:bird",
-		navBar: { ...defaultNavBarConfig, ...globalConfig.navBar, ...app.navBar },
+		navBar: resolveNavBarConfig(mergedNavBar),
 		routing: app.routing || null,
 		downloads: resolveDownloadConfig({ ...defaultDownloadConfig, ...globalConfig.downloads }),
 	}
@@ -153,7 +176,17 @@ export function selectConfigMode() {
 		partition: "",
 		theme: globalConfig.theme,
 		userAgent: "Bird",
-		navBar: { ...defaultNavBarConfig, position: globalConfig.navBar?.position || "top" },
+		navBar: {
+			position: globalConfig.navBar?.position || "top",
+			visible: true,
+			autoHide: false,
+			urlEditable: false,
+			allowSingleTabClose: false,
+			showBackButton: true,
+			showNextButton: false,
+			showRefreshButton: false,
+			showHomeButton: false,
+		},
 		routing: { internal: "^bird://" },
 		downloads: resolveDownloadConfig({ ...defaultDownloadConfig }),
 		preload: "../preload/index.js",

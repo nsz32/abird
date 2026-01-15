@@ -157,6 +157,19 @@ export const defaultNavBarConfig: NavBarConfig = {
 
 export const defaultDownloadConfig: DownloadConfig = {}
 
+// Config navbar résolue (boutons individuels)
+export interface ResolvedNavBarConfig {
+	position: "top" | "bottom"
+	visible: boolean
+	autoHide: boolean
+	urlEditable: boolean
+	allowSingleTabClose: boolean
+	showBackButton: boolean
+	showNextButton: boolean
+	showRefreshButton: boolean
+	showHomeButton: boolean
+}
+
 // Config résolue (valeurs parsées pour runtime)
 export interface ResolvedDownloadConfig {
 	directory: string | null
@@ -172,7 +185,7 @@ export interface ResolvedAppConfig {
 	partition: string
 	theme: ThemeMode
 	userAgent: string
-	navBar: NavBarConfig
+	navBar: ResolvedNavBarConfig
 	routing: Partial<RoutingConfig> | null
 	downloads: ResolvedDownloadConfig
 	preload?: string

@@ -1,6 +1,6 @@
 {
 	"$schema": "./bird.config.schema.json",
-	"theme": "light",
+	"theme": "dark",
 	"downloads": {
 		"autoOpenMaxSize": "1M",
 		"autoOpenMimeTypes": [
