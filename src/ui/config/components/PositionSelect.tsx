@@ -1,4 +1,4 @@
-import { Select } from "radix-ui"
+import { NativeSelect } from "@chakra-ui/react"
 
 type Position = "top" | "bottom"
 
@@ -7,29 +7,14 @@ interface PositionSelectProps {
 	onChange: (value: Position) => void
 }
 
-const options: { value: Position; label: string }[] = [
-	{ value: "top", label: "Haut" },
-	{ value: "bottom", label: "Bas" },
-]
-
 export function PositionSelect({ value, onChange }: PositionSelectProps) {
 	return (
-		<Select.Root value={value} onValueChange={(v) => onChange(v as Position)}>
-			<Select.Trigger className="select-trigger">
-				<Select.Value />
-				<Select.Icon>▼</Select.Icon>
-			</Select.Trigger>
-			<Select.Portal>
-				<Select.Content className="select-content" position="popper" sideOffset={4}>
-					<Select.Viewport>
-						{options.map((opt) => (
-							<Select.Item key={opt.value} value={opt.value} className="select-item">
-								<Select.ItemText>{opt.label}</Select.ItemText>
-							</Select.Item>
-						))}
-					</Select.Viewport>
-				</Select.Content>
-			</Select.Portal>
-		</Select.Root>
+		<NativeSelect.Root size="sm" width="140px">
+			<NativeSelect.Field value={value} onChange={(e) => onChange(e.target.value as Position)}>
+				<option value="top">Haut</option>
+				<option value="bottom">Bas</option>
+			</NativeSelect.Field>
+			<NativeSelect.Indicator />
+		</NativeSelect.Root>
 	)
 }

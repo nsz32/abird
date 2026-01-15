@@ -1,4 +1,4 @@
-import { Select } from "radix-ui"
+import { NativeSelect } from "@chakra-ui/react"
 import type { ThemeMode } from "@shared/config.schema"
 
 interface ThemeSelectProps {
@@ -6,30 +6,15 @@ interface ThemeSelectProps {
 	onChange: (value: ThemeMode) => void
 }
 
-const options: { value: ThemeMode; label: string }[] = [
-	{ value: "system", label: "Système" },
-	{ value: "light", label: "Clair" },
-	{ value: "dark", label: "Sombre" },
-]
-
 export function ThemeSelect({ value, onChange }: ThemeSelectProps) {
 	return (
-		<Select.Root value={value} onValueChange={(v) => onChange(v as ThemeMode)}>
-			<Select.Trigger className="select-trigger">
-				<Select.Value />
-				<Select.Icon>▼</Select.Icon>
-			</Select.Trigger>
-			<Select.Portal>
-				<Select.Content className="select-content" position="popper" sideOffset={4}>
-					<Select.Viewport>
-						{options.map((opt) => (
-							<Select.Item key={opt.value} value={opt.value} className="select-item">
-								<Select.ItemText>{opt.label}</Select.ItemText>
-							</Select.Item>
-						))}
-					</Select.Viewport>
-				</Select.Content>
-			</Select.Portal>
-		</Select.Root>
+		<NativeSelect.Root size="sm" width="140px">
+			<NativeSelect.Field value={value} onChange={(e) => onChange(e.target.value as ThemeMode)}>
+				<option value="system">Système</option>
+				<option value="light">Clair</option>
+				<option value="dark">Sombre</option>
+			</NativeSelect.Field>
+			<NativeSelect.Indicator />
+		</NativeSelect.Root>
 	)
 }

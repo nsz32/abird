@@ -140,7 +140,7 @@ export function selectConfigMode() {
 		partition: "",
 		theme: globalConfig.theme,
 		userAgent: "Bird",
-		navBar: { ...defaultNavBarConfig },
+		navBar: { ...defaultNavBarConfig, position: globalConfig.navBar?.position || "top" },
 		routing: { internal: "^bird://" },
 		downloads: resolveDownloadConfig({ ...defaultDownloadConfig }),
 		preload: "../preload/index.js",

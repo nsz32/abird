@@ -1,5 +1,6 @@
-import { useEffect } from "react"
+import { Box, Heading, HStack, Input, Text, VStack } from "@chakra-ui/react"
 import type { AppConfig, GlobalConfig } from "@shared/config.schema"
+import { useEffect } from "react"
 import { PositionSelect } from "../components/PositionSelect"
 import { SwitchField } from "../components/SwitchField"
 import { ThemeSelect } from "../components/ThemeSelect"
@@ -19,9 +20,9 @@ export function AppPage({ name, config, onChange }: AppPageProps) {
 
 	if (!app) {
 		return (
-			<div className="section">
-				<p>Application "{name}" non trouvée</p>
-			</div>
+			<Box bg="bg.panel" p={4} borderRadius="lg">
+				<Text>Application "{name}" non trouvée</Text>
+			</Box>
 		)
 	}
 
@@ -42,65 +43,35 @@ export function AppPage({ name, config, onChange }: AppPageProps) {
 	}
 
 	return (
-		<>
-			<section className="section">
-				<h2>Général</h2>
-				<div className="field">
-					<span className="field-label">URL de démarrage</span>
-					<input
-						type="text"
-						className="input"
-						value={app.startUrl}
-						onChange={(e) => updateApp({ startUrl: e.target.value })}
-					/>
-				</div>
-				<div className="field">
-					<span className="field-label">Partition</span>
-					<input
-						type="text"
-						className="input"
-						value={app.partition}
-						onChange={(e) => updateApp({ partition: e.target.value })}
-					/>
-				</div>
-				<div className="field">
-					<span className="field-label">Thème</span>
+		<VStack align="stretch" gap={4}>
+			<Box bg="bg.panel" p={4} borderRadius="lg">
+				<Heading size="md" mb={4}>Général</Heading>
+				<HStack justify="space-between" py={2}>
+					<Text fontSize="sm">URL de démarrage</Text>
+					<Input size="sm" width="200px" value={app.startUrl} onChange={(e) => updateApp({ startUrl: e.target.value })} />
+				</HStack>
+				<HStack justify="space-between" py={2}>
+					<Text fontSize="sm">Partition</Text>
+					<Input size="sm" width="200px" value={app.partition} onChange={(e) => updateApp({ partition: e.target.value })} />
+				</HStack>
+				<HStack justify="space-between" py={2}>
+					<Text fontSize="sm">Thème</Text>
 					<ThemeSelect value={app.theme || "system"} onChange={(v) => updateApp({ theme: v })} />
-				</div>
-			</section>
+				</HStack>
+			</Box>
 
-			<section className="section">
-				<h2>Barre de navigation</h2>
-				<div className="field">
-					<span className="field-label">Position</span>
+			<Box bg="bg.panel" p={4} borderRadius="lg">
+				<Heading size="md" mb={4}>Barre de navigation</Heading>
+				<HStack justify="space-between" py={2}>
+					<Text fontSize="sm">Position</Text>
 					<PositionSelect value={app.navBar?.position || "top"} onChange={(v) => updateNavBar("position", v)} />
-				</div>
-				<SwitchField
-					label="Visible"
-					checked={app.navBar?.visible ?? true}
-					onChange={(v) => updateNavBar("visible", v)}
-				/>
-				<SwitchField
-					label="Masquage automatique"
-					checked={app.navBar?.autoHide ?? false}
-					onChange={(v) => updateNavBar("autoHide", v)}
-				/>
-				<SwitchField
-					label="URL modifiable"
-					checked={app.navBar?.urlEditable ?? true}
-					onChange={(v) => updateNavBar("urlEditable", v)}
-				/>
-				<SwitchField
-					label="Boutons précédent/suivant"
-					checked={app.navBar?.showBackForward ?? true}
-					onChange={(v) => updateNavBar("showBackForward", v)}
-				/>
-				<SwitchField
-					label="Bouton recharger"
-					checked={app.navBar?.showReload ?? true}
-					onChange={(v) => updateNavBar("showReload", v)}
-				/>
-			</section>
-		</>
+				</HStack>
+				<SwitchField label="Visible" checked={app.navBar?.visible ?? true} onChange={(v) => updateNavBar("visible", v)} />
+				<SwitchField label="Masquage automatique" checked={app.navBar?.autoHide ?? false} onChange={(v) => updateNavBar("autoHide", v)} />
+				<SwitchField label="URL modifiable" checked={app.navBar?.urlEditable ?? true} onChange={(v) => updateNavBar("urlEditable", v)} />
+				<SwitchField label="Boutons précédent/suivant" checked={app.navBar?.showBackForward ?? true} onChange={(v) => updateNavBar("showBackForward", v)} />
+				<SwitchField label="Bouton recharger" checked={app.navBar?.showReload ?? true} onChange={(v) => updateNavBar("showReload", v)} />
+			</Box>
+		</VStack>
 	)
 }

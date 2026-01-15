@@ -1,9 +1,9 @@
+import { Container, Heading, HStack, IconButton, Spinner } from "@chakra-ui/react"
 import type { GlobalConfig } from "@shared/config.schema"
 import { useEffect, useState } from "react"
 import { AppPage } from "./pages/AppPage"
 import { HomePage } from "./pages/HomePage"
 import { useHashRouter } from "./useHashRouter"
-import "./styles.css"
 
 export function App() {
 	const { route, navigate, goBack } = useHashRouter()
@@ -26,7 +26,11 @@ export function App() {
 	}
 
 	if (!config) {
-		return <div className="container">Chargement...</div>
+		return (
+			<Container centerContent py={10}>
+				<Spinner />
+			</Container>
+		)
 	}
 
 	const isHome = route === "" || route === "#"
@@ -41,16 +45,16 @@ export function App() {
 	}
 
 	return (
-		<div className="container">
-			<div className="header">
+		<Container maxW="600px" py={6}>
+			<HStack mb={6} gap={3}>
 				{!isHome && (
-					<button type="button" className="back-button" onClick={goBack}>
+					<IconButton aria-label="Retour" variant="ghost" size="sm" onClick={goBack}>
 						←
-					</button>
+					</IconButton>
 				)}
-				<h1>{appName ? appName : "Bird Settings"}</h1>
-			</div>
+				<Heading size="lg">{appName ? appName : "Bird Settings"}</Heading>
+			</HStack>
 			{renderPage()}
-		</div>
+		</Container>
 	)
 }

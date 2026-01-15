@@ -1,4 +1,4 @@
-import { Switch } from "radix-ui"
+import { HStack, Switch, Text } from "@chakra-ui/react"
 
 interface SwitchFieldProps {
 	label: string
@@ -8,11 +8,14 @@ interface SwitchFieldProps {
 
 export function SwitchField({ label, checked, onChange }: SwitchFieldProps) {
 	return (
-		<div className="field">
-			<span className="field-label">{label}</span>
-			<Switch.Root className="switch-root" checked={checked} onCheckedChange={onChange}>
-				<Switch.Thumb className="switch-thumb" />
+		<HStack justify="space-between" py={2}>
+			<Text fontSize="sm">{label}</Text>
+			<Switch.Root checked={checked} onCheckedChange={(e) => onChange(e.checked)}>
+				<Switch.HiddenInput />
+				<Switch.Control>
+					<Switch.Thumb />
+				</Switch.Control>
 			</Switch.Root>
-		</div>
+		</HStack>
 	)
 }
