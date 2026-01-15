@@ -12,7 +12,7 @@
 		"preventDuplicateDownloads": true
 	},
 	"navBar": {
-		"position": "top",
+		"position": "bottom",
 		"visible": true,
 		"autoHide": true,
 		"urlEditable": true,

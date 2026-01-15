@@ -1,5 +1,6 @@
-import { Box, Button, Heading, HStack, Text, VStack } from "@chakra-ui/react"
+import { Box, Button, HStack, Heading, Text, VStack } from "@chakra-ui/react"
 import type { GlobalConfig } from "@shared/config.schema"
+import type { TranslationKey } from "@shared/i18n/translations"
 import { useEffect } from "react"
 import { PositionSelect } from "../components/PositionSelect"
 import { SwitchField } from "../components/SwitchField"
@@ -10,12 +11,13 @@ interface HomePageProps {
 	configPath: string
 	onChange: (config: GlobalConfig) => void
 	onNavigate: (hash: string) => void
+	t: (key: TranslationKey) => string
 }
 
-export function HomePage({ config, configPath, onChange, onNavigate }: HomePageProps) {
+export function HomePage({ config, configPath, onChange, onNavigate, t }: HomePageProps) {
 	useEffect(() => {
-		document.title = "Bird - Settings"
-	}, [])
+		document.title = t("settings.title")
+	}, [t])
 
 	const updateTheme = (theme: GlobalConfig["theme"]) => {
 		onChange({ ...config, theme })
@@ -33,37 +35,51 @@ export function HomePage({ config, configPath, onChange, onNavigate }: HomePageP
 	return (
 		<VStack align="stretch" gap={4}>
 			<Box bg="bg.panel" p={4} borderRadius="lg">
-				<Heading size="md" mb={4}>Apparence</Heading>
+				<Heading size="md" mb={4}>
+					{t("settings.appearance")}
+				</Heading>
 				<HStack justify="space-between">
-					<Text fontSize="sm">Thème</Text>
-					<ThemeSelect value={config.theme} onChange={updateTheme} />
+					<Text fontSize="sm">{t("settings.theme")}</Text>
+					<ThemeSelect value={config.theme} onChange={updateTheme} t={t} />
 				</HStack>
 			</Box>
 
 			<Box bg="bg.panel" p={4} borderRadius="lg">
-				<Heading size="md" mb={4}>Barre de navigation (global)</Heading>
+				<Heading size="md" mb={4}>
+					{t("settings.navbar")}
+				</Heading>
 				<HStack justify="space-between" py={2}>
-					<Text fontSize="sm">Position</Text>
-					<PositionSelect value={config.navBar?.position || "top"} onChange={(v) => updateNavBar("position", v)} />
+					<Text fontSize="sm">{t("navbar.position")}</Text>
+					<PositionSelect value={config.navBar?.position || "top"} onChange={(v) => updateNavBar("position", v)} t={t} />
 				</HStack>
-				<SwitchField label="Visible" checked={config.navBar?.visible ?? true} onChange={(v) => updateNavBar("visible", v)} />
-				<SwitchField label="Masquage automatique" checked={config.navBar?.autoHide ?? false} onChange={(v) => updateNavBar("autoHide", v)} />
-				<SwitchField label="URL modifiable" checked={config.navBar?.urlEditable ?? true} onChange={(v) => updateNavBar("urlEditable", v)} />
-				<SwitchField label="Boutons précédent/suivant" checked={config.navBar?.showBackForward ?? true} onChange={(v) => updateNavBar("showBackForward", v)} />
-				<SwitchField label="Bouton recharger" checked={config.navBar?.showReload ?? true} onChange={(v) => updateNavBar("showReload", v)} />
+				<SwitchField label={t("navbar.visible")} checked={config.navBar?.visible ?? true} onChange={(v) => updateNavBar("visible", v)} />
+				<SwitchField label={t("navbar.autoHide")} checked={config.navBar?.autoHide ?? false} onChange={(v) => updateNavBar("autoHide", v)} />
+				<SwitchField label={t("navbar.urlEditable")} checked={config.navBar?.urlEditable ?? true} onChange={(v) => updateNavBar("urlEditable", v)} />
+				<SwitchField
+					label={t("navbar.showBackForward")}
+					checked={config.navBar?.showBackForward ?? true}
+					onChange={(v) => updateNavBar("showBackForward", v)}
+				/>
+				<SwitchField label={t("navbar.showReload")} checked={config.navBar?.showReload ?? true} onChange={(v) => updateNavBar("showReload", v)} />
 			</Box>
 
 			<Box bg="bg.panel" p={4} borderRadius="lg">
-				<Heading size="md" mb={4}>Applications</Heading>
+				<Heading size="md" mb={4}>
+					{t("settings.apps")}
+				</Heading>
 				{apps.length === 0 ? (
-					<Text fontSize="sm" color="fg.muted">Aucune application configurée</Text>
+					<Text fontSize="sm" color="fg.muted">
+						{t("settings.noApps")}
+					</Text>
 				) : (
 					<VStack align="stretch" gap={2}>
 						{apps.map(([name, app]) => (
 							<Button key={name} variant="ghost" justifyContent="space-between" onClick={() => onNavigate(`#app/${name}`)}>
 								<Box textAlign="left">
 									<Text fontWeight="medium">{name}</Text>
-									<Text fontSize="xs" color="fg.muted">{app.startUrl}</Text>
+									<Text fontSize="xs" color="fg.muted">
+										{app.startUrl}
+									</Text>
 								</Box>
 								<Text>→</Text>
 							</Button>
@@ -72,7 +88,9 @@ export function HomePage({ config, configPath, onChange, onNavigate }: HomePageP
 				)}
 			</Box>
 
-			<Text fontSize="xs" color="fg.muted">Configuration : {configPath}</Text>
+			<Text fontSize="xs" color="fg.muted">
+				{t("settings.configPath")} : {configPath}
+			</Text>
 		</VStack>
 	)
 }

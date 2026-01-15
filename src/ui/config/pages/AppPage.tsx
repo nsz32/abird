@@ -1,5 +1,6 @@
-import { Box, Heading, HStack, Input, Text, VStack } from "@chakra-ui/react"
+import { Box, HStack, Heading, Input, Text, VStack } from "@chakra-ui/react"
 import type { AppConfig, GlobalConfig } from "@shared/config.schema"
+import type { TranslationKey } from "@shared/i18n/translations"
 import { useEffect } from "react"
 import { PositionSelect } from "../components/PositionSelect"
 import { SwitchField } from "../components/SwitchField"
@@ -9,9 +10,10 @@ interface AppPageProps {
 	name: string
 	config: GlobalConfig
 	onChange: (config: GlobalConfig) => void
+	t: (key: TranslationKey) => string
 }
 
-export function AppPage({ name, config, onChange }: AppPageProps) {
+export function AppPage({ name, config, onChange, t }: AppPageProps) {
 	useEffect(() => {
 		document.title = `Bird - ${name}`
 	}, [name])
@@ -45,7 +47,9 @@ export function AppPage({ name, config, onChange }: AppPageProps) {
 	return (
 		<VStack align="stretch" gap={4}>
 			<Box bg="bg.panel" p={4} borderRadius="lg">
-				<Heading size="md" mb={4}>Général</Heading>
+				<Heading size="md" mb={4}>
+					Général
+				</Heading>
 				<HStack justify="space-between" py={2}>
 					<Text fontSize="sm">URL de démarrage</Text>
 					<Input size="sm" width="200px" value={app.startUrl} onChange={(e) => updateApp({ startUrl: e.target.value })} />
@@ -56,20 +60,26 @@ export function AppPage({ name, config, onChange }: AppPageProps) {
 				</HStack>
 				<HStack justify="space-between" py={2}>
 					<Text fontSize="sm">Thème</Text>
-					<ThemeSelect value={app.theme || "system"} onChange={(v) => updateApp({ theme: v })} />
+					<ThemeSelect value={app.theme || "system"} onChange={(v) => updateApp({ theme: v })} t={t} />
 				</HStack>
 			</Box>
 
 			<Box bg="bg.panel" p={4} borderRadius="lg">
-				<Heading size="md" mb={4}>Barre de navigation</Heading>
+				<Heading size="md" mb={4}>
+					Barre de navigation
+				</Heading>
 				<HStack justify="space-between" py={2}>
 					<Text fontSize="sm">Position</Text>
-					<PositionSelect value={app.navBar?.position || "top"} onChange={(v) => updateNavBar("position", v)} />
+					<PositionSelect value={app.navBar?.position || "top"} onChange={(v) => updateNavBar("position", v)} t={t} />
 				</HStack>
 				<SwitchField label="Visible" checked={app.navBar?.visible ?? true} onChange={(v) => updateNavBar("visible", v)} />
 				<SwitchField label="Masquage automatique" checked={app.navBar?.autoHide ?? false} onChange={(v) => updateNavBar("autoHide", v)} />
 				<SwitchField label="URL modifiable" checked={app.navBar?.urlEditable ?? true} onChange={(v) => updateNavBar("urlEditable", v)} />
-				<SwitchField label="Boutons précédent/suivant" checked={app.navBar?.showBackForward ?? true} onChange={(v) => updateNavBar("showBackForward", v)} />
+				<SwitchField
+					label="Boutons précédent/suivant"
+					checked={app.navBar?.showBackForward ?? true}
+					onChange={(v) => updateNavBar("showBackForward", v)}
+				/>
 				<SwitchField label="Bouton recharger" checked={app.navBar?.showReload ?? true} onChange={(v) => updateNavBar("showReload", v)} />
 			</Box>
 		</VStack>

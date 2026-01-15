@@ -2,6 +2,11 @@ import { Menu, nativeTheme } from "electron"
 import { registerHandlers } from "../ipc/handlers"
 import { setupInputListener } from "../keyboard/inputListener"
 import { createAppMenu } from "../keyboard/menu"
+import { DownloadPanel } from "../overlays/DownloadPanel"
+import { FindBar } from "../overlays/FindBar"
+import { NavBar } from "../overlays/NavBar"
+import { NotificationCenter } from "../overlays/NotificationCenter"
+import { Watermark } from "../overlays/Watermark"
 import {
 	activeDownloads$,
 	activeTab$,
@@ -23,11 +28,6 @@ import {
 } from "../states"
 import type { Tab } from "../tabs/Tab"
 import { createTab, getTabsList } from "../tabs/Tabs"
-import { DownloadPanel } from "../ui/DownloadPanel"
-import { FindBar } from "../ui/FindBar"
-import { NavBar } from "../ui/NavBar"
-import { NotificationCenter } from "../ui/NotificationCenter"
-import { Watermark } from "../ui/Watermark"
 import { MainWindow } from "./MainWindow"
 
 let mainWindow: MainWindow

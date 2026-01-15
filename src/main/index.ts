@@ -2,6 +2,7 @@ import { join } from "node:path"
 import { app } from "electron"
 import { startApp } from "./core/App"
 import { getAvailableApps, loadConfig, selectApp, selectConfigMode } from "./core/Config"
+import { initI18n } from "./core/I18n"
 import { registerBirdScheme, setupBirdProtocol } from "./core/Protocol"
 
 function parseCliArgs(): { appName: string | null; configPath: string | null } {
@@ -25,6 +26,7 @@ registerBirdScheme()
 app.whenReady().then(() => {
 	const { appName, configPath } = parseCliArgs()
 	loadConfig(configPath)
+	initI18n()
 	setupBirdProtocol()
 
 	if (!appName) {

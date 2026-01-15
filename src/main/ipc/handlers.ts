@@ -1,6 +1,7 @@
 import { IpcChannels } from "@shared/types"
 import { ipcMain } from "electron"
 import { readRawConfig, writeRawConfig } from "../core/Config"
+import { getTranslations } from "../core/I18n"
 import { dismissNotification } from "../notifications/notify"
 import {
 	activeDownloads$,
@@ -62,4 +63,6 @@ export function registerHandlers() {
 	// User config (raw JSON)
 	ipcMain.handle(IpcChannels.USERCONFIG_READ, () => readRawConfig())
 	ipcMain.handle(IpcChannels.USERCONFIG_WRITE, (_, content: unknown) => writeRawConfig(content))
+	// I18n
+	ipcMain.handle(IpcChannels.I18N_GET_TRANSLATIONS, () => getTranslations())
 }

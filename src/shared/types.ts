@@ -13,6 +13,9 @@ export type {
 	GlobalConfig,
 } from "./config.schema"
 
+// I18n types
+export type { Translations } from "./i18n/translations"
+
 // Tab origin - determines how a tab should behave
 // "user": Created by user action (Home+, first tab) → always proper, activate immediately
 // "background": Created in background (middle-click) → always proper, don't activate
@@ -137,6 +140,8 @@ export const IpcChannels = {
 	// User config (raw JSON)
 	USERCONFIG_READ: "userconfig:read",
 	USERCONFIG_WRITE: "userconfig:write",
+	// I18n
+	I18N_GET_TRANSLATIONS: "bird:i18n:get-translations",
 } as const
 
 // Type utilitaire pour les valeurs de IpcChannels
@@ -252,6 +257,9 @@ export interface BirdApi {
 			read: () => Promise<{ path: string; content: unknown }>
 			write: (content: unknown) => Promise<{ success: boolean; errors?: string[] }>
 		}
+	}
+	i18n: {
+		getTranslations: () => Promise<Translations>
 	}
 }
 

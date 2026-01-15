@@ -1,3 +1,4 @@
+import type { Translations } from "@shared/i18n/translations"
 import {
 	type ActiveDownload,
 	type DownloadEvent,
@@ -116,5 +117,8 @@ contextBridge.exposeInMainWorld("bird", {
 			read: () => ipcRenderer.invoke(IpcChannels.USERCONFIG_READ),
 			write: (content: unknown) => ipcRenderer.invoke(IpcChannels.USERCONFIG_WRITE, content),
 		},
+	},
+	i18n: {
+		getTranslations: (): Promise<Translations> => ipcRenderer.invoke(IpcChannels.I18N_GET_TRANSLATIONS),
 	},
 })

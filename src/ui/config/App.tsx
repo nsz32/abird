@@ -1,12 +1,14 @@
-import { Container, Heading, HStack, IconButton, Spinner } from "@chakra-ui/react"
+import { Container, HStack, Heading, IconButton, Spinner } from "@chakra-ui/react"
 import type { GlobalConfig } from "@shared/config.schema"
 import { useEffect, useState } from "react"
 import { AppPage } from "./pages/AppPage"
 import { HomePage } from "./pages/HomePage"
 import { useHashRouter } from "./useHashRouter"
+import { useTranslations } from "./useTranslations"
 
 export function App() {
 	const { route, navigate, goBack } = useHashRouter()
+	const { t, ready } = useTranslations()
 	const [config, setConfig] = useState<GlobalConfig | null>(null)
 	const [configPath, setConfigPath] = useState("")
 
@@ -25,7 +27,7 @@ export function App() {
 		}
 	}
 
-	if (!config) {
+	if (!config || !ready) {
 		return (
 			<Container centerContent py={10}>
 				<Spinner />
@@ -39,20 +41,20 @@ export function App() {
 
 	const renderPage = () => {
 		if (appName) {
-			return <AppPage name={appName} config={config} onChange={handleChange} />
+			return <AppPage name={appName} config={config} onChange={handleChange} t={t} />
 		}
-		return <HomePage config={config} configPath={configPath} onChange={handleChange} onNavigate={navigate} />
+		return <HomePage config={config} configPath={configPath} onChange={handleChange} onNavigate={navigate} t={t} />
 	}
 
 	return (
 		<Container maxW="600px" py={6}>
 			<HStack mb={6} gap={3}>
 				{!isHome && (
-					<IconButton aria-label="Retour" variant="ghost" size="sm" onClick={goBack}>
+					<IconButton aria-label="Back" variant="ghost" size="sm" onClick={goBack}>
 						←
 					</IconButton>
 				)}
-				<Heading size="lg">{appName ? appName : "Bird Settings"}</Heading>
+				<Heading size="lg">{appName ? appName : t("settings.title")}</Heading>
 			</HStack>
 			{renderPage()}
 		</Container>
