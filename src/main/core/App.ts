@@ -98,6 +98,7 @@ function setupSubscriptions() {
 	config$.subscribe((config) => {
 		nativeTheme.themeSource = config.theme
 	})
+	nativeTheme.themeSource = config$.get().theme
 
 	navBarBounds$.subscribe((bounds) => navBar.setBounds(bounds))
 	contentBounds$.subscribe((bounds) => activeTab$.get()?.siteView.setBounds(bounds))

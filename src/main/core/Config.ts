@@ -124,6 +124,17 @@ export function writeRawConfig(content: unknown): { success: boolean; errors?: s
 	try {
 		writeFileSync(configFilePath, JSON.stringify(content, null, "\t"))
 		globalConfig = result.data
+
+		// Sync navbar position to effective config
+		const currentConfig = config$.get()
+		const newPosition = globalConfig.navBar?.position || "top"
+		if (currentConfig.navBar.position !== newPosition) {
+			config$.emit({
+				...currentConfig,
+				navBar: { ...currentConfig.navBar, position: newPosition },
+			})
+		}
+
 		return { success: true }
 	} catch (err) {
 		return { success: false, errors: [(err as Error).message] }

@@ -39,8 +39,6 @@ export class Tab {
 		this.siteView = new SiteView(partition, routing, userAgent, this.createCallbacks(), preload)
 		this.siteView.loadURL(url)
 
-		this.siteView.view.webContents.openDevTools()
-
 		console.log("CREATE TAB", this.id)
 	}
 

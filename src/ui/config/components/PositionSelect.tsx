@@ -1,4 +1,4 @@
-import { NativeSelect } from "@chakra-ui/react"
+import { SegmentGroup } from "@chakra-ui/react"
 
 type Position = "top" | "bottom"
 
@@ -9,12 +9,16 @@ interface PositionSelectProps {
 
 export function PositionSelect({ value, onChange }: PositionSelectProps) {
 	return (
-		<NativeSelect.Root size="sm" width="140px">
-			<NativeSelect.Field value={value} onChange={(e) => onChange(e.target.value as Position)}>
-				<option value="top">Haut</option>
-				<option value="bottom">Bas</option>
-			</NativeSelect.Field>
-			<NativeSelect.Indicator />
-		</NativeSelect.Root>
+		<SegmentGroup.Root size="sm" value={value} onValueChange={(e) => onChange(e.value as Position)}>
+			<SegmentGroup.Indicator />
+			<SegmentGroup.Item value="top">
+				<SegmentGroup.ItemText>Haut</SegmentGroup.ItemText>
+				<SegmentGroup.ItemHiddenInput />
+			</SegmentGroup.Item>
+			<SegmentGroup.Item value="bottom">
+				<SegmentGroup.ItemText>Bas</SegmentGroup.ItemText>
+				<SegmentGroup.ItemHiddenInput />
+			</SegmentGroup.Item>
+		</SegmentGroup.Root>
 	)
 }
