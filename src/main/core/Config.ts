@@ -125,12 +125,14 @@ export function writeRawConfig(content: unknown): { success: boolean; errors?: s
 		writeFileSync(configFilePath, JSON.stringify(content, null, "\t"))
 		globalConfig = result.data
 
-		// Sync navbar position to effective config
+		// Sync config changes to effective config
 		const currentConfig = config$.get()
 		const newPosition = globalConfig.navBar?.position || "top"
-		if (currentConfig.navBar.position !== newPosition) {
+		const newTheme = globalConfig.theme
+		if (currentConfig.navBar.position !== newPosition || currentConfig.theme !== newTheme) {
 			config$.emit({
 				...currentConfig,
+				theme: newTheme,
 				navBar: { ...currentConfig.navBar, position: newPosition },
 			})
 		}

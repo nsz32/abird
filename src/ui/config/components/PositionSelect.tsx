@@ -10,7 +10,7 @@ interface PositionSelectProps {
 export function PositionSelect({ value, onChange }: PositionSelectProps) {
 	return (
 		<SegmentGroup.Root size="sm" value={value} onValueChange={(e) => onChange(e.value as Position)}>
-			<SegmentGroup.Indicator />
+			<SegmentGroup.Indicator bg={{ base: "blue.100", _dark: "blue.800" }} />
 			<SegmentGroup.Item value="top">
 				<SegmentGroup.ItemText>Haut</SegmentGroup.ItemText>
 				<SegmentGroup.ItemHiddenInput />
