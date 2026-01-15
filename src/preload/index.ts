@@ -4,6 +4,7 @@ import {
 	type DownloadEvent,
 	type DownloadHistoryItem,
 	type FindState,
+	type IconFetchResult,
 	IpcChannels,
 	type NavigationState,
 	type Notification,
@@ -120,5 +121,9 @@ contextBridge.exposeInMainWorld("bird", {
 	},
 	i18n: {
 		getTranslations: (): Promise<Translations> => ipcRenderer.invoke(IpcChannels.I18N_GET_TRANSLATIONS),
+	},
+	icons: {
+		fetch: (url: string, partition?: string): Promise<IconFetchResult> =>
+			ipcRenderer.invoke(IpcChannels.ICONS_FETCH, url, partition),
 	},
 })

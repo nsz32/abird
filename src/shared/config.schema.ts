@@ -42,6 +42,7 @@ export type DownloadConfig = z.infer<typeof DownloadConfigSchema>
 export const AppConfigSchema = z.object({
 	partition: z.string(),
 	startUrl: z.string(),
+	icon: z.string().optional(),
 	theme: ThemeModeSchema.optional(),
 	userAgent: z.string().optional(),
 	userAgentRaw: z.string().optional(),

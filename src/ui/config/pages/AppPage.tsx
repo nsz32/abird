@@ -1,7 +1,8 @@
-import { Box, HStack, Heading, Input, Text, VStack } from "@chakra-ui/react"
+import { Box, Button, HStack, Heading, Image, Input, SimpleGrid, Spinner, Text, VStack } from "@chakra-ui/react"
 import type { AppConfig, GlobalConfig } from "@shared/config.schema"
 import type { TranslationKey } from "@shared/i18n/translations"
-import { useEffect } from "react"
+import type { IconResult } from "@shared/types"
+import { useEffect, useState } from "react"
 import { PositionSelect } from "../components/PositionSelect"
 import { SwitchField } from "../components/SwitchField"
 import { ThemeSelect } from "../components/ThemeSelect"
@@ -14,8 +15,12 @@ interface AppPageProps {
 }
 
 export function AppPage({ name, config, onChange, t }: AppPageProps) {
+	const [icons, setIcons] = useState<IconResult[]>([])
+	const [fetchingIcons, setFetchingIcons] = useState(false)
+
 	useEffect(() => {
 		document.title = `Bird - ${name}`
+		setIcons([]) // Reset icons when app changes
 	}, [name])
 
 	const app = config.apps[name]
@@ -44,6 +49,20 @@ export function AppPage({ name, config, onChange, t }: AppPageProps) {
 		})
 	}
 
+	const handleFetchIcons = async () => {
+		if (!app.startUrl) return
+		setFetchingIcons(true)
+		setIcons([])
+		try {
+			const result = await window.bird.icons.fetch(app.startUrl, app.partition)
+			setIcons(result.icons)
+		} catch (err) {
+			console.error("Failed to fetch icons:", err)
+		} finally {
+			setFetchingIcons(false)
+		}
+	}
+
 	return (
 		<VStack align="stretch" gap={4}>
 			<Box bg="bg.panel" p={4} borderRadius="lg">
@@ -61,6 +80,47 @@ export function AppPage({ name, config, onChange, t }: AppPageProps) {
 				<HStack justify="space-between" py={2}>
 					<Text fontSize="sm">Thème</Text>
 					<ThemeSelect value={app.theme || "system"} onChange={(v) => updateApp({ theme: v })} t={t} />
+				</HStack>
+				<HStack justify="space-between" py={2} align="flex-start">
+					<Text fontSize="sm">Icône</Text>
+					<VStack align="flex-end" gap={2}>
+						<Button size="sm" onClick={handleFetchIcons} disabled={fetchingIcons || !app.startUrl}>
+							{fetchingIcons ? <Spinner size="sm" /> : "Obtenir icônes"}
+						</Button>
+						{icons.length > 0 && (
+							<SimpleGrid columns={4} gap={2}>
+								{icons.map((icon) => (
+									<Box
+										key={icon.url}
+										p={1}
+										borderRadius="md"
+										border="1px solid"
+										borderColor="border.subtle"
+										cursor="pointer"
+										_hover={{ borderColor: "blue.500" }}
+										onClick={() => updateApp({ icon: icon.url })}
+										bg={app.icon === icon.url ? "blue.900" : undefined}
+									>
+										<Image
+											src={icon.url}
+											alt={icon.source}
+											boxSize="32px"
+											objectFit="contain"
+											fallback={<Box boxSize="32px" bg="bg.subtle" />}
+										/>
+									</Box>
+								))}
+							</SimpleGrid>
+						)}
+						{app.icon && (
+							<HStack gap={2}>
+								<Image src={app.icon} alt="Current icon" boxSize="24px" objectFit="contain" />
+								<Text fontSize="xs" color="fg.muted" maxW="150px" truncate>
+									{app.icon}
+								</Text>
+							</HStack>
+						)}
+					</VStack>
 				</HStack>
 			</Box>
 

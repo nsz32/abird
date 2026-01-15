@@ -142,6 +142,8 @@ export const IpcChannels = {
 	USERCONFIG_WRITE: "userconfig:write",
 	// I18n
 	I18N_GET_TRANSLATIONS: "bird:i18n:get-translations",
+	// Icons
+	ICONS_FETCH: "bird:icons:fetch",
 } as const
 
 // Type utilitaire pour les valeurs de IpcChannels
@@ -261,6 +263,24 @@ export interface BirdApi {
 	i18n: {
 		getTranslations: () => Promise<Translations>
 	}
+	icons: {
+		fetch: (url: string, partition?: string) => Promise<IconFetchResult>
+	}
+}
+
+// Icon fetching
+export type IconSource = "apple-touch" | "icon-hd" | "ms-tile" | "og-image" | "icon" | "favicon" | "google"
+
+export interface IconResult {
+	url: string
+	source: IconSource
+	size?: number
+}
+
+export interface IconFetchResult {
+	icons: IconResult[]
+	title?: string
+	themeColor?: string
 }
 
 // Déclaration globale pour window.bird
