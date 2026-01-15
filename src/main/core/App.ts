@@ -120,6 +120,7 @@ function setupSubscriptions() {
 	navBarHeight$.subscribe(updatePanelsNavBar)
 
 	activeTab$.subscribe((activeTab) => {
+		console.log("activate", { activeTab })
 		updateTabsVisibility(activeTab)
 	})
 
@@ -153,13 +154,16 @@ function setupSubscriptions() {
 }
 
 function updateTabsVisibility(activeTab: Tab | null) {
+	console.log("[App] updateTabsVisibility", activeTab?.id, "tabs:", tabs$.get().length)
 	for (const tab of tabs$.get()) {
 		const isActive = tab.id === activeTab?.id
 		// Non-proper tabs stay visible (loading in background)
 		// Proper tabs are only visible when active
 		tab.siteView.setVisible(isActive || !tab.proper)
 		if (isActive) {
-			tab.siteView.setBounds(contentBounds$.get())
+			const bounds = contentBounds$.get()
+			console.log("[App] setBounds for active tab", tab.id, bounds)
+			tab.siteView.setBounds(bounds)
 			mainWindow.bringViewToFront(tab.siteView.view)
 		}
 	}

@@ -96,3 +96,20 @@ function emitAppConfig(app: AppConfig) {
 	}
 	config$.emit(resolved)
 }
+
+export function selectConfigMode() {
+	currentAppName = "config"
+	const startUrl = process.env.ELECTRON_RENDERER_URL
+		? `${process.env.ELECTRON_RENDERER_URL}/config/`
+		: "bird://config"
+	const resolved: ResolvedAppConfig = {
+		startUrl,
+		partition: "",
+		theme: globalConfig.theme,
+		userAgent: "Bird",
+		navBar: { ...defaultNavBarConfig },
+		routing: { internal: "^bird://" },
+		downloads: resolveDownloadConfig({ ...defaultDownloadConfig }),
+	}
+	config$.emit(resolved)
+}

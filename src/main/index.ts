@@ -1,7 +1,8 @@
 import { join } from "node:path"
 import { app } from "electron"
 import { startApp } from "./core/App"
-import { getAvailableApps, loadConfig, selectApp } from "./core/Config"
+import { getAvailableApps, loadConfig, selectApp, selectConfigMode } from "./core/Config"
+import { registerBirdScheme, setupBirdProtocol } from "./core/Protocol"
 
 function parseCliArgs(): { appName: string | null; configPath: string | null } {
 	const args = process.argv.slice(2)
@@ -18,13 +19,17 @@ const xdgDataHome = process.env.XDG_DATA_HOME || join(app.getPath("home"), ".loc
 app.setPath("userData", join(xdgDataHome, "bird"))
 app.setName("okbird")
 
+// Must be called before app.whenReady()
+registerBirdScheme()
+
 app.whenReady().then(() => {
 	const { appName, configPath } = parseCliArgs()
 	loadConfig(configPath)
+	setupBirdProtocol()
 
 	if (!appName) {
-		console.error(`No app specified. Use --app <name>. Available: ${getAvailableApps().join(", ")}`)
-		app.quit()
+		selectConfigMode()
+		startApp()
 		return
 	}
 

@@ -84,6 +84,7 @@ export class MainWindow {
 		tabs$.subscribe((tabList) => {
 			for (const tab of tabList) {
 				if (!tab.siteView.view.webContents.hostWebContents) {
+					console.log("[MainWindow] addView for tab", tab.id)
 					this.addView(tab.siteView.view)
 				}
 			}

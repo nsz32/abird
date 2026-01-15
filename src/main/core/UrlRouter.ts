@@ -1,7 +1,7 @@
 import type { RoutingConfig } from "@shared/types"
 
 export function shouldHandleUrl(url: string, config: Partial<RoutingConfig> | null): boolean {
-	if (!url || url.startsWith("about:") || url.startsWith("javascript:") || url.startsWith("data:")) {
+	if (!url || url.startsWith("bird:") || url.startsWith("about:") || url.startsWith("javascript:") || url.startsWith("data:")) {
 		return true
 	}
 	return isInternalUrl(url, config) || isDownloadAllowed(url, config)

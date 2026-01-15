@@ -1,7 +1,7 @@
 import type { FindState, NavigationState, RoutingConfig, TabOrigin } from "@shared/types"
-import { StateObservable } from "../utils/observable"
 import { activeTab$, externalOpened$, findState$, tabs$ } from "../states"
 import { SiteView } from "../ui/SiteView"
+import { StateObservable } from "../utils/observable"
 import { closeTab, createTab, getTabIndex } from "./Tabs"
 
 const CHECK_INTERVAL = 50
@@ -38,6 +38,8 @@ export class Tab {
 
 		this.siteView = new SiteView(partition, routing, userAgent, this.createCallbacks())
 		this.siteView.loadURL(url)
+
+		this.siteView.view.webContents.openDevTools()
 
 		console.log("CREATE TAB", this.id)
 	}

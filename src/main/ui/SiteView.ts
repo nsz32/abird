@@ -26,7 +26,7 @@ export class SiteView {
 		userAgent: string,
 		private readonly callbacks: SiteViewCallbacks,
 	) {
-		const sess = session.fromPartition(`persist:${partition}`)
+		const sess = partition ? session.fromPartition(`persist:${partition}`) : session.defaultSession
 		sess.setUserAgent(resolveUserAgent(userAgent))
 		setupDownloads(sess, config$.get().downloads)
 
@@ -42,11 +42,15 @@ export class SiteView {
 
 		this.setupNavigation()
 		this.setupEventListeners()
+
+		this.webContents.on("did-fail-load", () => console.log("failed"))
+		this.webContents.on("did-finish-load", () => console.log("finish"))
 	}
 
 	// ─── Navigation API ─────────────────────────────────────────────────────────
 
 	loadURL(url: string) {
+		console.log("[SiteView] loadURL", url)
 		this.webContents.loadURL(url)
 	}
 
@@ -80,6 +84,7 @@ export class SiteView {
 	}
 
 	setVisible(visible: boolean) {
+		console.log("visible", visible)
 		this.view.setVisible(visible)
 	}
 
