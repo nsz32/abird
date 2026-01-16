@@ -1,6 +1,5 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
-import { homedir } from "node:os"
-import { dirname, join } from "node:path"
+import { dirname } from "node:path"
 import { validateConfig } from "@shared/config.schema"
 import {
 	type AppConfig,
@@ -13,18 +12,20 @@ import {
 } from "@shared/types"
 import { resolveDownloadConfig } from "../downloads/DownloadManager"
 import { config$ } from "../states"
+import { paths } from "../utils/platform"
 
-const CONFIG_DIR = join(homedir(), ".config", "bird")
-const DEFAULT_CONFIG_FILE = join(CONFIG_DIR, "config.json")
-
-let configFilePath = DEFAULT_CONFIG_FILE
+let customConfigPath: string | null = null
 let globalConfig: GlobalConfig = validateConfig({}).data
 let currentAppName: string | null = null
 
-export function loadConfig(customPath?: string | null) {
-	if (customPath) configFilePath = customPath
+function getConfigPath(): string {
+	return customConfigPath ?? paths.config
+}
 
-	if (!existsSync(configFilePath)) {
+export function loadConfig(customPath?: string | null) {
+	if (customPath) customConfigPath = customPath
+
+	if (!existsSync(getConfigPath())) {
 		saveConfig()
 		return
 	}
@@ -55,9 +56,10 @@ export function getCurrentAppName(): string | null {
 }
 
 function parseConfigFile() {
+	const configPath = getConfigPath()
 	try {
-		console.log("Loading config from:", configFilePath)
-		const content = readFileSync(configFilePath, "utf-8")
+		console.log("Loading config from:", configPath)
+		const content = readFileSync(configPath, "utf-8")
 		const loaded = JSON.parse(content)
 		const result = validateConfig(loaded)
 
@@ -78,7 +80,7 @@ function parseConfigFile() {
 }
 
 function ensureConfigDir() {
-	const dir = dirname(configFilePath)
+	const dir = dirname(getConfigPath())
 	if (!existsSync(dir)) {
 		mkdirSync(dir, { recursive: true })
 	}
@@ -86,7 +88,7 @@ function ensureConfigDir() {
 
 function writeConfigFile() {
 	try {
-		writeFileSync(configFilePath, JSON.stringify(globalConfig, null, "\t"))
+		writeFileSync(getConfigPath(), JSON.stringify(globalConfig, null, "\t"))
 	} catch (err) {
 		console.error("Failed to save config:", err)
 	}
@@ -126,14 +128,15 @@ export interface RawUserConfig {
 }
 
 export function readRawConfig(): RawUserConfig {
-	if (!existsSync(configFilePath)) {
-		return { path: configFilePath, content: {} }
+	const configPath = getConfigPath()
+	if (!existsSync(configPath)) {
+		return { path: configPath, content: {} }
 	}
 	try {
-		const content = readFileSync(configFilePath, "utf-8")
-		return { path: configFilePath, content: JSON.parse(content) }
+		const content = readFileSync(configPath, "utf-8")
+		return { path: configPath, content: JSON.parse(content) }
 	} catch {
-		return { path: configFilePath, content: {} }
+		return { path: configPath, content: {} }
 	}
 }
 
@@ -145,7 +148,7 @@ export function writeRawConfig(content: unknown): { success: boolean; errors?: s
 
 	ensureConfigDir()
 	try {
-		writeFileSync(configFilePath, JSON.stringify(content, null, "\t"))
+		writeFileSync(getConfigPath(), JSON.stringify(content, null, "\t"))
 		globalConfig = result.data
 
 		// Sync config changes to effective config

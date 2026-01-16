@@ -1,11 +1,8 @@
 import { randomBytes } from "node:crypto"
 import { existsSync, mkdirSync, unlinkSync, writeFileSync } from "node:fs"
-import { homedir } from "node:os"
 import { join } from "node:path"
 import { Jimp } from "jimp"
-
-const CONFIG_DIR = join(homedir(), ".config", "bird")
-const ICONS_DIR = join(CONFIG_DIR, "icons")
+import { paths } from "../utils/platform"
 
 function sanitizeAppName(name: string): string {
 	// Garde uniquement caractères safe pour filename
@@ -22,8 +19,8 @@ function generateFilename(appName: string): string {
 }
 
 function ensureIconsDir(): void {
-	if (!existsSync(ICONS_DIR)) {
-		mkdirSync(ICONS_DIR, { recursive: true })
+	if (!existsSync(paths.icons)) {
+		mkdirSync(paths.icons, { recursive: true })
 	}
 }
 
@@ -40,7 +37,7 @@ export async function saveIcon(appName: string, base64: string, oldIcon?: string
 
 	// Générer nom et sauvegarder
 	const filename = generateFilename(appName)
-	writeFileSync(join(ICONS_DIR, filename), pngBuffer)
+	writeFileSync(join(paths.icons, filename), pngBuffer)
 
 	// Supprimer ancienne icône si existe
 	if (oldIcon) {
@@ -54,7 +51,7 @@ export function deleteIcon(filename: string): void {
 	// Sécurité : ne pas permettre de path traversal
 	if (filename.includes("/") || filename.includes("\\")) return
 
-	const path = join(ICONS_DIR, filename)
+	const path = join(paths.icons, filename)
 	if (existsSync(path)) {
 		try {
 			unlinkSync(path)
@@ -67,6 +64,6 @@ export function deleteIcon(filename: string): void {
 export function getIconPath(filename: string): string | null {
 	if (!filename || filename.includes("/") || filename.includes("\\")) return null
 
-	const path = join(ICONS_DIR, filename)
+	const path = join(paths.icons, filename)
 	return existsSync(path) ? path : null
 }

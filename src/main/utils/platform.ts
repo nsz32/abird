@@ -1,5 +1,25 @@
 import { spawn } from "node:child_process"
-import { shell } from "electron"
+import { join } from "node:path"
+import { app, shell } from "electron"
+
+/**
+ * Centralized paths for the application.
+ * Uses Electron's app.getPath for cross-platform compatibility:
+ * - Linux: ~/.config/bird
+ * - Windows: C:\Users\<user>\AppData\Roaming\bird
+ * - macOS: ~/Library/Application Support/bird
+ */
+export const paths = {
+	get userData() {
+		return app.getPath("userData")
+	},
+	get config() {
+		return join(this.userData, "config.json")
+	},
+	get icons() {
+		return join(this.userData, "icons")
+	},
+}
 
 /**
  * Open a file with the system's default application.
