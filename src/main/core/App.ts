@@ -1,7 +1,4 @@
 import { Menu, nativeTheme } from "electron"
-import { registerHandlers } from "../ipc/handlers"
-import { setupInputListener } from "../keyboard/inputListener"
-import { createAppMenu } from "../keyboard/menu"
 import {
 	activeDownloads$,
 	activeTab$,
@@ -17,7 +14,10 @@ import {
 	navbarSync$,
 	notifications$,
 	tabs$,
-} from "../states"
+} from "../core/states"
+import { registerHandlers } from "../handlers"
+import { setupInputListener } from "../input/inputListener"
+import { createAppMenu } from "../input/menu"
 import type { Tab } from "../tabs/Tab"
 import { createTab, getTabsList } from "../tabs/Tabs"
 import { DownloadPanel } from "../views/DownloadPanel"

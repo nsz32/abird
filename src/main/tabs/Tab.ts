@@ -1,7 +1,8 @@
 import type { FindState, NavigationState, RoutingConfig, TabOrigin } from "@shared/types"
-import { activeTab$, externalOpened$, findState$, tabs$ } from "../states"
-import { SiteView } from "../views/SiteView"
+import { shell } from "electron"
+import { activeTab$, externalOpened$, findState$, tabs$ } from "../core/states"
 import { StateObservable } from "../utils/observable"
+import { SiteView } from "./SiteView"
 import { closeTab, createTab, getTabIndex } from "./Tabs"
 
 const CHECK_INTERVAL = 50
@@ -57,9 +58,7 @@ export class Tab {
 			onNavStateChanged: (state: NavigationState) => this.navState$.emit(state),
 			onFaviconChanged: (favicon: string | null) => this.updateFavicon(favicon),
 			onNewTab: (url: string, origin: TabOrigin) => this.openChildTab(url, origin),
-			onCloseTab: () => closeTab(this.id),
-			onExternalOpened: (willClose: boolean) => this.emitExternalOpened(willClose),
-			shouldCloseTab: () => this.shouldCloseOnExternalLink(),
+			onExternalUrl: (url: string) => this.handleExternalUrl(url),
 			onFindResult: (state: FindState) => this.emitFindResult(state),
 		}
 	}
@@ -109,9 +108,21 @@ export class Tab {
 		createTab(url, origin, parentIndex + 1, this.id)
 	}
 
-	private emitExternalOpened(willClose: boolean) {
-		const targetId = willClose && this.parentId ? this.parentId : this.id
+	private async handleExternalUrl(url: string) {
+		shell.openExternal(url)
+
+		const shouldClose = await this.shouldCloseAfterExternal()
+		const targetId = shouldClose && this.parentId ? this.parentId : this.id
 		externalOpened$.emit(targetId)
+
+		if (shouldClose) {
+			closeTab(this.id)
+		}
+	}
+
+	private async shouldCloseAfterExternal(): Promise<boolean> {
+		if (tabs$.get().length <= 1) return false
+		return !(await this.siteView.hasVisibleContent())
 	}
 
 	private async checkValidity(): Promise<boolean> {
@@ -123,15 +134,5 @@ export class Tab {
 		const hasContent = await this.siteView.hasVisibleContent()
 		console.log(`[${this.id}] checkValidity: ${hasContent} (hasContent=${hasContent})`)
 		return hasContent
-	}
-
-	private async shouldCloseOnExternalLink(): Promise<boolean> {
-		if (tabs$.get().length <= 1) {
-			console.log(`[${this.id}] shouldCloseOnExternalLink: false (last tab)`)
-			return false
-		}
-		const hasContent = await this.siteView.hasVisibleContent()
-		console.log(`[${this.id}] shouldCloseOnExternalLink: ${!hasContent} (hasContent=${hasContent})`)
-		return !hasContent
 	}
 }

@@ -10,8 +10,8 @@ import {
 	defaultDownloadConfig,
 	defaultNavBarConfig,
 } from "@shared/types"
-import { resolveDownloadConfig } from "../downloads/DownloadManager"
-import { config$ } from "../states"
+import { resolveDownloadConfig } from "../../services/DownloadManager"
+import { config$ } from "../core/states"
 import { paths } from "../utils/platform"
 
 let customConfigPath: string | null = null
@@ -171,9 +171,7 @@ export function writeRawConfig(content: unknown): { success: boolean; errors?: s
 
 export function selectConfigMode() {
 	currentAppName = "config"
-	const startUrl = process.env.ELECTRON_RENDERER_URL
-		? `${process.env.ELECTRON_RENDERER_URL}/config/`
-		: "bird://config"
+	const startUrl = process.env.ELECTRON_RENDERER_URL ? `${process.env.ELECTRON_RENDERER_URL}/config/` : "bird://config"
 	const resolved: ResolvedAppConfig = {
 		startUrl,
 		partition: "",

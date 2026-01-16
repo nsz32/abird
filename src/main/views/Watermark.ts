@@ -1,6 +1,6 @@
 import { View } from "../core/View"
 import { ZLayer } from "../core/ViewManager"
-import { windowBounds$ } from "../states"
+import { windowBounds$ } from "../core/states"
 
 export class Watermark extends View {
 	constructor() {

@@ -1,6 +1,6 @@
 import { app } from "electron"
 import { UiohookKey, uIOhook } from "uiohook-napi"
-import { ctrlPressed$ } from "../states"
+import { ctrlPressed$ } from "../core/states"
 
 export function setupInputListener() {
 	uIOhook.on("keydown", (e) => {

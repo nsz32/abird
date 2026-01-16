@@ -1,5 +1,5 @@
 import { Menu, shell } from "electron"
-import { activeTab$, findBarVisible$ } from "../states"
+import { activeTab$, findBarVisible$ } from "../core/states"
 import { closeTab, createTab } from "../tabs/Tabs"
 
 interface MenuCallbacks {

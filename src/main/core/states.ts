@@ -10,8 +10,8 @@ import {
 	defaultNavBarConfig,
 } from "@shared/types"
 import type { Rectangle } from "electron"
-import { BroadcastEvent, BroadcastObservable, CombinedObservable, StateObservable } from "./utils/observable"
-import type { Tab } from "./tabs/Tab"
+import type { Tab } from "../tabs/Tab"
+import { BroadcastEvent, BroadcastObservable, CombinedObservable, StateObservable } from "../utils/observable"
 
 // Config - single source of truth
 const DEFAULT_CONFIG: ResolvedAppConfig = {

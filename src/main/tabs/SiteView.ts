@@ -1,20 +1,17 @@
 import type { FindState, NavigationState, RoutingConfig, TabOrigin } from "@shared/types"
-import { shell } from "electron"
+import { setupDownloads } from "../../services/DownloadManager"
 import { shouldHandleUrl } from "../core/UrlRouter"
 import { View } from "../core/View"
 import { ZLayer } from "../core/ViewManager"
-import { setupDownloads } from "../downloads/DownloadManager"
-import { config$ } from "../states"
+import { config$ } from "../core/states"
 import { resolveUserAgent } from "../utils/userAgents"
-import { SCROLLBAR_CSS } from "./scrollbar.css"
+import { SCROLLBAR_CSS } from "../views/scrollbar.css"
 
 export interface SiteViewCallbacks {
 	onNavStateChanged: (state: NavigationState) => void
 	onFaviconChanged: (favicon: string | null) => void
 	onNewTab: (url: string, origin: TabOrigin) => void
-	onCloseTab: () => void
-	onExternalOpened: (willClose: boolean) => void
-	shouldCloseTab: () => Promise<boolean>
+	onExternalUrl: (url: string) => void
 	onFindResult: (state: FindState) => void
 }
 
@@ -127,31 +124,29 @@ export class SiteView extends View {
 	}
 
 	private setupNavigation() {
-		this.webContents.on("will-navigate", (event, url) => this.handleUrlNavigation(event, url))
-		this.webContents.on("will-redirect", (event, url) => this.handleUrlNavigation(event, url))
+		this.webContents.on("will-navigate", (event, url) => this.handleNavigation(event, url))
+		this.webContents.on("will-redirect", (event, url) => this.handleNavigation(event, url))
 
 		this.webContents.setWindowOpenHandler(({ url, disposition }) => {
-			if (shouldHandleUrl(url, this.routing)) {
-				const origin: TabOrigin = disposition === "background-tab" ? "background" : "blank"
-				this.callbacks.onNewTab(url, origin)
-			} else {
-				shell.openExternal(url)
-				this.callbacks.onExternalOpened(false)
-			}
+			this.handleNewWindow(url, disposition)
 			return { action: "deny" }
 		})
 	}
 
-	private handleUrlNavigation(event: Electron.Event, url: string) {
+	private handleNavigation(event: Electron.Event, url: string) {
 		if (shouldHandleUrl(url, this.routing)) return
 
 		event.preventDefault()
-		shell.openExternal(url)
+		this.callbacks.onExternalUrl(url)
+	}
 
-		this.callbacks.shouldCloseTab().then((willClose) => {
-			this.callbacks.onExternalOpened(willClose)
-			if (willClose) this.callbacks.onCloseTab()
-		})
+	private handleNewWindow(url: string, disposition: string) {
+		if (shouldHandleUrl(url, this.routing)) {
+			const origin: TabOrigin = disposition === "background-tab" ? "background" : "blank"
+			this.callbacks.onNewTab(url, origin)
+		} else {
+			this.callbacks.onExternalUrl(url)
+		}
 	}
 
 	private setupEventListeners() {

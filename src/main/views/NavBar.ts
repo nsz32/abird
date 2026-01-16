@@ -3,7 +3,7 @@ import { IpcChannels } from "@shared/types"
 import { ipcMain } from "electron"
 import { View } from "../core/View"
 import { ZLayer } from "../core/ViewManager"
-import { navBarBounds$, navBarHeight$ } from "../states"
+import { navBarBounds$, navBarHeight$ } from "../core/states"
 
 export class NavBar extends View {
 	constructor() {

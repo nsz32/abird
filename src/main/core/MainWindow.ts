@@ -1,5 +1,5 @@
 import { BaseWindow } from "electron"
-import { windowBounds$ } from "../states"
+import { windowBounds$ } from "../core/states"
 import { ViewManager } from "./ViewManager"
 
 const BOUNDS_UPDATE_DELAYS = [100, 200, 300, 400, 500, 750, 1000, 1500, 2000]

@@ -1,10 +1,10 @@
 import { IpcChannels } from "@shared/types"
 import { ipcMain } from "electron"
-import { readRawConfig, writeRawConfig } from "../core/Config"
-import { getTranslations } from "../core/I18n"
-import { fetchIcons } from "../icons/IconFetcher"
-import { saveIcon } from "../icons/IconStorage"
-import { dismissNotification } from "../notifications/notify"
+import { fetchIcons } from "../services/icons"
+import { saveIcon } from "../services/icons"
+import { dismissNotification } from "../services/notify"
+import { readRawConfig, writeRawConfig } from "./core/Config"
+import { getTranslations } from "./core/I18n"
 import {
 	activeDownloads$,
 	activeTab$,
@@ -15,8 +15,8 @@ import {
 	findState$,
 	navState$,
 	notifications$,
-} from "../states"
-import { activateTab, closeTab, createTab, getTabsList } from "../tabs/Tabs"
+} from "./core/states"
+import { activateTab, closeTab, createTab, getTabsList } from "./tabs/Tabs"
 
 export function registerHandlers() {
 	ipcMain.handle(IpcChannels.NAVIGATION_GET_STATE, () => navState$.get())
@@ -69,7 +69,5 @@ export function registerHandlers() {
 	ipcMain.handle(IpcChannels.I18N_GET_TRANSLATIONS, () => getTranslations())
 	// Icons
 	ipcMain.handle(IpcChannels.ICONS_FETCH, (_, url: string, partition?: string) => fetchIcons(url, partition))
-	ipcMain.handle(IpcChannels.ICONS_SAVE, (_, appName: string, base64: string, oldIcon?: string) =>
-		saveIcon(appName, base64, oldIcon)
-	)
+	ipcMain.handle(IpcChannels.ICONS_SAVE, (_, appName: string, base64: string, oldIcon?: string) => saveIcon(appName, base64, oldIcon))
 }

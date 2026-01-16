@@ -3,7 +3,7 @@ import { IpcChannels } from "@shared/types"
 import { type Rectangle, ipcMain } from "electron"
 import { View } from "../core/View"
 import { ZLayer } from "../core/ViewManager"
-import { config$, navBarHeight$, windowBounds$ } from "../states"
+import { config$, navBarHeight$, windowBounds$ } from "../core/states"
 
 const MARGIN = 16
 

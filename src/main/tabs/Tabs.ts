@@ -1,6 +1,6 @@
 import type { TabInfo, TabOrigin } from "@shared/types"
 import { app } from "electron"
-import { activeTab$, config$, findBarVisible$, findState$, navState$, tabs$ } from "../states"
+import { activeTab$, config$, findBarVisible$, findState$, navState$, tabs$ } from "../core/states"
 import { Tab } from "./Tab"
 
 let unsubscribeNavState: (() => void) | null = null

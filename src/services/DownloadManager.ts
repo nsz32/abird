@@ -4,11 +4,11 @@ import type { ActiveDownload, DownloadConfig, DownloadHistoryItem, DownloadStatu
 import type { Session } from "electron"
 import { app } from "electron"
 import { fileTypeFromFile } from "file-type"
-import { addNotification, dismissNotification, updateNotification } from "../notifications/notify"
-import { activeDownloads$, downloadEvents$, downloadHistory$ } from "../states"
-import { parseSize } from "../utils/parseSize"
-import { getFileMd5, openFile } from "../utils/platform"
-import { type ExecutableCheckResult, MIN_BYTES_FOR_MAGIC, checkOfficeMacroWarning, isExecutableByMagic } from "../utils/executableDetection"
+import { activeDownloads$, downloadEvents$, downloadHistory$ } from "../main/core/states"
+import { type ExecutableCheckResult, MIN_BYTES_FOR_MAGIC, checkOfficeMacroWarning, isExecutableByMagic } from "../main/utils/executableDetection"
+import { parseSize } from "../main/utils/parseSize"
+import { getFileMd5, openFile } from "../main/utils/platform"
+import { addNotification, dismissNotification, updateNotification } from "./notify"
 
 const MIN_BYTES_FOR_DETECTION = 4096
 
