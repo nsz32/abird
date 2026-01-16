@@ -18,7 +18,7 @@ import { createTab, getTabsList } from "../tabs/Tabs"
 import { FindBar } from "../views/FindBar"
 import { NavBar } from "../views/NavBar"
 import { NotificationCenter } from "../views/NotificationCenter"
-import { PanelView } from "../views/PanelView"
+import { OverlayPanel } from "../views/OverlayPanel"
 import { Watermark } from "../views/Watermark"
 import { MainWindow } from "./MainWindow"
 import { ViewManager } from "./ViewManager"
@@ -29,7 +29,7 @@ let mainWindow: MainWindow
 let watermark: Watermark
 let navBar: NavBar
 let notificationCenter: NotificationCenter
-let downloadsPanel: PanelView
+let downloadsPanel: OverlayPanel
 let findBar: FindBar
 
 export function startApp() {
@@ -43,7 +43,7 @@ export function startApp() {
 	watermark = new Watermark()
 	navBar = new NavBar()
 	notificationCenter = new NotificationCenter()
-	downloadsPanel = new PanelView("downloads")
+	downloadsPanel = new OverlayPanel("downloads")
 	findBar = new FindBar()
 
 	// Register downloads panel as a content view (not a tab)

@@ -21,10 +21,10 @@ import { activateTab, closeTab, createTab, getActiveTab, getTabsList } from "./t
 
 export function registerHandlers() {
 	ipcMain.handle(IpcChannels.NAVIGATION_GET_STATE, () => navState$.get())
-	ipcMain.handle(IpcChannels.NAVIGATION_BACK, () => getActiveTab()?.webView.back())
-	ipcMain.handle(IpcChannels.NAVIGATION_FORWARD, () => getActiveTab()?.webView.forward())
-	ipcMain.handle(IpcChannels.NAVIGATION_RELOAD, (_, ignoreCache?: boolean) => getActiveTab()?.webView.reload(ignoreCache))
-	ipcMain.handle(IpcChannels.NAVIGATION_STOP, () => getActiveTab()?.webView.stop())
+	ipcMain.handle(IpcChannels.NAVIGATION_BACK, () => getActiveTab()?.view.back())
+	ipcMain.handle(IpcChannels.NAVIGATION_FORWARD, () => getActiveTab()?.view.forward())
+	ipcMain.handle(IpcChannels.NAVIGATION_RELOAD, (_, ignoreCache?: boolean) => getActiveTab()?.view.reload(ignoreCache))
+	ipcMain.handle(IpcChannels.NAVIGATION_STOP, () => getActiveTab()?.view.stop())
 	ipcMain.handle(IpcChannels.NAVIGATION_GO_TO, (_, url: string) => getActiveTab()?.webView.goTo(url))
 	ipcMain.handle(IpcChannels.NAVIGATION_GO_HOME, () => getActiveTab()?.webView.goTo(config$.get().startUrl))
 	ipcMain.handle(IpcChannels.TABS_GET_LIST, () => getTabsList())
@@ -53,21 +53,21 @@ export function registerHandlers() {
 		const tab = getActiveTab()
 		if (tab) {
 			tab.findBarVisible = true
-			tab.webView.findInPage(text)
+			tab.view.findInPage(text)
 		}
 	})
 	ipcMain.handle(IpcChannels.FIND_NEXT, () => {
-		getActiveTab()?.webView.findNext()
+		getActiveTab()?.view.findNext()
 	})
 	ipcMain.handle(IpcChannels.FIND_PREV, () => {
-		getActiveTab()?.webView.findPrev()
+		getActiveTab()?.view.findPrev()
 	})
 	ipcMain.handle(IpcChannels.FIND_CLOSE, () => {
 		const tab = getActiveTab()
 		if (tab) {
 			tab.findBarVisible = false
 			tab.findState = { text: "", activeMatch: 0, totalMatches: 0 }
-			tab.webView.stopFind()
+			tab.view.stopFind()
 		}
 		findBarVisible$.emit(false)
 		findState$.emit({ text: "", activeMatch: 0, totalMatches: 0 })

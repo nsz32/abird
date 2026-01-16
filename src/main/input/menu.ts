@@ -61,7 +61,7 @@ export function createAppMenu(callbacks: MenuCallbacks): Menu {
 			submenu: [
 				{
 					label: "DevTools Site",
-					click: () => getActiveTab()?.webView.webContents.openDevTools(),
+					click: () => getActiveTab()?.view.webContents.openDevTools(),
 				},
 				{
 					label: "DevTools Navbar",

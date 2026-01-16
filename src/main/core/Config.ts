@@ -171,9 +171,8 @@ export function writeRawConfig(content: unknown): { success: boolean; errors?: s
 
 export function selectConfigMode() {
 	currentAppName = "config"
-	const startUrl = process.env.ELECTRON_RENDERER_URL ? `${process.env.ELECTRON_RENDERER_URL}/config/` : "bird://config"
 	const resolved: ResolvedAppConfig = {
-		startUrl,
+		startUrl: "bird://config",
 		partition: "",
 		theme: globalConfig.theme,
 		userAgent: "Bird",
@@ -190,7 +189,6 @@ export function selectConfigMode() {
 		},
 		routing: { internal: "^bird://" },
 		downloads: resolveDownloadConfig({ ...defaultDownloadConfig }),
-		preload: "../preload/index.js",
 	}
 	config$.emit(resolved)
 }

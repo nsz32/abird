@@ -3,6 +3,8 @@ import { shell } from "electron"
 import { ViewManager } from "../core/ViewManager"
 import { externalOpened$, findState$, tabs$ } from "../core/states"
 import { StateObservable } from "../utils/observable"
+import type { BrowserView } from "../views/BrowserView"
+import { PanelView } from "../views/PanelView"
 import { WebView } from "../views/WebView"
 import { closeTab, createTab, getTabIndex, isTabActive } from "./Tabs"
 
@@ -13,7 +15,7 @@ let nextId = 1
 
 export class Tab {
 	readonly id: string
-	readonly webView: WebView
+	readonly view: BrowserView
 	readonly initialUrl: string
 	readonly parentId: string | null
 
@@ -38,12 +40,23 @@ export class Tab {
 		this.initialUrl = url
 		this.parentId = parentId
 
-		this.webView = new WebView(partition, routing, userAgent, this.createCallbacks())
-		this.webView.loadURL(url)
+		const callbacks = this.createCallbacks()
 
-		ViewManager.get().registerContentView(this.id, this.webView.webContentsView)
+		this.view = url.startsWith("bird://") ? new PanelView(callbacks) : new WebView(partition, routing, userAgent, callbacks)
+		console.log("CREATED", url, this.view.constructor.name)
+
+		this.view.loadURL(url)
+
+		ViewManager.get().registerContentView(this.id, this.view.webContentsView)
 
 		console.log("CREATE TAB", this.id)
+	}
+
+	get webView(): WebView {
+		if (!(this.view instanceof WebView)) {
+			throw new Error("Cannot access webView on a PanelView tab")
+		}
+		return this.view
 	}
 
 	onValid(callback: () => void) {
@@ -54,7 +67,7 @@ export class Tab {
 		console.log("DESTROY TAB", this.id)
 		this.destroyed = true
 		ViewManager.get().unregisterContentView(this.id)
-		this.webView.destroy()
+		this.view.destroy()
 	}
 
 	private createCallbacks() {
@@ -125,7 +138,7 @@ export class Tab {
 
 	private async shouldCloseAfterExternal(): Promise<boolean> {
 		if (tabs$.get().length <= 1) return false
-		return !(await this.webView.hasVisibleContent())
+		return !(await this.view.hasVisibleContent())
 	}
 
 	private async checkValidity(): Promise<boolean> {
@@ -134,7 +147,7 @@ export class Tab {
 			console.log(`[${this.id}] checkValidity: true (only ${tabCount} tab)`)
 			return true
 		}
-		const hasContent = await this.webView.hasVisibleContent()
+		const hasContent = await this.view.hasVisibleContent()
 		console.log(`[${this.id}] checkValidity: ${hasContent} (hasContent=${hasContent})`)
 		return hasContent
 	}

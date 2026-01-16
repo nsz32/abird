@@ -39,6 +39,8 @@ export abstract class View {
 		this.htmlPath = config.html
 		this.initialUrl = config.url
 
+		console.log("CONFIG", config.url)
+
 		ViewManager.get().addView(this.webContentsView, config.layer)
 	}
 
