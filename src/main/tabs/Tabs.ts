@@ -1,6 +1,7 @@
 import type { TabInfo, TabOrigin } from "@shared/types"
 import { app } from "electron"
-import { activeTab$, config$, findBarVisible$, findState$, navState$, tabs$ } from "../core/states"
+import { ViewManager } from "../core/ViewManager"
+import { config$, findBarVisible$, findState$, navState$, tabs$ } from "../core/states"
 import { Tab } from "./Tab"
 
 let unsubscribeNavState: (() => void) | null = null
@@ -9,7 +10,7 @@ let pendingActivationId: string | null = null
 export function createTab(url?: string, origin: TabOrigin = "user", index?: number, parentId?: string): Tab {
 	console.log(`[Tabs] createTab origin=${origin}`)
 	const config = config$.get()
-	const tab = new Tab(config.partition, config.routing, url || config.startUrl, config.userAgent, parentId ?? null, config.preload)
+	const tab = new Tab(config.partition, config.routing, url || config.startUrl, config.userAgent, parentId ?? null)
 
 	insertTab(tab, index)
 
@@ -35,7 +36,7 @@ export function closeTab(id: string) {
 	const removedIndex = removeTab(id)
 	if (removedIndex === -1) return
 
-	if (activeTab$.get()?.id === id) {
+	if (isTabActive(id)) {
 		selectNextTab(removedIndex)
 	}
 
@@ -51,9 +52,8 @@ export function activateTab(id: string) {
 
 	pendingActivationId = null
 	subscribeToNavState(tab)
-	activeTab$.emit(tab)
+	ViewManager.get().showContent(id)
 
-	// Restore find state for this tab
 	findBarVisible$.emit(tab.findBarVisible)
 	findState$.emit(tab.findState)
 }
@@ -62,9 +62,18 @@ export function getTabIndex(id: string): number {
 	return tabs$.get().findIndex((t) => t.id === id)
 }
 
+export function isTabActive(id: string): boolean {
+	return ViewManager.get().activeContentId$.get() === id
+}
+
+export function getActiveTab(): Tab | null {
+	const activeId = ViewManager.get().activeContentId$.get()
+	return tabs$.get().find((t) => t.id === activeId) ?? null
+}
+
 export function getTabsList(): TabInfo[] {
 	const allTabs = tabs$.get()
-	const activeId = activeTab$.get()?.id
+	const activeId = ViewManager.get().activeContentId$.get()
 	const hasInvalidChild = (id: string) => allTabs.some((t) => !t.isValid && t.parentId === id)
 
 	return allTabs
@@ -99,7 +108,7 @@ function removeTab(id: string): number {
 function selectNextTab(removedIndex: number) {
 	const list = tabs$.get()
 	if (list.length === 0) {
-		activeTab$.emit(null)
+		ViewManager.get().hideAllContent()
 		return
 	}
 

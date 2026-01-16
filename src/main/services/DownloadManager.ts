@@ -1,13 +1,13 @@
-import { closeSync, existsSync, openSync, readSync, statSync, unlinkSync } from "node:fs"
+import { existsSync, statSync, unlinkSync } from "node:fs"
 import { basename, dirname, extname, join } from "node:path"
 import type { ActiveDownload, DownloadConfig, DownloadHistoryItem, DownloadStatus, ResolvedDownloadConfig } from "@shared/types"
 import type { Session } from "electron"
 import { app } from "electron"
-import { fileTypeFromFile } from "file-type"
-import { activeDownloads$, downloadEvents$, downloadHistory$ } from "../main/core/states"
-import { type ExecutableCheckResult, MIN_BYTES_FOR_MAGIC, checkOfficeMacroWarning, isExecutableByMagic } from "../main/utils/executableDetection"
-import { parseSize } from "../main/utils/parseSize"
-import { getFileMd5, openFile } from "../main/utils/platform"
+import { activeDownloads$, downloadEvents$, downloadHistory$ } from "../core/states"
+import { checkOfficeMacroWarning } from "../utils/executableDetection"
+import { type FileDetectionResult, detectFileType, detectFileTypeWithRetry } from "../utils/fileDetection"
+import { parseSize } from "../utils/parseSize"
+import { getFileMd5, openFile } from "../utils/platform"
 import { addNotification, dismissNotification, updateNotification } from "./notify"
 
 const MIN_BYTES_FOR_DETECTION = 4096
@@ -113,7 +113,7 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 		})
 
 		// Shared result: null = not checked yet
-		let earlyDetectionResult: Promise<DetectionResult> | null = null
+		let earlyDetectionResult: Promise<FileDetectionResult> | null = null
 		let wasBlockedAsExecutable = false
 
 		item.on("updated", (_e, state) => {
@@ -126,7 +126,7 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 
 				// Early executable detection with retry
 				if (!config.allowExecutablesDownload && !earlyDetectionResult && received >= MIN_BYTES_FOR_DETECTION) {
-					earlyDetectionResult = detectWithRetry(savePath).then((result) => {
+					earlyDetectionResult = detectFileTypeWithRetry(savePath, { minSize: MIN_BYTES_FOR_DETECTION }).then((result) => {
 						if (result.executable.isExecutable) {
 							console.log(`[Download] blocking executable: ${result.executable.name}`)
 							wasBlockedAsExecutable = true
@@ -179,65 +179,17 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 	})
 }
 
-const RETRY_DELAY_MS = 10
-const MAX_RETRIES = 10
-
-interface DetectionResult {
-	mime?: string
-	executable: ExecutableCheckResult
-}
-
-function readMagicBytes(filePath: string): Buffer | null {
-	try {
-		const fd = openSync(filePath, "r")
-		const buffer = Buffer.alloc(MIN_BYTES_FOR_MAGIC)
-		readSync(fd, buffer, 0, MIN_BYTES_FOR_MAGIC, 0)
-		closeSync(fd)
-		return buffer
-	} catch {
-		return null
-	}
-}
-
-async function detectWithRetry(savePath: string): Promise<DetectionResult> {
-	for (let i = 0; i < MAX_RETRIES; i++) {
-		try {
-			if (existsSync(savePath) && statSync(savePath).size >= MIN_BYTES_FOR_DETECTION) {
-				// Check magic bytes for executable detection
-				const magicBuffer = readMagicBytes(savePath)
-				const executable = magicBuffer ? isExecutableByMagic(magicBuffer) : { isExecutable: false }
-
-				// Get MIME type for other uses (auto-open, future icons)
-				const detected = await fileTypeFromFile(savePath)
-
-				return { mime: detected?.mime, executable }
-			}
-		} catch (err) {
-			console.error("[Download] detectWithRetry error:", err)
-		}
-		await new Promise((r) => setTimeout(r, RETRY_DELAY_MS))
-	}
-	return { executable: { isExecutable: false } } // Will be detected on completion
-}
-
-async function detectFinal(savePath: string): Promise<DetectionResult> {
-	const magicBuffer = readMagicBytes(savePath)
-	const executable = magicBuffer ? isExecutableByMagic(magicBuffer) : { isExecutable: false }
-	const detected = await fileTypeFromFile(savePath)
-	return { mime: detected?.mime, executable }
-}
-
 async function handleCompletedDownload(
 	downloadId: string,
 	savePath: string,
 	filename: string,
 	size: number,
 	config: ResolvedDownloadConfig,
-	earlyDetectionResult: Promise<DetectionResult> | null,
+	earlyDetectionResult: Promise<FileDetectionResult> | null,
 	originalPath: string | null,
 ) {
 	// Reuse early detection result if available, otherwise detect now
-	const result = earlyDetectionResult ? await earlyDetectionResult : await detectFinal(savePath)
+	const result = earlyDetectionResult ? await earlyDetectionResult : await detectFileType(savePath)
 
 	console.log(`[Download] completed: ${filename}, mime: ${result.mime}, executable: ${result.executable.isExecutable}`)
 	checkOfficeMacroWarning(result.mime)
@@ -294,7 +246,7 @@ async function handleCompletedDownload(
 	}
 }
 
-function shouldAutoOpen(result: DetectionResult, size: number, config: ResolvedDownloadConfig): boolean {
+function shouldAutoOpen(result: FileDetectionResult, size: number, config: ResolvedDownloadConfig): boolean {
 	// NEVER auto-open executables, even if MIME matches a wildcard pattern
 	if (result.executable.isExecutable) return false
 

@@ -1,13 +1,13 @@
 import type { FindState, NavigationState, RoutingConfig, TabOrigin } from "@shared/types"
-import { setupDownloads } from "../../services/DownloadManager"
 import { shouldHandleUrl } from "../core/UrlRouter"
 import { View } from "../core/View"
 import { ZLayer } from "../core/ViewManager"
-import { config$ } from "../core/states"
+import { config$, contentBounds$ } from "../core/states"
+import { setupDownloads } from "../services/DownloadManager"
 import { resolveUserAgent } from "../utils/userAgents"
-import { SCROLLBAR_CSS } from "../views/scrollbar.css"
+import { SCROLLBAR_CSS } from "./scrollbar.css"
 
-export interface SiteViewCallbacks {
+export interface WebViewCallbacks {
 	onNavStateChanged: (state: NavigationState) => void
 	onFaviconChanged: (favicon: string | null) => void
 	onNewTab: (url: string, origin: TabOrigin) => void
@@ -15,19 +15,21 @@ export interface SiteViewCallbacks {
 	onFindResult: (state: FindState) => void
 }
 
-export class SiteView extends View {
+/**
+ * View for external web content.
+ * No sensitive preload - safe for untrusted websites.
+ */
+export class WebView extends View {
 	private currentFindText = ""
 
 	constructor(
 		partition: string,
 		private readonly routing: Partial<RoutingConfig> | null,
 		userAgent: string,
-		private readonly callbacks: SiteViewCallbacks,
-		preload?: string,
+		private readonly callbacks: WebViewCallbacks,
 	) {
 		super({
 			layer: ZLayer.SITE_CONTENT,
-			preload: preload,
 			partition,
 			userAgent: resolveUserAgent(userAgent),
 		})
@@ -36,11 +38,11 @@ export class SiteView extends View {
 
 		this.setupNavigation()
 		this.setupEventListeners()
+		this.init()
 	}
 
 	protected setupSubscriptions() {
-		// SiteView n'a pas de subscriptions automatiques
-		// Son positionnement est géré par Tab/App
+		contentBounds$.subscribe((bounds) => this.setBounds(bounds))
 	}
 
 	loadURL(url: string) {

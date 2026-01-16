@@ -1,5 +1,5 @@
 import type { Notification, NotificationType } from "@shared/types"
-import { notifications$ } from "../main/core/states"
+import { notifications$ } from "../core/states"
 
 let nextId = 1
 

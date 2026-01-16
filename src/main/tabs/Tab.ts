@@ -1,9 +1,10 @@
 import type { FindState, NavigationState, RoutingConfig, TabOrigin } from "@shared/types"
 import { shell } from "electron"
-import { activeTab$, externalOpened$, findState$, tabs$ } from "../core/states"
+import { ViewManager } from "../core/ViewManager"
+import { externalOpened$, findState$, tabs$ } from "../core/states"
 import { StateObservable } from "../utils/observable"
-import { SiteView } from "./SiteView"
-import { closeTab, createTab, getTabIndex } from "./Tabs"
+import { WebView } from "../views/WebView"
+import { closeTab, createTab, getTabIndex, isTabActive } from "./Tabs"
 
 const CHECK_INTERVAL = 50
 const CHECK_MAX_TIME = 4000
@@ -12,7 +13,7 @@ let nextId = 1
 
 export class Tab {
 	readonly id: string
-	readonly siteView: SiteView
+	readonly webView: WebView
 	readonly initialUrl: string
 	readonly parentId: string | null
 
@@ -32,13 +33,15 @@ export class Tab {
 	private onValidCallback?: () => void
 	private destroyed = false
 
-	constructor(partition: string, routing: Partial<RoutingConfig> | null, url: string, userAgent: string, parentId: string | null = null, preload?: string) {
+	constructor(partition: string, routing: Partial<RoutingConfig> | null, url: string, userAgent: string, parentId: string | null = null) {
 		this.id = `tab-${nextId++}`
 		this.initialUrl = url
 		this.parentId = parentId
 
-		this.siteView = new SiteView(partition, routing, userAgent, this.createCallbacks(), preload)
-		this.siteView.loadURL(url)
+		this.webView = new WebView(partition, routing, userAgent, this.createCallbacks())
+		this.webView.loadURL(url)
+
+		ViewManager.get().registerContentView(this.id, this.webView.webContentsView)
 
 		console.log("CREATE TAB", this.id)
 	}
@@ -50,7 +53,8 @@ export class Tab {
 	destroy() {
 		console.log("DESTROY TAB", this.id)
 		this.destroyed = true
-		this.siteView.destroy()
+		ViewManager.get().unregisterContentView(this.id)
+		this.webView.destroy()
 	}
 
 	private createCallbacks() {
@@ -65,8 +69,7 @@ export class Tab {
 
 	private emitFindResult(state: FindState) {
 		this.findState = state
-		// Only emit if this tab is active
-		if (activeTab$.get()?.id === this.id) {
+		if (isTabActive(this.id)) {
 			findState$.emit(state)
 		}
 	}
@@ -122,7 +125,7 @@ export class Tab {
 
 	private async shouldCloseAfterExternal(): Promise<boolean> {
 		if (tabs$.get().length <= 1) return false
-		return !(await this.siteView.hasVisibleContent())
+		return !(await this.webView.hasVisibleContent())
 	}
 
 	private async checkValidity(): Promise<boolean> {
@@ -131,7 +134,7 @@ export class Tab {
 			console.log(`[${this.id}] checkValidity: true (only ${tabCount} tab)`)
 			return true
 		}
-		const hasContent = await this.siteView.hasVisibleContent()
+		const hasContent = await this.webView.hasVisibleContent()
 		console.log(`[${this.id}] checkValidity: ${hasContent} (hasContent=${hasContent})`)
 		return hasContent
 	}

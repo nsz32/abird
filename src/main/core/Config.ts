@@ -10,8 +10,8 @@ import {
 	defaultDownloadConfig,
 	defaultNavBarConfig,
 } from "@shared/types"
-import { resolveDownloadConfig } from "../../services/DownloadManager"
 import { config$ } from "../core/states"
+import { resolveDownloadConfig } from "../services/DownloadManager"
 import { paths } from "../utils/platform"
 
 let customConfigPath: string | null = null

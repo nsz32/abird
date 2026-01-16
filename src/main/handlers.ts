@@ -1,31 +1,22 @@
 import { IpcChannels } from "@shared/types"
 import { ipcMain } from "electron"
-import { fetchIcons } from "../services/icons"
-import { saveIcon } from "../services/icons"
-import { dismissNotification } from "../services/notify"
+import { DOWNLOADS_VIEW_ID } from "./core/App"
 import { readRawConfig, writeRawConfig } from "./core/Config"
 import { getTranslations } from "./core/I18n"
-import {
-	activeDownloads$,
-	activeTab$,
-	config$,
-	downloadHistory$,
-	downloadPanelVisible$,
-	findBarVisible$,
-	findState$,
-	navState$,
-	notifications$,
-} from "./core/states"
-import { activateTab, closeTab, createTab, getTabsList } from "./tabs/Tabs"
+import { ViewManager } from "./core/ViewManager"
+import { activeDownloads$, config$, downloadHistory$, findBarVisible$, findState$, navState$, notifications$ } from "./core/states"
+import { fetchIcons, saveIcon } from "./services/icons"
+import { dismissNotification } from "./services/notify"
+import { activateTab, closeTab, createTab, getActiveTab, getTabsList } from "./tabs/Tabs"
 
 export function registerHandlers() {
 	ipcMain.handle(IpcChannels.NAVIGATION_GET_STATE, () => navState$.get())
-	ipcMain.handle(IpcChannels.NAVIGATION_BACK, () => activeTab$.get()?.siteView.back())
-	ipcMain.handle(IpcChannels.NAVIGATION_FORWARD, () => activeTab$.get()?.siteView.forward())
-	ipcMain.handle(IpcChannels.NAVIGATION_RELOAD, (_, ignoreCache?: boolean) => activeTab$.get()?.siteView.reload(ignoreCache))
-	ipcMain.handle(IpcChannels.NAVIGATION_STOP, () => activeTab$.get()?.siteView.stop())
-	ipcMain.handle(IpcChannels.NAVIGATION_GO_TO, (_, url: string) => activeTab$.get()?.siteView.goTo(url))
-	ipcMain.handle(IpcChannels.NAVIGATION_GO_HOME, () => activeTab$.get()?.siteView.goTo(config$.get().startUrl))
+	ipcMain.handle(IpcChannels.NAVIGATION_BACK, () => getActiveTab()?.webView.back())
+	ipcMain.handle(IpcChannels.NAVIGATION_FORWARD, () => getActiveTab()?.webView.forward())
+	ipcMain.handle(IpcChannels.NAVIGATION_RELOAD, (_, ignoreCache?: boolean) => getActiveTab()?.webView.reload(ignoreCache))
+	ipcMain.handle(IpcChannels.NAVIGATION_STOP, () => getActiveTab()?.webView.stop())
+	ipcMain.handle(IpcChannels.NAVIGATION_GO_TO, (_, url: string) => getActiveTab()?.webView.goTo(url))
+	ipcMain.handle(IpcChannels.NAVIGATION_GO_HOME, () => getActiveTab()?.webView.goTo(config$.get().startUrl))
 	ipcMain.handle(IpcChannels.TABS_GET_LIST, () => getTabsList())
 	ipcMain.handle(IpcChannels.TABS_ACTIVATE, (_, id: string) => activateTab(id))
 	ipcMain.handle(IpcChannels.TABS_CLOSE, (_, id: string) => closeTab(id))
@@ -35,38 +26,52 @@ export function registerHandlers() {
 	ipcMain.handle(IpcChannels.CONFIG_GET, () => config$.get())
 	ipcMain.handle(IpcChannels.NOTIF_GET_LIST, () => notifications$.get())
 	ipcMain.handle(IpcChannels.NOTIF_DISMISS, (_, id: string) => dismissNotification(id))
-	ipcMain.handle(IpcChannels.DOWNLOADS_TOGGLE, () => downloadPanelVisible$.emit(!downloadPanelVisible$.get()))
+	ipcMain.handle(IpcChannels.DOWNLOADS_TOGGLE, () => {
+		const vm = ViewManager.get()
+		const isDownloadsActive = vm.activeContentId$.get() === DOWNLOADS_VIEW_ID
+		if (isDownloadsActive) {
+			// Return to first valid tab
+			const firstTab = getTabsList()[0]
+			if (firstTab) activateTab(firstTab.id)
+		} else {
+			vm.showContent(DOWNLOADS_VIEW_ID)
+		}
+	})
 	ipcMain.handle(IpcChannels.DOWNLOADS_GET_HISTORY, () => downloadHistory$.get())
 	ipcMain.handle(IpcChannels.DOWNLOADS_GET_ACTIVE, () => activeDownloads$.get())
+
 	// Find in page
 	ipcMain.handle(IpcChannels.FIND_SEARCH, (_, text: string) => {
-		const tab = activeTab$.get()
+		const tab = getActiveTab()
 		if (tab) {
 			tab.findBarVisible = true
-			tab.siteView.findInPage(text)
+			tab.webView.findInPage(text)
 		}
 	})
 	ipcMain.handle(IpcChannels.FIND_NEXT, () => {
-		activeTab$.get()?.siteView.findNext()
+		getActiveTab()?.webView.findNext()
 	})
 	ipcMain.handle(IpcChannels.FIND_PREV, () => {
-		activeTab$.get()?.siteView.findPrev()
+		getActiveTab()?.webView.findPrev()
 	})
 	ipcMain.handle(IpcChannels.FIND_CLOSE, () => {
-		const tab = activeTab$.get()
+		const tab = getActiveTab()
 		if (tab) {
 			tab.findBarVisible = false
 			tab.findState = { text: "", activeMatch: 0, totalMatches: 0 }
-			tab.siteView.stopFind()
+			tab.webView.stopFind()
 		}
 		findBarVisible$.emit(false)
 		findState$.emit({ text: "", activeMatch: 0, totalMatches: 0 })
 	})
+
 	// User config (raw JSON)
 	ipcMain.handle(IpcChannels.USERCONFIG_READ, () => readRawConfig())
 	ipcMain.handle(IpcChannels.USERCONFIG_WRITE, (_, content: unknown) => writeRawConfig(content))
+
 	// I18n
 	ipcMain.handle(IpcChannels.I18N_GET_TRANSLATIONS, () => getTranslations())
+
 	// Icons
 	ipcMain.handle(IpcChannels.ICONS_FETCH, (_, url: string, partition?: string) => fetchIcons(url, partition))
 	ipcMain.handle(IpcChannels.ICONS_SAVE, (_, appName: string, base64: string, oldIcon?: string) => saveIcon(appName, base64, oldIcon))

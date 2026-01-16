@@ -1,6 +1,6 @@
 import { Menu, shell } from "electron"
-import { activeTab$, findBarVisible$ } from "../core/states"
-import { closeTab, createTab } from "../tabs/Tabs"
+import { findBarVisible$ } from "../core/states"
+import { closeTab, createTab, getActiveTab } from "../tabs/Tabs"
 
 interface MenuCallbacks {
 	onFocusUrl: () => void
@@ -23,7 +23,7 @@ export function createAppMenu(callbacks: MenuCallbacks): Menu {
 					label: "Ouvrir externe",
 					accelerator: "CmdOrCtrl+E",
 					click: () => {
-						const activeTab = activeTab$.get()
+						const activeTab = getActiveTab()
 						if (activeTab) {
 							const url = activeTab.navState$.get().url || activeTab.initialUrl
 							if (url && url !== "about:blank") shell.openExternal(url)
@@ -40,7 +40,7 @@ export function createAppMenu(callbacks: MenuCallbacks): Menu {
 					label: "Fermer",
 					accelerator: "CmdOrCtrl+W",
 					click: () => {
-						const activeTab = activeTab$.get()
+						const activeTab = getActiveTab()
 						if (activeTab) closeTab(activeTab.id)
 					},
 				},
@@ -61,7 +61,7 @@ export function createAppMenu(callbacks: MenuCallbacks): Menu {
 			submenu: [
 				{
 					label: "DevTools Site",
-					click: () => activeTab$.get()?.siteView.webContents.openDevTools(),
+					click: () => getActiveTab()?.webView.webContents.openDevTools(),
 				},
 				{
 					label: "DevTools Navbar",

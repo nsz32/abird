@@ -4,7 +4,7 @@ import { join } from "node:path"
 import type { IconFetchResult, IconResult, IconSource } from "@shared/types"
 import { net, WebContentsView } from "electron"
 import { Jimp } from "jimp"
-import { paths } from "../main/utils/platform"
+import { paths } from "../utils/platform"
 
 const PAGE_LOAD_TIMEOUT = 10000
 const FETCH_TIMEOUT = 5000

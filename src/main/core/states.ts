@@ -38,9 +38,8 @@ export const navBarHeight$ = new StateObservable<number>(0)
 
 // Tabs
 export const tabs$ = new StateObservable<Tab[]>([])
-export const activeTab$ = new StateObservable<Tab | null>(null)
 
-// Navigation (tab active)
+// Navigation (active tab)
 export const navState$ = new StateObservable<NavigationState>({
 	url: "",
 	title: "",
@@ -67,11 +66,10 @@ export const contentBounds$ = new CombinedObservable([windowBounds$, config$, na
 		: { x: 0, y: 0, width: windowBounds.width, height: windowBounds.height - navHeight }
 })
 
-// Navbar sync trigger (combinaison de navState, tabs, activeTab)
-export const navbarSync$ = new CombinedObservable([navState$, tabs$, activeTab$], () => ({
+// Navbar sync trigger (combinaison de navState et tabs)
+export const navbarSync$ = new CombinedObservable([navState$, tabs$], () => ({
 	navState: navState$.get(),
 	tabs: tabs$.get(),
-	activeTab: activeTab$.get(),
 }))
 
 // Notifications
@@ -81,7 +79,6 @@ export const notifications$ = new StateObservable<Notification[]>([])
 export const activeDownloads$ = new BroadcastObservable<ActiveDownload[]>([], IpcChannels.DOWNLOADS_ACTIVE_CHANGED)
 export const downloadHistory$ = new BroadcastObservable<DownloadHistoryItem[]>([], IpcChannels.DOWNLOADS_HISTORY_CHANGED)
 export const downloadEvents$ = new BroadcastEvent<DownloadEvent>(IpcChannels.DOWNLOADS_EVENT)
-export const downloadPanelVisible$ = new StateObservable<boolean>(false)
 
 // Find in page
 export const findBarVisible$ = new StateObservable<boolean>(false)

@@ -1,4 +1,5 @@
 import type { View, WebContentsView } from "electron"
+import { StateObservable } from "../utils/observable"
 
 /**
  * Z-index layers for views. Higher values are rendered on top.
@@ -9,7 +10,6 @@ export enum ZLayer {
 	NAVBAR = 100,
 	FIND_BAR = 101,
 	NOTIFICATIONS = 102,
-	DOWNLOAD_PANEL = 103,
 }
 
 interface ManagedView {
@@ -18,13 +18,15 @@ interface ManagedView {
 }
 
 /**
- * Manages WebContentsView z-ordering within a parent View.
+ * Manages WebContentsView z-ordering and content view visibility.
  * Uses detach/reattach pattern since Electron's native z-index doesn't work reliably.
- * Views are sorted by zIndex and reattached in order (last attached = on top).
  */
 export class ViewManager {
 	private views: ManagedView[] = []
+	private contentViews = new Map<string, WebContentsView>()
 	private static instance: ViewManager | null = null
+
+	readonly activeContentId$ = new StateObservable<string | null>(null)
 
 	constructor(private readonly contentView: View) {
 		ViewManager.instance = this
@@ -36,6 +38,8 @@ export class ViewManager {
 		}
 		return ViewManager.instance
 	}
+
+	// Z-ordering
 
 	addView(view: WebContentsView, zIndex: number) {
 		if (this.views.some((v) => v.view === view)) return
@@ -52,14 +56,43 @@ export class ViewManager {
 		}
 	}
 
-	/**
-	 * Detaches all views and reattaches them sorted by zIndex.
-	 * Lower zIndex = attached first = rendered below.
-	 */
 	reorderAllViews() {
 		const sorted = [...this.views].sort((a, b) => a.zIndex - b.zIndex)
 
 		for (const { view } of sorted) this.contentView.removeChildView(view)
 		for (const { view } of sorted) this.contentView.addChildView(view)
+	}
+
+	// Content views management
+
+	registerContentView(id: string, view: WebContentsView) {
+		this.contentViews.set(id, view)
+		view.setVisible(false)
+	}
+
+	unregisterContentView(id: string) {
+		this.contentViews.delete(id)
+
+		if (this.activeContentId$.get() === id) {
+			this.activeContentId$.emit(null)
+		}
+	}
+
+	showContent(id: string) {
+		if (!this.contentViews.has(id)) return
+
+		for (const [viewId, view] of this.contentViews) {
+			view.setVisible(viewId === id)
+		}
+
+		this.activeContentId$.emit(id)
+	}
+
+	hideAllContent() {
+		for (const view of this.contentViews.values()) {
+			view.setVisible(false)
+		}
+
+		this.activeContentId$.emit(null)
 	}
 }
