@@ -1,5 +1,5 @@
 import type { View, WebContentsView } from "electron"
-import { StateObservable } from "../utils/observable"
+import { activeContentId$ } from "./states"
 
 /**
  * Z-index layers for views. Higher values are rendered on top.
@@ -25,8 +25,6 @@ export class ViewManager {
 	private views: ManagedView[] = []
 	private contentViews = new Map<string, WebContentsView>()
 	private static instance: ViewManager | null = null
-
-	readonly activeContentId$ = new StateObservable<string | null>(null)
 
 	constructor(private readonly contentView: View) {
 		ViewManager.instance = this
@@ -73,8 +71,8 @@ export class ViewManager {
 	unregisterContentView(id: string) {
 		this.contentViews.delete(id)
 
-		if (this.activeContentId$.get() === id) {
-			this.activeContentId$.emit(null)
+		if (activeContentId$.get() === id) {
+			activeContentId$.emit(null)
 		}
 	}
 
@@ -85,7 +83,7 @@ export class ViewManager {
 			view.setVisible(viewId === id)
 		}
 
-		this.activeContentId$.emit(id)
+		activeContentId$.emit(id)
 	}
 
 	hideAllContent() {
@@ -93,6 +91,6 @@ export class ViewManager {
 			view.setVisible(false)
 		}
 
-		this.activeContentId$.emit(null)
+		activeContentId$.emit(null)
 	}
 }

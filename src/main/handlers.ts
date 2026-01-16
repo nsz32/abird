@@ -4,7 +4,7 @@ import { DOWNLOADS_VIEW_ID } from "./core/App"
 import { readRawConfig, writeRawConfig } from "./core/Config"
 import { getTranslations } from "./core/I18n"
 import { ViewManager } from "./core/ViewManager"
-import { activeDownloads$, config$, downloadHistory$, findBarVisible$, findState$, navState$, notifications$ } from "./core/states"
+import { activeContentId$, activeDownloads$, config$, downloadHistory$, findBarVisible$, findState$, navState$, notifications$ } from "./core/states"
 import { fetchIcons, saveIcon } from "./services/icons"
 import { dismissNotification } from "./services/notify"
 import { activateTab, closeTab, createTab, getActiveTab, getTabsList } from "./tabs/Tabs"
@@ -27,14 +27,12 @@ export function registerHandlers() {
 	ipcMain.handle(IpcChannels.NOTIF_GET_LIST, () => notifications$.get())
 	ipcMain.handle(IpcChannels.NOTIF_DISMISS, (_, id: string) => dismissNotification(id))
 	ipcMain.handle(IpcChannels.DOWNLOADS_TOGGLE, () => {
-		const vm = ViewManager.get()
-		const isDownloadsActive = vm.activeContentId$.get() === DOWNLOADS_VIEW_ID
+		const isDownloadsActive = activeContentId$.get() === DOWNLOADS_VIEW_ID
 		if (isDownloadsActive) {
-			// Return to first valid tab
 			const firstTab = getTabsList()[0]
 			if (firstTab) activateTab(firstTab.id)
 		} else {
-			vm.showContent(DOWNLOADS_VIEW_ID)
+			ViewManager.get().showContent(DOWNLOADS_VIEW_ID)
 		}
 	})
 	ipcMain.handle(IpcChannels.DOWNLOADS_GET_HISTORY, () => downloadHistory$.get())

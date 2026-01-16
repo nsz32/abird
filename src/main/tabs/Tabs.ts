@@ -1,7 +1,7 @@
 import type { TabInfo, TabOrigin } from "@shared/types"
 import { app } from "electron"
 import { ViewManager } from "../core/ViewManager"
-import { config$, findBarVisible$, findState$, navState$, tabs$ } from "../core/states"
+import { activeContentId$, config$, findBarVisible$, findState$, navState$, tabs$ } from "../core/states"
 import { Tab } from "./Tab"
 
 let unsubscribeNavState: (() => void) | null = null
@@ -63,17 +63,17 @@ export function getTabIndex(id: string): number {
 }
 
 export function isTabActive(id: string): boolean {
-	return ViewManager.get().activeContentId$.get() === id
+	return activeContentId$.get() === id
 }
 
 export function getActiveTab(): Tab | null {
-	const activeId = ViewManager.get().activeContentId$.get()
+	const activeId = activeContentId$.get()
 	return tabs$.get().find((t) => t.id === activeId) ?? null
 }
 
 export function getTabsList(): TabInfo[] {
 	const allTabs = tabs$.get()
-	const activeId = ViewManager.get().activeContentId$.get()
+	const activeId = activeContentId$.get()
 	const hasInvalidChild = (id: string) => allTabs.some((t) => !t.isValid && t.parentId === id)
 
 	return allTabs

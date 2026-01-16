@@ -39,6 +39,9 @@ export const navBarHeight$ = new StateObservable<number>(0)
 // Tabs
 export const tabs$ = new StateObservable<Tab[]>([])
 
+// Active content view (tab id or panel id like "downloads")
+export const activeContentId$ = new StateObservable<string | null>(null)
+
 // Navigation (active tab)
 export const navState$ = new StateObservable<NavigationState>({
 	url: "",
@@ -66,10 +69,11 @@ export const contentBounds$ = new CombinedObservable([windowBounds$, config$, na
 		: { x: 0, y: 0, width: windowBounds.width, height: windowBounds.height - navHeight }
 })
 
-// Navbar sync trigger (combinaison de navState et tabs)
-export const navbarSync$ = new CombinedObservable([navState$, tabs$], () => ({
+// Navbar sync trigger (combinaison de navState, tabs et activeContentId)
+export const navbarSync$ = new CombinedObservable([navState$, tabs$, activeContentId$], () => ({
 	navState: navState$.get(),
 	tabs: tabs$.get(),
+	activeContentId: activeContentId$.get(),
 }))
 
 // Notifications
