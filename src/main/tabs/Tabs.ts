@@ -33,10 +33,11 @@ export function createTab(url?: string, origin: TabOrigin = "user", index?: numb
 }
 
 export function closeTab(id: string) {
+	const wasSelected = activeTabId$.get() === id
 	const removedIndex = removeTab(id)
 	if (removedIndex === -1) return
 
-	if (isTabActive(id)) {
+	if (wasSelected) {
 		selectNextTab(removedIndex)
 	}
 
