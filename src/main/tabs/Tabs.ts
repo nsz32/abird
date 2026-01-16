@@ -13,14 +13,14 @@ export function createTab(url?: string, origin: TabOrigin = "user", index?: numb
 
 	insertTab(tab, index)
 
-	// "user" and "background" tabs are always proper (user-initiated)
-	// "blank" tabs must be checked for content before becoming proper
+	// "user" and "background" tabs are always valid (user-initiated)
+	// "blank" tabs must be checked for content before becoming valid
 	if (origin === "blank") {
 		pendingActivationId = tab.id
-		tab.onProper(() => handleTabProper(tab))
-		tab.scheduleProperCheck()
+		tab.onValid(() => handleTabValid(tab))
+		tab.scheduleValidation()
 	} else {
-		tab.proper = true
+		tab.isValid = true
 		if (origin === "user") {
 			activateTab(tab.id)
 		} else {
@@ -39,15 +39,15 @@ export function closeTab(id: string) {
 		selectNextTab(removedIndex)
 	}
 
-	const hasProperTabs = tabs$.get().some((t) => t.proper)
-	if (!hasProperTabs) {
+	const hasValidTabs = tabs$.get().some((t) => t.isValid)
+	if (!hasValidTabs) {
 		app.quit()
 	}
 }
 
 export function activateTab(id: string) {
 	const tab = tabs$.get().find((t) => t.id === id)
-	if (!tab || !tab.proper) return
+	if (!tab || !tab.isValid) return
 
 	pendingActivationId = null
 	subscribeToNavState(tab)
@@ -65,17 +65,17 @@ export function getTabIndex(id: string): number {
 export function getTabsList(): TabInfo[] {
 	const allTabs = tabs$.get()
 	const activeId = activeTab$.get()?.id
-	const hasNonProperChild = (id: string) => allTabs.some((t) => !t.proper && t.parentId === id)
+	const hasInvalidChild = (id: string) => allTabs.some((t) => !t.isValid && t.parentId === id)
 
 	return allTabs
-		.filter((t) => t.proper)
+		.filter((t) => t.isValid)
 		.map((t) => ({
 			id: t.id,
 			title: t.navState$.get().title,
 			url: t.navState$.get().url || t.initialUrl,
 			favicon: t.favicon,
 			isActive: t.id === activeId,
-			isLoading: t.navState$.get().isLoading || hasNonProperChild(t.id),
+			isLoading: t.navState$.get().isLoading || hasInvalidChild(t.id),
 		}))
 }
 
@@ -107,8 +107,8 @@ function selectNextTab(removedIndex: number) {
 	activateTab(list[nextIndex].id)
 }
 
-function handleTabProper(tab: Tab) {
-	// Notify that tabs list changed (tab became proper)
+function handleTabValid(tab: Tab) {
+	// Notify that tabs list changed (tab became valid)
 	notifyTabsChanged()
 
 	if (pendingActivationId === tab.id) {

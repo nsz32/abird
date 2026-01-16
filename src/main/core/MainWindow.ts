@@ -1,15 +1,12 @@
 import { BaseWindow, type WebContentsView } from "electron"
 import { tabs$, windowBounds$ } from "../states"
+import { ViewManager, ZLayer } from "./ViewManager"
 
 const BOUNDS_UPDATE_DELAYS = [100, 200, 300, 400, 500, 750, 1000, 1500, 2000]
 
 export class MainWindow {
 	readonly window: BaseWindow
-	private watermarkView: WebContentsView | null = null
-	private navBarView: WebContentsView | null = null
-	private notificationView: WebContentsView | null = null
-	private downloadPanelView: WebContentsView | null = null
-	private findBarView: WebContentsView | null = null
+	private readonly viewManager: ViewManager
 
 	constructor() {
 		this.window = new BaseWindow({
@@ -20,6 +17,8 @@ export class MainWindow {
 			autoHideMenuBar: true,
 		})
 
+		this.viewManager = new ViewManager(this.window.contentView)
+
 		this.setupEventListeners()
 		this.setupTabsSubscription()
 	}
@@ -29,49 +28,28 @@ export class MainWindow {
 		this.emitBoundsWithRetry()
 	}
 
-	addView(view: WebContentsView) {
-		this.window.contentView.addChildView(view)
+	addSiteView(view: WebContentsView) {
+		this.viewManager.addView(view, ZLayer.SITE_CONTENT)
 	}
 
 	setWatermark(view: WebContentsView) {
-		this.watermarkView = view
-		this.addView(view)
-		this.bringToFront(this.watermarkView)
+		this.viewManager.addView(view, ZLayer.WATERMARK)
 	}
 
 	setNavBar(view: WebContentsView) {
-		this.navBarView = view
-		this.addView(view)
+		this.viewManager.addView(view, ZLayer.NAVBAR)
 	}
 
 	setNotificationCenter(view: WebContentsView) {
-		this.notificationView = view
-		this.addView(view)
-		this.bringOverlaysToFront()
+		this.viewManager.addView(view, ZLayer.NOTIFICATIONS)
 	}
 
 	setDownloadPanel(view: WebContentsView) {
-		this.downloadPanelView = view
-		this.addView(view)
-		this.bringOverlaysToFront()
+		this.viewManager.addView(view, ZLayer.DOWNLOAD_PANEL)
 	}
 
 	setFindBar(view: WebContentsView) {
-		this.findBarView = view
-		this.addView(view)
-		this.bringOverlaysToFront()
-	}
-
-	bringViewToFront(view: WebContentsView) {
-		this.bringToFront(view)
-		this.bringOverlaysToFront()
-	}
-
-	bringOverlaysToFront() {
-		if (this.navBarView) this.bringToFront(this.navBarView)
-		if (this.findBarView) this.bringToFront(this.findBarView)
-		if (this.downloadPanelView) this.bringToFront(this.downloadPanelView)
-		if (this.notificationView) this.bringToFront(this.notificationView)
+		this.viewManager.addView(view, ZLayer.FIND_BAR)
 	}
 
 	private setupEventListeners() {
@@ -85,10 +63,9 @@ export class MainWindow {
 			for (const tab of tabList) {
 				if (!tab.siteView.view.webContents.hostWebContents) {
 					console.log("[MainWindow] addView for tab", tab.id)
-					this.addView(tab.siteView.view)
+					this.addSiteView(tab.siteView.view)
 				}
 			}
-			this.bringOverlaysToFront()
 		})
 	}
 
@@ -101,10 +78,5 @@ export class MainWindow {
 		for (const delay of BOUNDS_UPDATE_DELAYS) {
 			setTimeout(() => this.emitBounds(), delay)
 		}
-	}
-
-	private bringToFront(view: WebContentsView) {
-		this.window.contentView.removeChildView(view)
-		this.window.contentView.addChildView(view)
 	}
 }

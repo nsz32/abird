@@ -15,7 +15,7 @@ export class Tab {
 	readonly initialUrl: string
 	readonly parentId: string | null
 
-	proper = false
+	isValid = false
 	favicon: string | null = null
 	findState: FindState = { text: "", activeMatch: 0, totalMatches: 0 }
 	findBarVisible = false
@@ -28,7 +28,7 @@ export class Tab {
 	})
 
 	private readonly createdAt = Date.now()
-	private onProperCallback?: () => void
+	private onValidCallback?: () => void
 	private destroyed = false
 
 	constructor(partition: string, routing: Partial<RoutingConfig> | null, url: string, userAgent: string, parentId: string | null = null, preload?: string) {
@@ -42,8 +42,8 @@ export class Tab {
 		console.log("CREATE TAB", this.id)
 	}
 
-	onProper(callback: () => void) {
-		this.onProperCallback = callback
+	onValid(callback: () => void) {
+		this.onValidCallback = callback
 	}
 
 	destroy() {
@@ -77,31 +77,31 @@ export class Tab {
 		tabs$.emit([...tabs$.get()])
 	}
 
-	scheduleProperCheck() {
-		if (this.proper) return
-		this.runProperCheck()
+	scheduleValidation() {
+		if (this.isValid) return
+		this.runValidationCheck()
 	}
 
-	private async runProperCheck() {
-		if (this.proper || this.destroyed) return
+	private async runValidationCheck() {
+		if (this.isValid || this.destroyed) return
 
 		const elapsed = Date.now() - this.createdAt
 		if (elapsed >= CHECK_MAX_TIME) {
-			this.setProper()
+			this.markAsValid()
 			return
 		}
 
-		if (await this.isTabProper()) {
-			this.setProper()
+		if (await this.checkValidity()) {
+			this.markAsValid()
 		} else {
-			setTimeout(() => this.runProperCheck(), CHECK_INTERVAL)
+			setTimeout(() => this.runValidationCheck(), CHECK_INTERVAL)
 		}
 	}
 
-	private setProper() {
-		console.log(`[${this.id}] setProper`)
-		this.proper = true
-		this.onProperCallback?.()
+	private markAsValid() {
+		console.log(`[${this.id}] markAsValid`)
+		this.isValid = true
+		this.onValidCallback?.()
 	}
 
 	private openChildTab(url: string, origin: TabOrigin) {
@@ -114,14 +114,14 @@ export class Tab {
 		externalOpened$.emit(targetId)
 	}
 
-	private async isTabProper(): Promise<boolean> {
+	private async checkValidity(): Promise<boolean> {
 		const tabCount = tabs$.get().length
 		if (tabCount <= 1) {
-			console.log(`[${this.id}] isTabProper: true (only ${tabCount} tab)`)
+			console.log(`[${this.id}] checkValidity: true (only ${tabCount} tab)`)
 			return true
 		}
 		const hasContent = await this.siteView.hasVisibleContent()
-		console.log(`[${this.id}] isTabProper: ${hasContent} (hasContent=${hasContent})`)
+		console.log(`[${this.id}] checkValidity: ${hasContent} (hasContent=${hasContent})`)
 		return hasContent
 	}
 
