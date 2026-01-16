@@ -1,7 +1,8 @@
-import { join } from "node:path"
 import type { FindState, NavigationState, RoutingConfig, TabOrigin } from "@shared/types"
-import { type Rectangle, WebContentsView, session, shell } from "electron"
+import { shell } from "electron"
 import { shouldHandleUrl } from "../core/UrlRouter"
+import { View } from "../core/View"
+import { ZLayer } from "../core/ViewManager"
 import { setupDownloads } from "../downloads/DownloadManager"
 import { config$ } from "../states"
 import { resolveUserAgent } from "../utils/userAgents"
@@ -17,9 +18,8 @@ export interface SiteViewCallbacks {
 	onFindResult: (state: FindState) => void
 }
 
-export class SiteView {
-	readonly view: WebContentsView
-	private readonly webContents: Electron.WebContents
+export class SiteView extends View {
+	private currentFindText = ""
 
 	constructor(
 		partition: string,
@@ -28,32 +28,25 @@ export class SiteView {
 		private readonly callbacks: SiteViewCallbacks,
 		preload?: string,
 	) {
-		const sess = partition ? session.fromPartition(`persist:${partition}`) : session.defaultSession
-		sess.setUserAgent(resolveUserAgent(userAgent))
-		setupDownloads(sess, config$.get().downloads)
-
-		this.view = new WebContentsView({
-			webPreferences: {
-				nodeIntegration: false,
-				contextIsolation: true,
-				session: sess,
-				preload: preload ? join(__dirname, preload) : undefined,
-			},
+		super({
+			layer: ZLayer.SITE_CONTENT,
+			preload: preload,
+			partition,
+			userAgent: resolveUserAgent(userAgent),
 		})
-		this.view.setBackgroundColor("#00000000")
-		this.webContents = this.view.webContents
+
+		setupDownloads(this.webContents.session, config$.get().downloads)
 
 		this.setupNavigation()
 		this.setupEventListeners()
-
-		this.webContents.on("did-fail-load", () => console.log("failed"))
-		this.webContents.on("did-finish-load", () => console.log("finish"))
 	}
 
-	// ─── Navigation API ─────────────────────────────────────────────────────────
+	protected setupSubscriptions() {
+		// SiteView n'a pas de subscriptions automatiques
+		// Son positionnement est géré par Tab/App
+	}
 
 	loadURL(url: string) {
-		console.log("[SiteView] loadURL", url)
 		this.webContents.loadURL(url)
 	}
 
@@ -82,25 +75,7 @@ export class SiteView {
 		this.webContents.stop()
 	}
 
-	setBounds(bounds: Rectangle) {
-		this.view.setBounds(bounds)
-	}
-
-	setVisible(visible: boolean) {
-		console.log("visible", visible)
-		this.view.setVisible(visible)
-	}
-
-	destroy() {
-		this.webContents.close()
-	}
-
-	// ─── Find in Page API ──────────────────────────────────────────────────────
-
-	private currentFindText = ""
-
 	findInPage(text: string) {
-		// Stop previous search before starting a new one
 		if (this.currentFindText) {
 			this.webContents.stopFindInPage("clearSelection")
 		}
@@ -170,12 +145,10 @@ export class SiteView {
 	private handleUrlNavigation(event: Electron.Event, url: string) {
 		if (shouldHandleUrl(url, this.routing)) return
 
-		console.log(`[SiteView] handleUrlNavigation: external URL ${url}`)
 		event.preventDefault()
 		shell.openExternal(url)
 
 		this.callbacks.shouldCloseTab().then((willClose) => {
-			console.log(`[SiteView] shouldCloseTab resolved: willClose=${willClose}`)
 			this.callbacks.onExternalOpened(willClose)
 			if (willClose) this.callbacks.onCloseTab()
 		})
@@ -187,15 +160,11 @@ export class SiteView {
 			this.emitNavState()
 		})
 
-		this.webContents.once("did-start-loading", () => {
-			this.emitNavState()
-		})
-
+		this.webContents.once("did-start-loading", () => this.emitNavState())
 		this.webContents.on("did-navigate-in-page", () => {
 			this.deduplicateHistory()
 			this.emitNavState()
 		})
-
 		this.webContents.on("did-start-loading", () => this.emitNavState())
 		this.webContents.on("did-stop-loading", () => this.emitNavState())
 		this.webContents.on("did-finish-load", () => this.emitNavState())

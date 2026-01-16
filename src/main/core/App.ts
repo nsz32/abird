@@ -2,11 +2,6 @@ import { Menu, nativeTheme } from "electron"
 import { registerHandlers } from "../ipc/handlers"
 import { setupInputListener } from "../keyboard/inputListener"
 import { createAppMenu } from "../keyboard/menu"
-import { DownloadPanel } from "../overlays/DownloadPanel"
-import { FindBar } from "../overlays/FindBar"
-import { NavBar } from "../overlays/NavBar"
-import { NotificationCenter } from "../overlays/NotificationCenter"
-import { Watermark } from "../overlays/Watermark"
 import {
 	activeDownloads$,
 	activeTab$,
@@ -19,15 +14,17 @@ import {
 	externalOpened$,
 	findBarVisible$,
 	findState$,
-	navBarBounds$,
-	navBarHeight$,
 	navbarSync$,
 	notifications$,
 	tabs$,
-	windowBounds$,
 } from "../states"
 import type { Tab } from "../tabs/Tab"
 import { createTab, getTabsList } from "../tabs/Tabs"
+import { DownloadPanel } from "../views/DownloadPanel"
+import { FindBar } from "../views/FindBar"
+import { NavBar } from "../views/NavBar"
+import { NotificationCenter } from "../views/NotificationCenter"
+import { Watermark } from "../views/Watermark"
 import { MainWindow } from "./MainWindow"
 
 let mainWindow: MainWindow
@@ -38,42 +35,36 @@ let downloadPanel: DownloadPanel
 let findBar: FindBar
 
 export function startApp() {
-	// Must be first to capture all WebContents
 	setupInputListener()
 	registerHandlers()
 
-	// Initialize components
+	// MainWindow must be created first (initializes ViewManager)
 	mainWindow = new MainWindow()
+
+	// Views auto-register with ViewManager on construction
 	watermark = new Watermark()
 	navBar = new NavBar()
 	notificationCenter = new NotificationCenter()
 	downloadPanel = new DownloadPanel()
 	findBar = new FindBar()
 
-	mainWindow.setWatermark(watermark.view)
-	mainWindow.setNavBar(navBar.view)
-	mainWindow.setNotificationCenter(notificationCenter.view)
-	mainWindow.setDownloadPanel(downloadPanel.view)
-	mainWindow.setFindBar(findBar.view)
-	navBar.setBounds(navBarBounds$.get())
+	// Initial visibility
 	navBar.setVisible(config$.get().navBar.visible)
 	downloadPanel.setVisible(false)
 	findBar.setVisible(false)
 
 	// Register views for broadcast observables
-	activeDownloads$.register(navBar.view.webContents)
-	activeDownloads$.register(downloadPanel.view.webContents)
-	downloadHistory$.register(navBar.view.webContents)
-	downloadHistory$.register(downloadPanel.view.webContents)
-	downloadEvents$.register(navBar.view.webContents)
-	downloadEvents$.register(downloadPanel.view.webContents)
-	findState$.register(findBar.view.webContents)
-	ctrlPressed$.register(navBar.view.webContents)
+	activeDownloads$.register(navBar.webContents)
+	activeDownloads$.register(downloadPanel.webContents)
+	downloadHistory$.register(navBar.webContents)
+	downloadHistory$.register(downloadPanel.webContents)
+	downloadEvents$.register(navBar.webContents)
+	downloadEvents$.register(downloadPanel.webContents)
+	findState$.register(findBar.webContents)
+	ctrlPressed$.register(navBar.webContents)
 
-	// Setup subscriptions
 	setupSubscriptions()
 
-	// Setup menu
 	Menu.setApplicationMenu(
 		createAppMenu({
 			onFocusUrl: () => navBar.sendFocusUrl(),
@@ -81,7 +72,7 @@ export function startApp() {
 		}),
 	)
 
-	// Load and show
+	// Load HTML and show
 	watermark.load()
 	navBar.load()
 	notificationCenter.load()
@@ -100,28 +91,9 @@ function setupSubscriptions() {
 	})
 	nativeTheme.themeSource = config$.get().theme
 
-	navBarBounds$.subscribe((bounds) => navBar.setBounds(bounds))
 	contentBounds$.subscribe((bounds) => activeTab$.get()?.siteView.setBounds(bounds))
-	windowBounds$.subscribe((bounds) => {
-		watermark.setBounds(bounds)
-		notificationCenter.setBounds(bounds)
-		downloadPanel.setBounds(bounds)
-		findBar.setBounds(bounds)
-	})
-
-	// Update panels position when navbar config or height changes
-	const updatePanelsNavBar = () => {
-		const { navBar: navBarConfig } = config$.get()
-		const height = navBarConfig.visible ? navBarHeight$.get() : 0
-		notificationCenter.setNavBar(navBarConfig.position, height)
-		downloadPanel.setNavBar(navBarConfig.position, height)
-		findBar.setNavBar(navBarConfig.position, height)
-	}
-	config$.subscribe(updatePanelsNavBar)
-	navBarHeight$.subscribe(updatePanelsNavBar)
 
 	activeTab$.subscribe((activeTab) => {
-		console.log("activate", { activeTab })
 		updateTabsVisibility(activeTab)
 	})
 
@@ -155,16 +127,11 @@ function setupSubscriptions() {
 }
 
 function updateTabsVisibility(activeTab: Tab | null) {
-	console.log("[App] updateTabsVisibility", activeTab?.id, "tabs:", tabs$.get().length)
 	for (const tab of tabs$.get()) {
 		const isActive = tab.id === activeTab?.id
-		// Invalid tabs stay visible (loading in background)
-		// Valid tabs are only visible when active
 		tab.siteView.setVisible(isActive || !tab.isValid)
 		if (isActive) {
-			const bounds = contentBounds$.get()
-			console.log("[App] setBounds for active tab", tab.id, bounds)
-			tab.siteView.setBounds(bounds)
+			tab.siteView.setBounds(contentBounds$.get())
 		}
 	}
 }

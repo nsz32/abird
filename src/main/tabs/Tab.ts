@@ -1,6 +1,6 @@
 import type { FindState, NavigationState, RoutingConfig, TabOrigin } from "@shared/types"
-import { SiteView } from "../overlays/SiteView"
 import { activeTab$, externalOpened$, findState$, tabs$ } from "../states"
+import { SiteView } from "../views/SiteView"
 import { StateObservable } from "../utils/observable"
 import { closeTab, createTab, getTabIndex } from "./Tabs"
 

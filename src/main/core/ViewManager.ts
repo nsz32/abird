@@ -24,8 +24,18 @@ interface ManagedView {
  */
 export class ViewManager {
 	private views: ManagedView[] = []
+	private static instance: ViewManager | null = null
 
-	constructor(private readonly contentView: View) {}
+	constructor(private readonly contentView: View) {
+		ViewManager.instance = this
+	}
+
+	static get(): ViewManager {
+		if (!ViewManager.instance) {
+			throw new Error("ViewManager not initialized")
+		}
+		return ViewManager.instance
+	}
 
 	addView(view: WebContentsView, zIndex: number) {
 		if (this.views.some((v) => v.view === view)) return
@@ -39,14 +49,6 @@ export class ViewManager {
 		if (index !== -1) {
 			this.views.splice(index, 1)
 			this.contentView.removeChildView(view)
-		}
-	}
-
-	setZIndex(view: WebContentsView, zIndex: number) {
-		const managed = this.views.find((v) => v.view === view)
-		if (managed) {
-			managed.zIndex = zIndex
-			this.reorderAllViews()
 		}
 	}
 
