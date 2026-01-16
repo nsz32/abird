@@ -3,6 +3,7 @@ import { ipcMain } from "electron"
 import { readRawConfig, writeRawConfig } from "../core/Config"
 import { getTranslations } from "../core/I18n"
 import { fetchIcons } from "../icons/IconFetcher"
+import { saveIcon } from "../icons/IconStorage"
 import { dismissNotification } from "../notifications/notify"
 import {
 	activeDownloads$,
@@ -68,4 +69,7 @@ export function registerHandlers() {
 	ipcMain.handle(IpcChannels.I18N_GET_TRANSLATIONS, () => getTranslations())
 	// Icons
 	ipcMain.handle(IpcChannels.ICONS_FETCH, (_, url: string, partition?: string) => fetchIcons(url, partition))
+	ipcMain.handle(IpcChannels.ICONS_SAVE, (_, appName: string, base64: string, oldIcon?: string) =>
+		saveIcon(appName, base64, oldIcon)
+	)
 }

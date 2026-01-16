@@ -1,4 +1,4 @@
-import { Box, Button, HStack, Heading, Image, Input, SimpleGrid, Spinner, Text, VStack } from "@chakra-ui/react"
+import { Box, Button, Flex, HStack, Heading, Image, Input, Spinner, Text, VStack } from "@chakra-ui/react"
 import type { AppConfig, GlobalConfig } from "@shared/config.schema"
 import type { TranslationKey } from "@shared/i18n/translations"
 import type { IconResult } from "@shared/types"
@@ -16,12 +16,33 @@ interface AppPageProps {
 
 export function AppPage({ name, config, onChange, t }: AppPageProps) {
 	const [icons, setIcons] = useState<IconResult[]>([])
+	const [iconSizes, setIconSizes] = useState<Record<string, { w: number; h: number }>>({})
 	const [fetchingIcons, setFetchingIcons] = useState(false)
+	const [savingIcon, setSavingIcon] = useState(false)
 
 	useEffect(() => {
 		document.title = `Bird - ${name}`
 		setIcons([]) // Reset icons when app changes
+		setIconSizes({})
 	}, [name])
+
+	const handleImageLoad = (url: string, e: React.SyntheticEvent<HTMLImageElement>) => {
+		const img = e.currentTarget
+		setIconSizes((prev) => ({ ...prev, [url]: { w: img.naturalWidth, h: img.naturalHeight } }))
+	}
+
+	const handleSelectIcon = async (base64: string) => {
+		if (savingIcon) return
+		setSavingIcon(true)
+		try {
+			const filename = await window.bird.icons.save(name, base64, app.icon)
+			updateApp({ icon: filename })
+		} catch (err) {
+			console.error("Failed to save icon:", err)
+		} finally {
+			setSavingIcon(false)
+		}
+	}
 
 	const app = config.apps[name]
 
@@ -88,37 +109,40 @@ export function AppPage({ name, config, onChange, t }: AppPageProps) {
 							{fetchingIcons ? <Spinner size="sm" /> : "Obtenir icônes"}
 						</Button>
 						{icons.length > 0 && (
-							<SimpleGrid columns={4} gap={2}>
-								{icons.map((icon) => (
-									<Box
-										key={icon.url}
-										p={1}
-										borderRadius="md"
-										border="1px solid"
-										borderColor="border.subtle"
-										cursor="pointer"
-										_hover={{ borderColor: "blue.500" }}
-										onClick={() => updateApp({ icon: icon.url })}
-										bg={app.icon === icon.url ? "blue.900" : undefined}
-									>
-										<Image
-											src={icon.url}
-											alt={icon.source}
-											boxSize="32px"
-											objectFit="contain"
-											fallback={<Box boxSize="32px" bg="bg.subtle" />}
-										/>
-									</Box>
-								))}
-							</SimpleGrid>
+							<Flex wrap="wrap" gap={3}>
+								{icons.map((icon) => {
+									const size = iconSizes[icon.url]
+									return (
+										<VStack
+											key={icon.url}
+											gap={1}
+											p={2}
+											borderRadius="md"
+											border="1px solid"
+											borderColor="border.subtle"
+											cursor={savingIcon ? "wait" : "pointer"}
+											_hover={{ borderColor: "blue.500" }}
+											onClick={() => handleSelectIcon(icon.url)}
+											opacity={savingIcon ? 0.5 : 1}
+										>
+											<Image
+												src={icon.url}
+												alt={icon.source}
+												onLoad={(e) => handleImageLoad(icon.url, e)}
+												fallback={<Box boxSize="32px" bg="bg.subtle" />}
+											/>
+											<Text fontSize="xs" color="fg.muted">
+												{size ? `${size.w}x${size.h}` : "..."}
+											</Text>
+										</VStack>
+									)
+								})}
+							</Flex>
 						)}
 						{app.icon && (
-							<HStack gap={2}>
-								<Image src={app.icon} alt="Current icon" boxSize="24px" objectFit="contain" />
-								<Text fontSize="xs" color="fg.muted" maxW="150px" truncate>
-									{app.icon}
-								</Text>
-							</HStack>
+							<Text fontSize="xs" color="fg.muted">
+								Icône : {app.icon}
+							</Text>
 						)}
 					</VStack>
 				</HStack>

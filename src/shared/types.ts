@@ -144,6 +144,7 @@ export const IpcChannels = {
 	I18N_GET_TRANSLATIONS: "bird:i18n:get-translations",
 	// Icons
 	ICONS_FETCH: "bird:icons:fetch",
+	ICONS_SAVE: "bird:icons:save",
 } as const
 
 // Type utilitaire pour les valeurs de IpcChannels
@@ -265,6 +266,7 @@ export interface BirdApi {
 	}
 	icons: {
 		fetch: (url: string, partition?: string) => Promise<IconFetchResult>
+		save: (appName: string, base64: string, oldIcon?: string) => Promise<string>
 	}
 }
 
