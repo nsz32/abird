@@ -155,6 +155,10 @@ body,
 	cursor: default;
 }
 
+.tab-button.active.hidden-tab {
+	color: #888;
+}
+
 .tab-favicon {
 	width: 47.59cqh;
 	height: 47.59cqh;

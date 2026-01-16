@@ -1,7 +1,7 @@
 import type { TabInfo, TabOrigin } from "@shared/types"
 import { app } from "electron"
 import { ViewManager } from "../core/ViewManager"
-import { activeContentId$, config$, findBarVisible$, findState$, navState$, tabs$ } from "../core/states"
+import { activeContentId$, activeTabId$, config$, findBarVisible$, findState$, navState$, tabs$ } from "../core/states"
 import { Tab } from "./Tab"
 
 let unsubscribeNavState: (() => void) | null = null
@@ -52,6 +52,7 @@ export function activateTab(id: string) {
 
 	pendingActivationId = null
 	subscribeToNavState(tab)
+	activeTabId$.emit(id)
 	ViewManager.get().showContent(id)
 
 	findBarVisible$.emit(tab.findBarVisible)
@@ -73,7 +74,8 @@ export function getActiveTab(): Tab | null {
 
 export function getTabsList(): TabInfo[] {
 	const allTabs = tabs$.get()
-	const activeId = activeContentId$.get()
+	const selectedId = activeTabId$.get()
+	const visibleId = activeContentId$.get()
 	const hasInvalidChild = (id: string) => allTabs.some((t) => !t.isValid && t.parentId === id)
 
 	return allTabs
@@ -83,7 +85,8 @@ export function getTabsList(): TabInfo[] {
 			title: t.navState$.get().title,
 			url: t.navState$.get().url || t.initialUrl,
 			favicon: t.favicon,
-			isActive: t.id === activeId,
+			isActive: t.id === selectedId,
+			isVisible: t.id === visibleId,
 			isLoading: t.navState$.get().isLoading || hasInvalidChild(t.id),
 		}))
 }

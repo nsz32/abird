@@ -38,6 +38,7 @@ export interface TabInfo {
 	url: string
 	favicon: string | null
 	isActive: boolean
+	isVisible: boolean
 	isLoading: boolean
 }
 

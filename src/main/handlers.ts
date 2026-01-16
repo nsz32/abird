@@ -4,7 +4,17 @@ import { DOWNLOADS_VIEW_ID } from "./core/App"
 import { readRawConfig, writeRawConfig } from "./core/Config"
 import { getTranslations } from "./core/I18n"
 import { ViewManager } from "./core/ViewManager"
-import { activeContentId$, activeDownloads$, config$, downloadHistory$, findBarVisible$, findState$, navState$, notifications$ } from "./core/states"
+import {
+	activeContentId$,
+	activeDownloads$,
+	activeTabId$,
+	config$,
+	downloadHistory$,
+	findBarVisible$,
+	findState$,
+	navState$,
+	notifications$,
+} from "./core/states"
 import { fetchIcons, saveIcon } from "./services/icons"
 import { dismissNotification } from "./services/notify"
 import { activateTab, closeTab, createTab, getActiveTab, getTabsList } from "./tabs/Tabs"
@@ -29,8 +39,8 @@ export function registerHandlers() {
 	ipcMain.handle(IpcChannels.DOWNLOADS_TOGGLE, () => {
 		const isDownloadsActive = activeContentId$.get() === DOWNLOADS_VIEW_ID
 		if (isDownloadsActive) {
-			const firstTab = getTabsList()[0]
-			if (firstTab) activateTab(firstTab.id)
+			const tabId = activeTabId$.get()
+			if (tabId) activateTab(tabId)
 		} else {
 			ViewManager.get().showContent(DOWNLOADS_VIEW_ID)
 		}
