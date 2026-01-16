@@ -1,5 +1,5 @@
-import { app } from "electron"
 import { type Locale, type Translations, translations } from "@shared/i18n/translations"
+import { app } from "electron"
 
 const SUPPORTED_LOCALES: Locale[] = ["en", "fr"]
 const FALLBACK_LOCALE: Locale = "en"

@@ -36,10 +36,7 @@ interface DetectWithRetryOptions {
 	maxRetries?: number
 }
 
-export async function detectFileTypeWithRetry(
-	filePath: string,
-	options: DetectWithRetryOptions = {},
-): Promise<FileDetectionResult> {
+export async function detectFileTypeWithRetry(filePath: string, options: DetectWithRetryOptions = {}): Promise<FileDetectionResult> {
 	const minSize = options.minSize ?? DEFAULT_MIN_SIZE
 	const retryDelay = options.retryDelay ?? DEFAULT_RETRY_DELAY
 	const maxRetries = options.maxRetries ?? DEFAULT_MAX_RETRIES

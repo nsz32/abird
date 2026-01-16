@@ -4,11 +4,7 @@
 	"description": "Web app wrapper - isolate web applications from the browser",
 	"main": "out/main/index.js",
 	"pnpm": {
-		"onlyBuiltDependencies": [
-			"@biomejs/biome",
-			"electron",
-			"esbuild"
-		]
+		"onlyBuiltDependencies": ["@biomejs/biome", "electron", "esbuild"]
 	},
 	"scripts": {
 		"dev": "electron-vite dev",
@@ -25,11 +21,7 @@
 		"typecheck": "tsc --noEmit",
 		"generate:schema": "npx tsx scripts/generate-schema.ts"
 	},
-	"keywords": [
-		"electron",
-		"webapp",
-		"wrapper"
-	],
+	"keywords": ["electron", "webapp", "wrapper"],
 	"author": "",
 	"license": "ISC",
 	"type": "module",
