@@ -42,10 +42,8 @@ export class Tab {
 
 		const callbacks = this.createCallbacks()
 
-		this.view = url.startsWith("bird://") ? new PanelView(callbacks) : new WebView(partition, routing, userAgent, callbacks)
+		this.view = url.startsWith("bird://") ? new PanelView(url, callbacks) : new WebView(url, partition, routing, userAgent, callbacks)
 		console.log("CREATED", url, this.view.constructor.name)
-
-		this.view.loadURL(url)
 
 		ViewManager.get().registerContentView(this.id, this.view.webContentsView)
 

@@ -12,6 +12,7 @@ export interface BrowserViewCallbacks {
 }
 
 export interface BrowserViewConfig {
+	url: string
 	partition?: string
 	userAgent?: string
 	preload?: boolean
@@ -30,6 +31,7 @@ export abstract class BrowserView extends View {
 	) {
 		super({
 			layer: ZLayer.SITE_CONTENT,
+			url: config.url,
 			partition: config.partition,
 			userAgent: config.userAgent,
 			preload: config.preload,
@@ -37,6 +39,7 @@ export abstract class BrowserView extends View {
 
 		this.setupEventListeners()
 		this.init()
+		this.load()
 	}
 
 	protected setupSubscriptions() {
@@ -44,8 +47,6 @@ export abstract class BrowserView extends View {
 	}
 
 	// Navigation
-
-	abstract loadURL(url: string): void
 
 	back() {
 		if (this.webContents.navigationHistory.canGoBack()) {

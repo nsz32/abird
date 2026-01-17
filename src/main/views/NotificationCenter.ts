@@ -17,7 +17,7 @@ export class NotificationCenter extends View {
 		super({
 			layer: ZLayer.NOTIFICATIONS,
 			preload: true,
-			html: "notifications",
+			url: "bird://notifications/",
 		})
 
 		ipcMain.on(IpcChannels.NOTIF_RESIZE, (_, width: number, height: number) => {

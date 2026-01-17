@@ -11,7 +11,7 @@ export class NavBar extends View {
 			layer: ZLayer.NAVBAR,
 			preload: true,
 			backgroundColor: "#1a1a2e",
-			html: "navbar",
+			url: "bird://navbar/",
 		})
 
 		ipcMain.on(IpcChannels.NAVBAR_RESIZE, (_, height: number) => {

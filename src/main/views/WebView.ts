@@ -12,6 +12,7 @@ import { SCROLLBAR_CSS } from "./scrollbar.css"
  */
 export class WebView extends BrowserView {
 	constructor(
+		url: string,
 		partition: string,
 		private readonly routing: Partial<RoutingConfig> | null,
 		userAgent: string,
@@ -19,6 +20,7 @@ export class WebView extends BrowserView {
 	) {
 		super(
 			{
+				url,
 				partition,
 				userAgent: resolveUserAgent(userAgent),
 				preload: false,
@@ -29,10 +31,6 @@ export class WebView extends BrowserView {
 		setupDownloads(this.webContents.session, config$.get().downloads)
 		this.setupNavigation()
 		this.setupScrollbarCSS()
-	}
-
-	loadURL(url: string) {
-		this.webContents.loadURL(url)
 	}
 
 	goTo(url: string) {

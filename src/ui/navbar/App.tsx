@@ -55,25 +55,21 @@ export function App() {
 					<ArrowLeft />
 				</NavButton>
 			)}
-
 			{navBar.showNextButton && (
 				<NavButton onClick={() => window.bird.navigation.forward()} disabled={!navState.canGoForward}>
 					<ArrowRight />
 				</NavButton>
 			)}
-
 			{navBar.showRefreshButton && (
 				<NavButton onClick={() => (navState.isLoading ? window.bird.navigation.stop() : window.bird.navigation.reload())}>
 					{navState.isLoading ? <X strokeWidth={2.5} /> : <RotateCw />}
 				</NavButton>
 			)}
-
 			{navBar.showHomeButton && (
 				<NavButton onClick={() => (ctrlPressed ? window.bird.navigation.goHome() : window.bird.tabs.create(0))}>
 					{ctrlPressed ? <Home /> : <HousePlus />}
 				</NavButton>
 			)}
-
 			{isUrlMode && navBar.urlEditable ? (
 				<input ref={urlInputRef} type="text" className="url-input" defaultValue={navState.url} onKeyDown={handleUrlKeyDown} onBlur={exitUrlMode} />
 			) : (
@@ -90,7 +86,6 @@ export function App() {
 					))}
 				</div>
 			)}
-
 			{hasDownloads && (
 				<NavButton onClick={() => window.bird.downloads.toggle()}>{hasActiveDownloads ? <Loader2 className="spinning" /> : <Download />}</NavButton>
 			)}

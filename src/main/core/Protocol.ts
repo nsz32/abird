@@ -11,26 +11,21 @@ export function registerBirdScheme() {
 }
 
 /**
- * Setup the bird:// protocol handler.
- * Called inside app.whenReady()
+ * Setup the bird:// protocol handler for production.
+ * In dev, Views load directly from Vite server (bypassing this handler).
  */
 export function setupBirdProtocol() {
 	protocol.handle("bird", (request) => {
 		const { host, pathname } = new URL(request.url)
+		const rendererPath = join(__dirname, "../renderer")
+		console.log("PROTOCOL:", request.url, "host:", host, "pathname:", pathname)
 
-		// Dev mode: redirect to Vite server
-		if (process.env.ELECTRON_RENDERER_URL) {
-			const viteUrl = `${process.env.ELECTRON_RENDERER_URL}/${host}${pathname}`
-			return net.fetch(viteUrl)
-		}
-
-		// Prod mode: serve from built files
 		if (pathname.startsWith("/assets/")) {
-			const filePath = join(__dirname, "../renderer", pathname)
-			return net.fetch(pathToFileURL(filePath).toString())
+			return net.fetch(pathToFileURL(join(rendererPath, pathname)).toString())
 		}
-		const basePath = join(__dirname, "../renderer", host)
-		const filePath = pathname === "/" || pathname === "" ? join(basePath, "index.html") : join(basePath, pathname)
+
+		const filePath = pathname === "/" || pathname === "" ? join(rendererPath, host, "index.html") : join(rendererPath, host, pathname)
+
 		return net.fetch(pathToFileURL(filePath).toString())
 	})
 }

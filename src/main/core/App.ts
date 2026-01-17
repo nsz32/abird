@@ -43,7 +43,7 @@ export function startApp() {
 	watermark = new Watermark()
 	navBar = new NavBar()
 	notificationCenter = new NotificationCenter()
-	downloadsPanel = new OverlayPanel("downloads")
+	downloadsPanel = new OverlayPanel("bird://downloads/")
 	findBar = new FindBar()
 
 	// Register downloads panel as a content view (not a tab)

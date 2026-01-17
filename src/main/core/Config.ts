@@ -172,7 +172,7 @@ export function writeRawConfig(content: unknown): { success: boolean; errors?: s
 export function selectConfigMode() {
 	currentAppName = "config"
 	const resolved: ResolvedAppConfig = {
-		startUrl: "bird://config",
+		startUrl: "bird://config/",
 		partition: "",
 		theme: globalConfig.theme,
 		userAgent: "Bird",

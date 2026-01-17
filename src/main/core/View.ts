@@ -8,7 +8,6 @@ export interface ViewConfig {
 	backgroundColor?: string
 	partition?: string
 	userAgent?: string
-	html?: string
 	url?: string
 }
 
@@ -19,8 +18,7 @@ export interface ViewConfig {
 export abstract class View {
 	readonly webContentsView: WebContentsView
 	readonly webContents: Electron.WebContents
-	private readonly htmlPath?: string
-	private readonly initialUrl?: string
+	private readonly url?: string
 
 	constructor(config: ViewConfig) {
 		const sess = this.createSession(config.partition, config.userAgent)
@@ -36,10 +34,7 @@ export abstract class View {
 		this.webContentsView.setBackgroundColor(config.backgroundColor ?? "#00000000")
 		this.webContents = this.webContentsView.webContents
 
-		this.htmlPath = config.html
-		this.initialUrl = config.url
-
-		console.log("CONFIG", config.url)
+		this.url = config.url
 
 		ViewManager.get().addView(this.webContentsView, config.layer)
 	}
@@ -49,18 +44,11 @@ export abstract class View {
 	}
 
 	load() {
-		if (this.initialUrl) {
-			this.webContents.loadURL(this.initialUrl)
-			return
-		}
+		if (!this.url) return
 
-		if (this.htmlPath) {
-			if (process.env.ELECTRON_RENDERER_URL) {
-				this.webContents.loadURL(`${process.env.ELECTRON_RENDERER_URL}/${this.htmlPath}/`)
-			} else {
-				this.webContents.loadFile(join(__dirname, `../renderer/${this.htmlPath}/index.html`))
-			}
-		}
+		const finalUrl =
+			process.env.ELECTRON_RENDERER_URL && this.url.startsWith("bird://") ? `${process.env.ELECTRON_RENDERER_URL}/${this.url.slice(7)}/` : this.url
+		this.webContents.loadURL(finalUrl)
 	}
 
 	setBounds(bounds: Rectangle) {
