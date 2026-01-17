@@ -41,9 +41,9 @@ export function App() {
 
 	const renderPage = () => {
 		if (appName) {
-			return <AppPage name={appName} config={config} onChange={handleChange} t={t} />
+			return <AppPage name={appName} config={config} onChange={handleChange} />
 		}
-		return <HomePage config={config} configPath={configPath} onChange={handleChange} onNavigate={navigate} t={t} />
+		return <HomePage config={config} configPath={configPath} onChange={handleChange} onNavigate={navigate} />
 	}
 
 	return (

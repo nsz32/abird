@@ -1,6 +1,6 @@
 import { Box, Button, HStack, Heading, Text, VStack } from "@chakra-ui/react"
 import type { BirdConfig } from "@shared/config.schema"
-import type { TranslationKey } from "@shared/i18n/translations"
+import { useTranslations } from "@ui/shared/hooks"
 import { useEffect } from "react"
 import { PositionSelect } from "../components/PositionSelect"
 import { SwitchField } from "../components/SwitchField"
@@ -11,10 +11,10 @@ interface HomePageProps {
 	configPath: string
 	onChange: (config: BirdConfig) => void
 	onNavigate: (hash: string) => void
-	t: (key: TranslationKey) => string
 }
 
-export function HomePage({ config, configPath, onChange, onNavigate, t }: HomePageProps) {
+export function HomePage({ config, configPath, onChange, onNavigate }: HomePageProps) {
+	const { t } = useTranslations()
 	useEffect(() => {
 		document.title = t("settings.title")
 	}, [t])
@@ -40,7 +40,7 @@ export function HomePage({ config, configPath, onChange, onNavigate, t }: HomePa
 				</Heading>
 				<HStack justify="space-between">
 					<Text fontSize="sm">{t("settings.theme")}</Text>
-					<ThemeSelect value={config.theme} onChange={updateTheme} t={t} />
+					<ThemeSelect value={config.theme} onChange={updateTheme} />
 				</HStack>
 			</Box>
 
@@ -50,7 +50,7 @@ export function HomePage({ config, configPath, onChange, onNavigate, t }: HomePa
 				</Heading>
 				<HStack justify="space-between" py={2}>
 					<Text fontSize="sm">{t("navbar.position")}</Text>
-					<PositionSelect value={config.navBar?.position || "top"} onChange={(v) => updateNavBar("position", v)} t={t} />
+					<PositionSelect value={config.navBar?.position || "top"} onChange={(v) => updateNavBar("position", v)} />
 				</HStack>
 				<SwitchField label={t("navbar.visible")} checked={config.navBar?.visible ?? true} onChange={(v) => updateNavBar("visible", v)} />
 				<SwitchField label={t("navbar.autoHide")} checked={config.navBar?.autoHide ?? false} onChange={(v) => updateNavBar("autoHide", v)} />

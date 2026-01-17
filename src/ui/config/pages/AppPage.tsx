@@ -1,6 +1,5 @@
 import { Box, Button, Flex, HStack, Heading, Image, Input, Spinner, Text, VStack } from "@chakra-ui/react"
 import type { AppConfig, BirdConfig } from "@shared/config.schema"
-import type { TranslationKey } from "@shared/i18n/translations"
 import type { IconResult } from "@shared/types"
 import { useEffect, useState } from "react"
 import { PositionSelect } from "../components/PositionSelect"
@@ -11,10 +10,9 @@ interface AppPageProps {
 	name: string
 	config: BirdConfig
 	onChange: (config: BirdConfig) => void
-	t: (key: TranslationKey) => string
 }
 
-export function AppPage({ name, config, onChange, t }: AppPageProps) {
+export function AppPage({ name, config, onChange }: AppPageProps) {
 	const [icons, setIcons] = useState<IconResult[]>([])
 	const [iconSizes, setIconSizes] = useState<Record<string, { w: number; h: number }>>({})
 	const [fetchingIcons, setFetchingIcons] = useState(false)
@@ -100,7 +98,7 @@ export function AppPage({ name, config, onChange, t }: AppPageProps) {
 				</HStack>
 				<HStack justify="space-between" py={2}>
 					<Text fontSize="sm">Thème</Text>
-					<ThemeSelect value={app.theme || "system"} onChange={(v) => updateApp({ theme: v })} t={t} />
+					<ThemeSelect value={app.theme || "system"} onChange={(v) => updateApp({ theme: v })} />
 				</HStack>
 				<HStack justify="space-between" py={2} align="flex-start">
 					<Text fontSize="sm">Icône</Text>
@@ -125,12 +123,7 @@ export function AppPage({ name, config, onChange, t }: AppPageProps) {
 											onClick={() => handleSelectIcon(icon.url)}
 											opacity={savingIcon ? 0.5 : 1}
 										>
-											<Image
-												src={icon.url}
-												alt={icon.source}
-												onLoad={(e) => handleImageLoad(icon.url, e)}
-												fallback={<Box boxSize="32px" bg="bg.subtle" />}
-											/>
+											<Image src={icon.url} alt={icon.source} onLoad={(e) => handleImageLoad(icon.url, e)} />
 											<Text fontSize="xs" color="fg.muted">
 												{size ? `${size.w}x${size.h}` : "..."}
 											</Text>
@@ -154,7 +147,7 @@ export function AppPage({ name, config, onChange, t }: AppPageProps) {
 				</Heading>
 				<HStack justify="space-between" py={2}>
 					<Text fontSize="sm">Position</Text>
-					<PositionSelect value={app.navBar?.position || "top"} onChange={(v) => updateNavBar("position", v)} t={t} />
+					<PositionSelect value={app.navBar?.position || "top"} onChange={(v) => updateNavBar("position", v)} />
 				</HStack>
 				<SwitchField label="Visible" checked={app.navBar?.visible ?? true} onChange={(v) => updateNavBar("visible", v)} />
 				<SwitchField label="Masquage automatique" checked={app.navBar?.autoHide ?? false} onChange={(v) => updateNavBar("autoHide", v)} />

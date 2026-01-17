@@ -9,7 +9,8 @@ const statusIcons: Record<DownloadStatus, typeof CheckCircle> = {
 	blocked: ShieldX,
 }
 
-function ActiveDownloadItem({ item, t }: { item: ActiveDownload; t: ReturnType<typeof useTranslations>["t"] }) {
+function ActiveDownloadItem({ item }: { item: ActiveDownload }) {
+	const { t } = useTranslations()
 	const progress = item.totalBytes > 0 ? Math.round((item.receivedBytes / item.totalBytes) * 100) : 0
 	const hasProgress = item.totalBytes > 0
 
@@ -31,7 +32,8 @@ function ActiveDownloadItem({ item, t }: { item: ActiveDownload; t: ReturnType<t
 	)
 }
 
-function HistoryDownloadItem({ item, t }: { item: DownloadHistoryItem; t: ReturnType<typeof useTranslations>["t"] }) {
+function HistoryDownloadItem({ item }: { item: DownloadHistoryItem }) {
+	const { t } = useTranslations()
 	const Icon = statusIcons[item.status]
 
 	return (
@@ -69,10 +71,10 @@ export function App() {
 				) : (
 					<div className="downloads-list">
 						{active.map((item) => (
-							<ActiveDownloadItem key={item.id} item={item} t={t} />
+							<ActiveDownloadItem key={item.id} item={item} />
 						))}
 						{history.map((item) => (
-							<HistoryDownloadItem key={item.id} item={item} t={t} />
+							<HistoryDownloadItem key={item.id} item={item} />
 						))}
 					</div>
 				)}
