@@ -1,7 +1,7 @@
 import { IpcChannels } from "@shared/types"
 import { ipcMain } from "electron"
+import { readRawConfig, writeRawConfig } from "./config"
 import { DOWNLOADS_VIEW_ID } from "./core/App"
-import { readRawConfig, writeRawConfig } from "./core/Config"
 import { getTranslations } from "./core/I18n"
 import { ViewManager } from "./core/ViewManager"
 import {

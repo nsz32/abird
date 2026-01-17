@@ -1,9 +1,9 @@
 import { writeFileSync } from "node:fs"
 import { join } from "node:path"
 import { zodToJsonSchema } from "zod-to-json-schema"
-import { GlobalConfigSchema } from "../src/shared/config.schema"
+import { BirdConfigSchema } from "../src/shared/config.schema"
 
-const jsonSchema = zodToJsonSchema(GlobalConfigSchema, {
+const jsonSchema = zodToJsonSchema(BirdConfigSchema, {
 	name: "BirdConfig",
 	$refStrategy: "none",
 })

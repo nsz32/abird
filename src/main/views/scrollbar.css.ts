@@ -1,5 +1,5 @@
 export const SCROLLBAR_CSS = `
-:root {
+* {
   scrollbar-width: thin;
 }
 

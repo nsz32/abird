@@ -2,24 +2,33 @@ import {
 	type ActiveDownload,
 	type DownloadEvent,
 	type DownloadHistoryItem,
+	type EffectiveConfig,
 	type FindState,
 	IpcChannels,
 	type NavigationState,
 	type Notification,
-	type ResolvedAppConfig,
-	defaultNavBarConfig,
 } from "@shared/types"
 import type { Rectangle } from "electron"
 import type { Tab } from "../tabs/Tab"
 import { BroadcastEvent, BroadcastObservable, CombinedObservable, StateObservable } from "../utils/observable"
 
-// Config - single source of truth
-const DEFAULT_CONFIG: ResolvedAppConfig = {
+// Config effective - single source of truth
+const DEFAULT_CONFIG: EffectiveConfig = {
 	startUrl: "about:blank",
 	partition: "default",
 	theme: "system",
 	userAgent: "desktop:bird",
-	navBar: defaultNavBarConfig,
+	navBar: {
+		position: "top",
+		visible: true,
+		autoHide: false,
+		urlEditable: true,
+		allowSingleTabClose: false,
+		showBackButton: true,
+		showNextButton: true,
+		showRefreshButton: true,
+		showHomeButton: true,
+	},
 	routing: null,
 	downloads: {
 		directory: null,
@@ -30,7 +39,7 @@ const DEFAULT_CONFIG: ResolvedAppConfig = {
 	},
 }
 
-export const config$ = new StateObservable<ResolvedAppConfig>(DEFAULT_CONFIG)
+export const config$ = new StateObservable<EffectiveConfig>(DEFAULT_CONFIG)
 
 // Window
 export const windowBounds$ = new StateObservable<Rectangle>({ x: 0, y: 0, width: 0, height: 0 })

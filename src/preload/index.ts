@@ -3,12 +3,12 @@ import {
 	type ActiveDownload,
 	type DownloadEvent,
 	type DownloadHistoryItem,
+	type EffectiveConfig,
 	type FindState,
 	type IconFetchResult,
 	IpcChannels,
 	type NavigationState,
 	type Notification,
-	type ResolvedAppConfig,
 	type TabInfo,
 } from "@shared/types"
 import { contextBridge, ipcRenderer } from "electron"
@@ -46,7 +46,7 @@ contextBridge.exposeInMainWorld("bird", {
 		create: (index?: number) => ipcRenderer.invoke(IpcChannels.TABS_CREATE, index),
 	},
 	config: {
-		get: (): Promise<ResolvedAppConfig> => ipcRenderer.invoke(IpcChannels.CONFIG_GET),
+		get: (): Promise<EffectiveConfig> => ipcRenderer.invoke(IpcChannels.CONFIG_GET),
 	},
 	navbar: {
 		resize: (height: number) => ipcRenderer.send(IpcChannels.NAVBAR_RESIZE, height),

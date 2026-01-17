@@ -1,9 +1,14 @@
 {
 	"$schema": "./bird.config.schema.json",
-	"theme": "dark",
+	"theme": "system",
 	"downloads": {
 		"autoOpenMaxSize": "1M",
-		"autoOpenMimeTypes": ["image/*", "application/pdf", "video/*", "audio/*"],
+		"autoOpenMimeTypes": [
+			"image/*",
+			"application/pdf",
+			"video/*",
+			"audio/*"
+		],
 		"preventDuplicateDownloads": true
 	},
 	"navBar": {
@@ -55,6 +60,13 @@
 			"startUrl": "https://testpages.herokuapp.com/styled/index.html",
 			"routing": {
 				"internal": "https://testpages.herokuapp.com"
+			}
+		},
+		"dark": {
+			"partition": "test",
+			"startUrl": "https://int10h.org/oldschool-pc-fonts/fontlist/font?ibm_vga_8x16#-",
+			"routing": {
+				"internal": "https://int10h.org"
 			}
 		}
 	}

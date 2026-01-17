@@ -1,0 +1,126 @@
+/**
+ * Configuration store - gestion du fichier JSON utilisateur
+ * Responsabilités : lecture, écriture, validation, cache
+ */
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
+import { dirname } from "node:path"
+import { type BirdConfig, validateConfig } from "@shared/config.schema"
+import { paths } from "../utils/platform"
+
+let configPath: string = paths.config
+let birdConfig: BirdConfig = validateConfig({}).data
+let currentAppName: string | null = null
+
+export function getConfigPath(): string {
+	return configPath
+}
+
+export function getBirdConfig(): BirdConfig {
+	return birdConfig
+}
+
+export function getCurrentAppName(): string | null {
+	return currentAppName
+}
+
+export function setCurrentAppName(name: string | null): void {
+	currentAppName = name
+}
+
+export function loadConfig(customPath?: string | null): void {
+	if (customPath) configPath = customPath
+
+	if (!existsSync(configPath)) {
+		saveConfig()
+		return
+	}
+
+	parseConfigFile()
+}
+
+export function saveConfig(): void {
+	ensureConfigDir()
+	writeConfigFile()
+}
+
+export function getAvailableApps(): string[] {
+	return Object.keys(birdConfig.apps)
+}
+
+function parseConfigFile(): void {
+	try {
+		console.log("Loading config from:", configPath)
+		const content = readFileSync(configPath, "utf-8")
+		const loaded = JSON.parse(content)
+		const result = validateConfig(loaded)
+
+		if (result.unknownKeys.length > 0) {
+			console.warn("Unknown config keys:", result.unknownKeys.join(", "))
+		}
+
+		if (!result.success) {
+			console.error("Config validation errors:", result.errors.join("; "))
+		}
+
+		birdConfig = result.data
+		console.log("Config loaded, apps:", Object.keys(birdConfig.apps))
+	} catch (err) {
+		console.error("Failed to load config:", err)
+		birdConfig = validateConfig({}).data
+	}
+}
+
+function ensureConfigDir(): void {
+	const dir = dirname(configPath)
+	if (!existsSync(dir)) {
+		mkdirSync(dir, { recursive: true })
+	}
+}
+
+function writeConfigFile(): void {
+	try {
+		writeFileSync(configPath, JSON.stringify(birdConfig, null, "\t"))
+	} catch (err) {
+		console.error("Failed to save config:", err)
+	}
+}
+
+export interface RawUserConfig {
+	path: string
+	content: unknown
+}
+
+export function readRawConfig(): RawUserConfig {
+	if (!existsSync(configPath)) {
+		return { path: configPath, content: {} }
+	}
+	try {
+		const content = readFileSync(configPath, "utf-8")
+		return { path: configPath, content: JSON.parse(content) }
+	} catch {
+		return { path: configPath, content: {} }
+	}
+}
+
+let onConfigChanged: (() => void) | null = null
+
+export function setOnConfigChanged(callback: () => void): void {
+	onConfigChanged = callback
+}
+
+export function writeRawConfig(content: unknown): { success: boolean; errors?: string[] } {
+	const result = validateConfig(content)
+	if (!result.success) {
+		return { success: false, errors: result.errors }
+	}
+
+	ensureConfigDir()
+	try {
+		writeFileSync(configPath, JSON.stringify(content, null, "\t"))
+		birdConfig = result.data
+		onConfigChanged?.()
+		return { success: true }
+	} catch (err) {
+		return { success: false, errors: [(err as Error).message] }
+	}
+}

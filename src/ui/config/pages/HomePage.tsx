@@ -1,5 +1,5 @@
 import { Box, Button, HStack, Heading, Text, VStack } from "@chakra-ui/react"
-import type { GlobalConfig } from "@shared/config.schema"
+import type { BirdConfig } from "@shared/config.schema"
 import type { TranslationKey } from "@shared/i18n/translations"
 import { useEffect } from "react"
 import { PositionSelect } from "../components/PositionSelect"
@@ -7,9 +7,9 @@ import { SwitchField } from "../components/SwitchField"
 import { ThemeSelect } from "../components/ThemeSelect"
 
 interface HomePageProps {
-	config: GlobalConfig
+	config: BirdConfig
 	configPath: string
-	onChange: (config: GlobalConfig) => void
+	onChange: (config: BirdConfig) => void
 	onNavigate: (hash: string) => void
 	t: (key: TranslationKey) => string
 }
@@ -19,7 +19,7 @@ export function HomePage({ config, configPath, onChange, onNavigate, t }: HomePa
 		document.title = t("settings.title")
 	}, [t])
 
-	const updateTheme = (theme: GlobalConfig["theme"]) => {
+	const updateTheme = (theme: BirdConfig["theme"]) => {
 		onChange({ ...config, theme })
 	}
 

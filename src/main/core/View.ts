@@ -1,5 +1,6 @@
 import { join } from "node:path"
 import { type Rectangle, WebContentsView, session } from "electron"
+import { SCROLLBAR_CSS } from "../views/scrollbar.css"
 import { ViewManager, type ZLayer } from "./ViewManager"
 
 export interface ViewConfig {
@@ -35,6 +36,8 @@ export abstract class View {
 		this.webContents = this.webContentsView.webContents
 
 		this.url = config.url
+
+		this.webContents.on("did-navigate", () => this.webContents.insertCSS(SCROLLBAR_CSS))
 
 		ViewManager.get().addView(this.webContentsView, config.layer)
 	}

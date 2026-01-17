@@ -1,7 +1,7 @@
 import { join } from "node:path"
 import { app } from "electron"
+import { getAvailableApps, loadConfig, selectApp, selectConfigMode } from "./config"
 import { startApp } from "./core/App"
-import { getAvailableApps, loadConfig, selectApp, selectConfigMode } from "./core/Config"
 import { initI18n } from "./core/I18n"
 import { registerBirdScheme, setupBirdProtocol } from "./core/Protocol"
 

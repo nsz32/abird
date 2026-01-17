@@ -1,4 +1,4 @@
-import type { NavigationState, ResolvedAppConfig, TabInfo } from "@shared/types"
+import type { EffectiveConfig, NavigationState, TabInfo } from "@shared/types"
 import { useCallback, useEffect, useRef, useState } from "react"
 
 const EXTERNAL_INDICATOR_DURATION = 800
@@ -11,7 +11,7 @@ export function useNavbarState() {
 		canGoForward: false,
 		isLoading: false,
 	})
-	const [config, setConfig] = useState<ResolvedAppConfig | null>(null)
+	const [config, setConfig] = useState<EffectiveConfig | null>(null)
 	const [tabs, setTabs] = useState<TabInfo[]>([])
 	const [externalTabIds, setExternalTabIds] = useState<Set<string>>(new Set())
 	const [isUrlMode, setIsUrlMode] = useState(false)

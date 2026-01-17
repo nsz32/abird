@@ -10,7 +10,7 @@ export type {
 	RoutingConfig,
 	DownloadConfig,
 	AppConfig,
-	GlobalConfig,
+	BirdConfig,
 } from "./config.schema"
 
 // I18n types
@@ -151,20 +151,7 @@ export const IpcChannels = {
 // Type utilitaire pour les valeurs de IpcChannels
 export type IpcChannel = (typeof IpcChannels)[keyof typeof IpcChannels]
 
-// Valeurs par défaut (définies ici pour éviter d'importer zod dans preload)
-import type { DownloadConfig, NavBarConfig, RoutingConfig, ThemeMode } from "./config.schema"
-
-export const defaultNavBarConfig: NavBarConfig = {
-	position: "top",
-	visible: true,
-	autoHide: false,
-	urlEditable: true,
-	showBackForward: true,
-	showReload: true,
-	allowSingleTabClose: false,
-}
-
-export const defaultDownloadConfig: DownloadConfig = {}
+import type { RoutingConfig, ThemeMode } from "./config.schema"
 
 // Config navbar résolue (boutons individuels)
 export interface ResolvedNavBarConfig {
@@ -188,8 +175,8 @@ export interface ResolvedDownloadConfig {
 	preventDuplicateDownloads: boolean
 }
 
-// Config app complète et résolue (tous champs required)
-export interface ResolvedAppConfig {
+// Config effective (computée selon BirdConfig + contexte)
+export interface EffectiveConfig {
 	startUrl: string
 	partition: string
 	theme: ThemeMode
@@ -221,7 +208,7 @@ export interface BirdApi {
 		create: (index?: number) => Promise<void>
 	}
 	config: {
-		get: () => Promise<ResolvedAppConfig>
+		get: () => Promise<EffectiveConfig>
 	}
 	navbar: {
 		resize: (height: number) => void

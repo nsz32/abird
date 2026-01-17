@@ -1,5 +1,5 @@
 import { Box, Button, Flex, HStack, Heading, Image, Input, Spinner, Text, VStack } from "@chakra-ui/react"
-import type { AppConfig, GlobalConfig } from "@shared/config.schema"
+import type { AppConfig, BirdConfig } from "@shared/config.schema"
 import type { TranslationKey } from "@shared/i18n/translations"
 import type { IconResult } from "@shared/types"
 import { useEffect, useState } from "react"
@@ -9,8 +9,8 @@ import { ThemeSelect } from "../components/ThemeSelect"
 
 interface AppPageProps {
 	name: string
-	config: GlobalConfig
-	onChange: (config: GlobalConfig) => void
+	config: BirdConfig
+	onChange: (config: BirdConfig) => void
 	t: (key: TranslationKey) => string
 }
 

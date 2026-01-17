@@ -51,19 +51,19 @@ export const AppConfigSchema = z.object({
 })
 export type AppConfig = z.infer<typeof AppConfigSchema>
 
-// Configuration globale
-export const GlobalConfigSchema = z.object({
+// Configuration racine (fichier JSON utilisateur)
+export const BirdConfigSchema = z.object({
 	theme: ThemeModeSchema.default("system"),
 	navBar: NavBarConfigSchema.partial().default({}),
 	downloads: DownloadConfigSchema.default({}),
 	apps: z.record(z.string(), AppConfigSchema).default({}),
 })
-export type GlobalConfig = z.infer<typeof GlobalConfigSchema>
+export type BirdConfig = z.infer<typeof BirdConfigSchema>
 
 // Validation avec gestion des clés inconnues
 interface ValidationResult {
 	success: boolean
-	data: GlobalConfig
+	data: BirdConfig
 	unknownKeys: string[]
 	errors: string[]
 }
@@ -104,15 +104,15 @@ function collectUnknownKeys(data: unknown, schema: z.ZodObject<z.ZodRawShape>, p
 }
 
 export function validateConfig(data: unknown): ValidationResult {
-	const unknownKeys = collectUnknownKeys(data, GlobalConfigSchema)
+	const unknownKeys = collectUnknownKeys(data, BirdConfigSchema)
 
 	// Use passthrough to keep unknown keys during parsing (won't fail)
-	const result = GlobalConfigSchema.passthrough().safeParse(data)
+	const result = BirdConfigSchema.passthrough().safeParse(data)
 
 	if (result.success) {
 		return {
 			success: true,
-			data: result.data as GlobalConfig,
+			data: result.data as BirdConfig,
 			unknownKeys,
 			errors: [],
 		}
@@ -120,8 +120,12 @@ export function validateConfig(data: unknown): ValidationResult {
 
 	return {
 		success: false,
-		data: GlobalConfigSchema.parse({}) as GlobalConfig,
+		data: BirdConfigSchema.parse({}) as BirdConfig,
 		unknownKeys,
 		errors: result.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`),
 	}
 }
+
+// Valeurs par défaut (générées depuis Zod - source unique de vérité)
+export const DEFAULT_NAVBAR: NavBarConfig = NavBarConfigSchema.parse({})
+export const DEFAULT_DOWNLOADS: DownloadConfig = {}

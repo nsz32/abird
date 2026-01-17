@@ -1,5 +1,5 @@
 import { Container, HStack, Heading, IconButton, Spinner } from "@chakra-ui/react"
-import type { GlobalConfig } from "@shared/config.schema"
+import type { BirdConfig } from "@shared/config.schema"
 import { useEffect, useState } from "react"
 import { AppPage } from "./pages/AppPage"
 import { HomePage } from "./pages/HomePage"
@@ -9,17 +9,17 @@ import { useTranslations } from "./useTranslations"
 export function App() {
 	const { route, navigate, goBack } = useHashRouter()
 	const { t, ready } = useTranslations()
-	const [config, setConfig] = useState<GlobalConfig | null>(null)
+	const [config, setConfig] = useState<BirdConfig | null>(null)
 	const [configPath, setConfigPath] = useState("")
 
 	useEffect(() => {
 		window.bird.settings.userconfig.read().then((result) => {
-			setConfig(result.content as GlobalConfig)
+			setConfig(result.content as BirdConfig)
 			setConfigPath(result.path)
 		})
 	}, [])
 
-	const handleChange = async (newConfig: GlobalConfig) => {
+	const handleChange = async (newConfig: BirdConfig) => {
 		setConfig(newConfig)
 		const result = await window.bird.settings.userconfig.write(newConfig)
 		if (!result.success) {

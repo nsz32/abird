@@ -4,7 +4,6 @@ import { config$ } from "../core/states"
 import { setupDownloads } from "../services/DownloadManager"
 import { resolveUserAgent } from "../utils/userAgents"
 import { BrowserView, type BrowserViewCallbacks } from "./BrowserView"
-import { SCROLLBAR_CSS } from "./scrollbar.css"
 
 /**
  * View for external web content (http/https).
@@ -30,7 +29,6 @@ export class WebView extends BrowserView {
 
 		setupDownloads(this.webContents.session, config$.get().downloads)
 		this.setupNavigation()
-		this.setupScrollbarCSS()
 	}
 
 	goTo(url: string) {
@@ -64,11 +62,5 @@ export class WebView extends BrowserView {
 		} else {
 			this.callbacks.onExternalUrl(url)
 		}
-	}
-
-	private setupScrollbarCSS() {
-		this.webContents.on("did-navigate", () => {
-			this.webContents.insertCSS(SCROLLBAR_CSS)
-		})
 	}
 }
