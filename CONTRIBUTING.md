@@ -6,14 +6,14 @@
 
 ### Principles
 
-- **No comments needed** — If code requires a comment, rewrite it to be clearer
+- **Document functions** — Brief comment before functions, avoid comments inside (code should be self-explanatory)
 - **Logical grouping** — Use blank lines to separate logical blocks within functions
 - **DRY, KISS, YAGNI** — No premature abstractions, no over-engineering
 - **SOLID** — Single responsibility, clean interfaces
 
 ### What We Avoid
 
-- Comments explaining "what" (code should be obvious)
+- Inline comments explaining "what" (code should be obvious)
 - Abstractions for single-use cases
 - Feature flags or backwards-compatibility shims
 - Defensive coding against impossible scenarios
