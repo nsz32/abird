@@ -1,8 +1,9 @@
-import type { Notification } from "@shared/types"
+import type { Notification, NotificationType } from "@shared/types"
+import { useBirdState } from "@ui/shared/hooks"
 import { AlertCircle, Download, ExternalLink, Info, X } from "lucide-react"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 
-const iconMap = {
+const iconMap: Record<NotificationType, typeof Info> = {
 	info: Info,
 	"external-link": ExternalLink,
 	error: AlertCircle,
@@ -34,14 +35,8 @@ function NotificationItem({ notification, onDismiss }: { notification: Notificat
 }
 
 export function App() {
-	const [notifications, setNotifications] = useState<Notification[]>([])
+	const notifications = useBirdState(window.bird.notifications.getList, window.bird.notifications.onListChanged, [])
 	const containerRef = useRef<HTMLDivElement>(null)
-
-	useEffect(() => {
-		window.bird.notifications.getList().then(setNotifications)
-		const unsubscribe = window.bird.notifications.onListChanged(setNotifications)
-		return unsubscribe
-	}, [])
 
 	useEffect(() => {
 		const container = containerRef.current

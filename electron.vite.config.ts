@@ -6,6 +6,11 @@ const sharedAlias = {
 	"@shared": resolve(__dirname, "src/shared"),
 }
 
+const rendererAlias = {
+	...sharedAlias,
+	"@ui": resolve(__dirname, "src/ui"),
+}
+
 export default defineConfig({
 	main: {
 		plugins: [externalizeDepsPlugin()],
@@ -37,7 +42,7 @@ export default defineConfig({
 	renderer: {
 		root: "src/ui",
 		plugins: [react()],
-		resolve: { alias: sharedAlias },
+		resolve: { alias: rendererAlias },
 		build: {
 			rollupOptions: {
 				input: {

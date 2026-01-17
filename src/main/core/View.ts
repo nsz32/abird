@@ -28,6 +28,7 @@ export abstract class View {
 			webPreferences: {
 				nodeIntegration: false,
 				contextIsolation: true,
+				sandbox: true,
 				session: sess,
 				preload: this.resolvePreload(config.preload),
 			},

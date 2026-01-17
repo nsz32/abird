@@ -152,6 +152,7 @@ export const IpcChannels = {
 export type IpcChannel = (typeof IpcChannels)[keyof typeof IpcChannels]
 
 import type { RoutingConfig, ThemeMode } from "./config.schema"
+import type { Translations } from "./i18n/translations"
 
 // Config navbar résolue (boutons individuels)
 export interface ResolvedNavBarConfig {

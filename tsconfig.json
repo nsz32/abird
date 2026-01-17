@@ -21,7 +21,8 @@
 		"verbatimModuleSyntax": true,
 		"baseUrl": ".",
 		"paths": {
-			"@shared/*": ["src/shared/*"]
+			"@shared/*": ["src/shared/*"],
+			"@ui/*": ["src/ui/*"]
 		}
 	},
 	"include": ["src/**/*", "electron.vite.config.ts"],

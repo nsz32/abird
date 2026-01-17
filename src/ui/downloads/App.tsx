@@ -1,15 +1,15 @@
-import type { ActiveDownload, DownloadHistoryItem } from "@shared/types"
+import type { ActiveDownload, DownloadHistoryItem, DownloadStatus } from "@shared/types"
+import { useBirdState, useTranslations } from "@ui/shared/hooks"
 import { AlertCircle, CheckCircle, Download, Loader2, ShieldX, XCircle } from "lucide-react"
-import { useEffect, useState } from "react"
 
-const statusConfig = {
-	completed: { icon: CheckCircle, label: "Terminé", className: "completed" },
-	cancelled: { icon: XCircle, label: "Annulé", className: "cancelled" },
-	failed: { icon: AlertCircle, label: "Échec", className: "failed" },
-	blocked: { icon: ShieldX, label: "Bloqué", className: "blocked" },
+const statusIcons: Record<DownloadStatus, typeof CheckCircle> = {
+	completed: CheckCircle,
+	cancelled: XCircle,
+	failed: AlertCircle,
+	blocked: ShieldX,
 }
 
-function ActiveDownloadItem({ item }: { item: ActiveDownload }) {
+function ActiveDownloadItem({ item, t }: { item: ActiveDownload; t: ReturnType<typeof useTranslations>["t"] }) {
 	const progress = item.totalBytes > 0 ? Math.round((item.receivedBytes / item.totalBytes) * 100) : 0
 	const hasProgress = item.totalBytes > 0
 
@@ -24,25 +24,24 @@ function ActiveDownloadItem({ item }: { item: ActiveDownload }) {
 					</div>
 				)}
 				<div className="download-status">
-					<span>{hasProgress ? `${progress}%` : "En cours..."}</span>
+					<span>{hasProgress ? `${progress}%` : t("downloads.inProgress")}</span>
 				</div>
 			</div>
 		</div>
 	)
 }
 
-function HistoryDownloadItem({ item }: { item: DownloadHistoryItem }) {
-	const config = statusConfig[item.status]
-	const Icon = config.icon
+function HistoryDownloadItem({ item, t }: { item: DownloadHistoryItem; t: ReturnType<typeof useTranslations>["t"] }) {
+	const Icon = statusIcons[item.status]
 
 	return (
-		<div className={`download-item ${config.className}`}>
+		<div className={`download-item ${item.status}`}>
 			<Download size={20} className="download-icon" />
 			<div className="download-content">
 				<div className="download-filename">{item.filename}</div>
 				<div className="download-status">
 					<Icon size={14} />
-					<span>{item.message || config.label}</span>
+					<span>{item.message || t(`downloads.status.${item.status}`)}</span>
 				</div>
 			</div>
 		</div>
@@ -50,19 +49,11 @@ function HistoryDownloadItem({ item }: { item: DownloadHistoryItem }) {
 }
 
 export function App() {
-	const [active, setActive] = useState<ActiveDownload[]>([])
-	const [history, setHistory] = useState<DownloadHistoryItem[]>([])
+	const { t, ready } = useTranslations()
+	const active = useBirdState(window.bird.downloads.getActive, window.bird.downloads.onActiveChanged, [])
+	const history = useBirdState(window.bird.downloads.getHistory, window.bird.downloads.onHistoryChanged, [])
 
-	useEffect(() => {
-		window.bird.downloads.getActive().then(setActive)
-		window.bird.downloads.getHistory().then(setHistory)
-		const unsubActive = window.bird.downloads.onActiveChanged(setActive)
-		const unsubHistory = window.bird.downloads.onHistoryChanged(setHistory)
-		return () => {
-			unsubActive()
-			unsubHistory()
-		}
-	}, [])
+	if (!ready) return null
 
 	const isEmpty = active.length === 0 && history.length === 0
 
@@ -71,17 +62,17 @@ export function App() {
 			<div className="downloads-container">
 				<div className="downloads-header">
 					<Download size={24} />
-					<span>Téléchargements</span>
+					<span>{t("downloads.title")}</span>
 				</div>
 				{isEmpty ? (
-					<div className="downloads-empty">Aucun téléchargement</div>
+					<div className="downloads-empty">{t("downloads.empty")}</div>
 				) : (
 					<div className="downloads-list">
 						{active.map((item) => (
-							<ActiveDownloadItem key={item.id} item={item} />
+							<ActiveDownloadItem key={item.id} item={item} t={t} />
 						))}
 						{history.map((item) => (
-							<HistoryDownloadItem key={item.id} item={item} />
+							<HistoryDownloadItem key={item.id} item={item} t={t} />
 						))}
 					</div>
 				)}

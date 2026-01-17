@@ -1,18 +1,13 @@
-import type { EffectiveConfig, NavigationState, TabInfo } from "@shared/types"
+import { useBirdState } from "@ui/shared/hooks"
 import { useCallback, useEffect, useRef, useState } from "react"
 
 const EXTERNAL_INDICATOR_DURATION = 800
 
 export function useNavbarState() {
-	const [navState, setNavState] = useState<NavigationState>({
-		url: "",
-		title: "",
-		canGoBack: false,
-		canGoForward: false,
-		isLoading: false,
-	})
-	const [config, setConfig] = useState<EffectiveConfig | null>(null)
-	const [tabs, setTabs] = useState<TabInfo[]>([])
+	const config = useBirdState(window.bird.config.get, () => () => {})
+	const navState = useBirdState(window.bird.navigation.getState, window.bird.navigation.onStateChanged)
+	const tabs = useBirdState(window.bird.tabs.getList, window.bird.tabs.onListChanged)
+
 	const [externalTabIds, setExternalTabIds] = useState<Set<string>>(new Set())
 	const [isUrlMode, setIsUrlMode] = useState(false)
 	const containerRef = useRef<HTMLDivElement>(null)
@@ -31,12 +26,6 @@ export function useNavbarState() {
 	}, [])
 
 	useEffect(() => {
-		window.bird.config.get().then(setConfig)
-		window.bird.navigation.getState().then(setNavState)
-		window.bird.tabs.getList().then(setTabs)
-
-		const unsubscribeNav = window.bird.navigation.onStateChanged(setNavState)
-		const unsubscribeTabs = window.bird.tabs.onListChanged(setTabs)
 		const unsubscribeExternal = window.bird.tabs.onExternalOpened((tabId) => {
 			setExternalTabIds((prev) => new Set(prev).add(tabId))
 			setTimeout(() => {
@@ -50,8 +39,6 @@ export function useNavbarState() {
 		const unsubscribeFocusUrl = window.bird.commands.onFocusUrl(enterUrlMode)
 
 		return () => {
-			unsubscribeNav()
-			unsubscribeTabs()
 			unsubscribeExternal()
 			unsubscribeFocusUrl()
 		}

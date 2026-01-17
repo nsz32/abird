@@ -32,7 +32,7 @@ export function App() {
 		return window.bird.keyboard.onCtrlChanged(setCtrlPressed)
 	}, [])
 
-	if (!config) return null
+	if (!config || !navState || !tabs) return null
 
 	const { navBar } = config
 

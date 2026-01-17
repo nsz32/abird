@@ -1,10 +1,12 @@
 import type { FindState } from "@shared/types"
+import { useTranslations } from "@ui/shared/hooks"
 import { ChevronDown, ChevronUp, X } from "lucide-react"
 import { type KeyboardEvent, useEffect, useRef, useState } from "react"
 
 const DEBOUNCE_MS = 250
 
 export function App() {
+	const { t } = useTranslations()
 	const [findState, setFindState] = useState<FindState>({ text: "", activeMatch: 0, totalMatches: 0 })
 	const [inputValue, setInputValue] = useState("")
 	const inputRef = useRef<HTMLInputElement>(null)
@@ -55,7 +57,6 @@ export function App() {
 		if (!inputValue) handleClose()
 	}
 
-	// Don't show results until search for current text is complete
 	const isStale = inputValue !== findState.text
 	const hasResults = findState.totalMatches > 0
 	const noResults = !isStale && inputValue.length > 0 && findState.totalMatches === 0
@@ -66,7 +67,7 @@ export function App() {
 				ref={inputRef}
 				type="text"
 				className={`find-input ${noResults ? "no-results" : ""}`}
-				placeholder="Rechercher..."
+				placeholder={t("find.placeholder")}
 				value={inputValue}
 				onChange={(e) => handleSearch(e.target.value)}
 				onKeyDown={handleKeyDown}
@@ -75,13 +76,13 @@ export function App() {
 			<span className={`find-count ${noResults ? "no-results" : ""}`}>
 				{inputValue.length > 0 && !isStale ? (hasResults ? `${findState.activeMatch} / ${findState.totalMatches}` : "0") : ""}
 			</span>
-			<button type="button" className="find-button" onClick={() => window.bird.find.prev()} disabled={!hasResults} title="Précédent (Shift+Enter)">
+			<button type="button" className="find-button" onClick={() => window.bird.find.prev()} disabled={!hasResults} title={t("find.previous")}>
 				<ChevronUp size={16} />
 			</button>
-			<button type="button" className="find-button" onClick={() => window.bird.find.next()} disabled={!hasResults} title="Suivant (Enter)">
+			<button type="button" className="find-button" onClick={() => window.bird.find.next()} disabled={!hasResults} title={t("find.next")}>
 				<ChevronDown size={16} />
 			</button>
-			<button type="button" className="find-button close" onClick={handleClose} title="Fermer (Échap)">
+			<button type="button" className="find-button close" onClick={handleClose} title={t("find.close")}>
 				<X size={16} />
 			</button>
 		</div>
