@@ -1,10 +1,12 @@
 import { randomBytes } from "node:crypto"
-import { existsSync, mkdirSync, unlinkSync, writeFileSync } from "node:fs"
+import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 import type { IconFetchResult, IconResult, IconSource } from "@shared/types"
-import { net, WebContentsView } from "electron"
+import { dialog, net, WebContentsView } from "electron"
 import { Jimp } from "jimp"
 import { paths } from "../utils/platform"
+
+const ICON_SIZE = 128
 
 const PAGE_LOAD_TIMEOUT = 10000
 const FETCH_TIMEOUT = 5000
@@ -199,7 +201,12 @@ function ensureIconsDir(): void {
 	}
 }
 
-export async function saveIcon(appName: string, base64: string, oldIcon?: string): Promise<string> {
+export async function saveIcon(
+	appName: string,
+	base64: string,
+	oldIcon?: string,
+	resize?: { w: number; h: number },
+): Promise<string> {
 	ensureIconsDir()
 
 	// Décoder base64
@@ -208,6 +215,11 @@ export async function saveIcon(appName: string, base64: string, oldIcon?: string
 
 	// Convertir en PNG avec jimp
 	const image = await Jimp.fromBuffer(buffer)
+
+	if (resize) {
+		image.resize({ w: resize.w, h: resize.h })
+	}
+
 	const pngBuffer = await image.getBuffer("image/png")
 
 	// Générer nom et sauvegarder
@@ -241,4 +253,20 @@ export function getIconPath(filename: string): string | null {
 
 	const path = join(paths.icons, filename)
 	return existsSync(path) ? path : null
+}
+
+export async function importIconFile(appName: string, oldIcon?: string): Promise<string | null> {
+	const result = await dialog.showOpenDialog({
+		filters: [{ name: "Images", extensions: ["png", "jpg", "jpeg", "gif", "webp", "ico", "svg"] }],
+		properties: ["openFile"],
+	})
+
+	if (result.canceled || !result.filePaths[0]) {
+		return null
+	}
+
+	const buffer = readFileSync(result.filePaths[0])
+	const base64 = `data:image/png;base64,${buffer.toString("base64")}`
+
+	return saveIcon(appName, base64, oldIcon, { w: ICON_SIZE, h: ICON_SIZE })
 }

@@ -1,54 +1,39 @@
-import { Box, Button, Flex, HStack, Heading, Image, Input, Spinner, Text, VStack } from "@chakra-ui/react"
-import type { AppConfig, BirdConfig } from "@shared/config.schema"
+import { Button, Flex, HStack, Image, Input, Spinner, Text, VStack } from "@chakra-ui/react"
+import type { AppConfig, BirdConfig, NavBarConfig } from "@shared/config.schema"
 import type { IconResult } from "@shared/types"
+import { useTranslations } from "@ui/shared/hooks"
 import { useEffect, useState } from "react"
-import { PositionSelect } from "../components/PositionSelect"
-import { SwitchField } from "../components/SwitchField"
+import { ConfigSection } from "../components/ConfigSection"
+import { NavBarConfigForm } from "../components/NavBarConfigForm"
 import { ThemeSelect } from "../components/ThemeSelect"
 
 interface AppPageProps {
 	name: string
 	config: BirdConfig
 	onChange: (config: BirdConfig) => void
+	onNavigate: (hash: string) => void
 }
 
-export function AppPage({ name, config, onChange }: AppPageProps) {
+export function AppPage({ name, config, onChange, onNavigate }: AppPageProps) {
+	const { t } = useTranslations()
 	const [icons, setIcons] = useState<IconResult[]>([])
 	const [iconSizes, setIconSizes] = useState<Record<string, { w: number; h: number }>>({})
 	const [fetchingIcons, setFetchingIcons] = useState(false)
 	const [savingIcon, setSavingIcon] = useState(false)
 
+	const app = config.apps[name]
+
 	useEffect(() => {
 		document.title = `Bird - ${name}`
-		setIcons([]) // Reset icons when app changes
+		setIcons([])
 		setIconSizes({})
 	}, [name])
 
-	const handleImageLoad = (url: string, e: React.SyntheticEvent<HTMLImageElement>) => {
-		const img = e.currentTarget
-		setIconSizes((prev) => ({ ...prev, [url]: { w: img.naturalWidth, h: img.naturalHeight } }))
-	}
-
-	const handleSelectIcon = async (base64: string) => {
-		if (savingIcon) return
-		setSavingIcon(true)
-		try {
-			const filename = await window.bird.icons.save(name, base64, app.icon)
-			updateApp({ icon: filename })
-		} catch (err) {
-			console.error("Failed to save icon:", err)
-		} finally {
-			setSavingIcon(false)
-		}
-	}
-
-	const app = config.apps[name]
-
 	if (!app) {
 		return (
-			<Box bg="bg.panel" p={4} borderRadius="lg">
-				<Text>Application "{name}" non trouvée</Text>
-			</Box>
+			<ConfigSection title={name}>
+				<Text>{t("app.notFound")}</Text>
+			</ConfigSection>
 		)
 	}
 
@@ -62,10 +47,22 @@ export function AppPage({ name, config, onChange }: AppPageProps) {
 		})
 	}
 
-	const updateNavBar = (key: string, value: boolean | string) => {
-		updateApp({
-			navBar: { ...app.navBar, [key]: value },
-		})
+	const updateNavBar = (key: keyof NavBarConfig, value: boolean | string | undefined) => {
+		const newNavBar = { ...app.navBar, [key]: value }
+
+		if (value === undefined) {
+			delete newNavBar[key]
+		}
+
+		const hasValues = Object.keys(newNavBar).length > 0
+		updateApp({ navBar: hasValues ? newNavBar : undefined })
+	}
+
+	const handleDeleteApp = () => {
+		if (!confirm(t("app.deleteConfirm"))) return
+		const { [name]: _, ...rest } = config.apps
+		onChange({ ...config, apps: rest })
+		onNavigate("#")
 	}
 
 	const handleFetchIcons = async () => {
@@ -82,30 +79,65 @@ export function AppPage({ name, config, onChange }: AppPageProps) {
 		}
 	}
 
+	const handleSelectIcon = async (base64: string) => {
+		if (savingIcon) return
+		setSavingIcon(true)
+		try {
+			const filename = await window.bird.icons.save(name, base64, app.icon)
+			updateApp({ icon: filename })
+		} catch (err) {
+			console.error("Failed to save icon:", err)
+		} finally {
+			setSavingIcon(false)
+		}
+	}
+
+	const handleImportIcon = async () => {
+		if (savingIcon) return
+		setSavingIcon(true)
+		try {
+			const filename = await window.bird.icons.importFile(name, app.icon)
+			if (filename) {
+				updateApp({ icon: filename })
+			}
+		} catch (err) {
+			console.error("Failed to import icon:", err)
+		} finally {
+			setSavingIcon(false)
+		}
+	}
+
+	const handleImageLoad = (url: string, e: React.SyntheticEvent<HTMLImageElement>) => {
+		const img = e.currentTarget
+		setIconSizes((prev) => ({ ...prev, [url]: { w: img.naturalWidth, h: img.naturalHeight } }))
+	}
+
 	return (
 		<VStack align="stretch" gap={4}>
-			<Box bg="bg.panel" p={4} borderRadius="lg">
-				<Heading size="md" mb={4}>
-					Général
-				</Heading>
+			<ConfigSection title={t("app.general")}>
 				<HStack justify="space-between" py={2}>
-					<Text fontSize="sm">URL de démarrage</Text>
+					<Text fontSize="sm">{t("app.startUrl")}</Text>
 					<Input size="sm" width="200px" value={app.startUrl} onChange={(e) => updateApp({ startUrl: e.target.value })} />
 				</HStack>
 				<HStack justify="space-between" py={2}>
-					<Text fontSize="sm">Partition</Text>
+					<Text fontSize="sm">{t("app.partition")}</Text>
 					<Input size="sm" width="200px" value={app.partition} onChange={(e) => updateApp({ partition: e.target.value })} />
 				</HStack>
 				<HStack justify="space-between" py={2}>
-					<Text fontSize="sm">Thème</Text>
+					<Text fontSize="sm">{t("settings.theme")}</Text>
 					<ThemeSelect value={app.theme || "system"} onChange={(v) => updateApp({ theme: v })} />
 				</HStack>
 				<HStack justify="space-between" py={2} align="flex-start">
-					<Text fontSize="sm">Icône</Text>
+					<Text fontSize="sm">{t("app.icon")}</Text>
 					<VStack align="flex-end" gap={2}>
-						<Button size="sm" onClick={handleFetchIcons} disabled={fetchingIcons || !app.startUrl}>
-							{fetchingIcons ? <Spinner size="sm" /> : "Obtenir icônes"}
-						</Button>
+						<HStack gap={2}>
+							<Button size="sm" onClick={handleFetchIcons} disabled={fetchingIcons || savingIcon || !app.startUrl}>
+								{fetchingIcons ? <Spinner size="sm" /> : t("app.fetchIcons")}
+							</Button>
+							<Button size="sm" variant="outline" onClick={handleImportIcon} disabled={savingIcon}>
+								{savingIcon ? <Spinner size="sm" /> : t("app.importIcon")}
+							</Button>
+						</HStack>
 						{icons.length > 0 && (
 							<Flex wrap="wrap" gap={3}>
 								{icons.map((icon) => {
@@ -134,31 +166,20 @@ export function AppPage({ name, config, onChange }: AppPageProps) {
 						)}
 						{app.icon && (
 							<Text fontSize="xs" color="fg.muted">
-								Icône : {app.icon}
+								{app.icon}
 							</Text>
 						)}
 					</VStack>
 				</HStack>
-			</Box>
+			</ConfigSection>
 
-			<Box bg="bg.panel" p={4} borderRadius="lg">
-				<Heading size="md" mb={4}>
-					Barre de navigation
-				</Heading>
-				<HStack justify="space-between" py={2}>
-					<Text fontSize="sm">Position</Text>
-					<PositionSelect value={app.navBar?.position || "top"} onChange={(v) => updateNavBar("position", v)} />
-				</HStack>
-				<SwitchField label="Visible" checked={app.navBar?.visible ?? true} onChange={(v) => updateNavBar("visible", v)} />
-				<SwitchField label="Masquage automatique" checked={app.navBar?.autoHide ?? false} onChange={(v) => updateNavBar("autoHide", v)} />
-				<SwitchField label="URL modifiable" checked={app.navBar?.urlEditable ?? true} onChange={(v) => updateNavBar("urlEditable", v)} />
-				<SwitchField
-					label="Boutons précédent/suivant"
-					checked={app.navBar?.showBackForward ?? true}
-					onChange={(v) => updateNavBar("showBackForward", v)}
-				/>
-				<SwitchField label="Bouton recharger" checked={app.navBar?.showReload ?? true} onChange={(v) => updateNavBar("showReload", v)} />
-			</Box>
+			<ConfigSection title={t("app.navbar")}>
+				<NavBarConfigForm mode="app" config={app.navBar || {}} defaults={config.navBar || {}} onChange={updateNavBar} />
+			</ConfigSection>
+
+			<Button colorPalette="red" variant="outline" size="sm" onClick={handleDeleteApp}>
+				{t("app.delete")}
+			</Button>
 		</VStack>
 	)
 }

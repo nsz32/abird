@@ -125,5 +125,6 @@ contextBridge.exposeInMainWorld("bird", {
 	icons: {
 		fetch: (url: string, partition?: string): Promise<IconFetchResult> => ipcRenderer.invoke(IpcChannels.ICONS_FETCH, url, partition),
 		save: (appName: string, base64: string, oldIcon?: string): Promise<string> => ipcRenderer.invoke(IpcChannels.ICONS_SAVE, appName, base64, oldIcon),
+		importFile: (appName: string, oldIcon?: string): Promise<string | null> => ipcRenderer.invoke(IpcChannels.ICONS_IMPORT_FILE, appName, oldIcon),
 	},
 })

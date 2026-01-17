@@ -5,7 +5,7 @@ import { app, shell } from "electron"
 /**
  * Centralized paths for the application.
  * Uses Electron's app.getPath for cross-platform compatibility:
- * - Linux: ~/.config/bird
+ * - Linux: ~/.local/share/bird
  * - Windows: C:\Users\<user>\AppData\Roaming\bird
  * - macOS: ~/Library/Application Support/bird
  */

@@ -27,6 +27,26 @@ const en = {
 	"navbar.showBackForward": "Back/Forward buttons",
 	"navbar.showReload": "Reload button",
 
+	// App config
+	"app.general": "General",
+	"app.navbar": "Navigation bar",
+	"app.startUrl": "Start URL",
+	"app.partition": "Partition",
+	"app.icon": "Icon",
+	"app.fetchIcons": "Fetch icons",
+	"app.importIcon": "Import file",
+	"app.create": "New app",
+	"app.delete": "Delete",
+	"app.deleteConfirm": "Delete this application?",
+	"app.notFound": "Application not found",
+	"app.name": "Name",
+	"app.namePlaceholder": "my-app",
+	"app.urlPlaceholder": "https://example.com",
+	"app.cancel": "Cancel",
+
+	// Inherit state
+	"inherit.reset": "Reset",
+
 	// Downloads
 	"downloads.title": "Downloads",
 	"downloads.empty": "No downloads",
@@ -69,6 +89,26 @@ const fr: typeof en = {
 	"navbar.urlEditable": "URL modifiable",
 	"navbar.showBackForward": "Boutons précédent/suivant",
 	"navbar.showReload": "Bouton recharger",
+
+	// App config
+	"app.general": "Général",
+	"app.navbar": "Barre de navigation",
+	"app.startUrl": "URL de démarrage",
+	"app.partition": "Partition",
+	"app.icon": "Icône",
+	"app.fetchIcons": "Obtenir icônes",
+	"app.importIcon": "Importer fichier",
+	"app.create": "Nouvelle app",
+	"app.delete": "Supprimer",
+	"app.deleteConfirm": "Supprimer cette application ?",
+	"app.notFound": "Application non trouvée",
+	"app.name": "Nom",
+	"app.namePlaceholder": "mon-app",
+	"app.urlPlaceholder": "https://exemple.com",
+	"app.cancel": "Annuler",
+
+	// Inherit state
+	"inherit.reset": "Réinitialiser",
 
 	// Downloads
 	"downloads.title": "Téléchargements",

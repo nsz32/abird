@@ -15,7 +15,7 @@ import {
 	navState$,
 	notifications$,
 } from "./core/states"
-import { fetchIcons, saveIcon } from "./services/icons"
+import { fetchIcons, importIconFile, saveIcon } from "./services/icons"
 import { dismissNotification } from "./services/notify"
 import { activateTab, closeTab, createTab, getActiveTab, getTabsList } from "./tabs/Tabs"
 
@@ -83,4 +83,5 @@ export function registerHandlers() {
 	// Icons
 	ipcMain.handle(IpcChannels.ICONS_FETCH, (_, url: string, partition?: string) => fetchIcons(url, partition))
 	ipcMain.handle(IpcChannels.ICONS_SAVE, (_, appName: string, base64: string, oldIcon?: string) => saveIcon(appName, base64, oldIcon))
+	ipcMain.handle(IpcChannels.ICONS_IMPORT_FILE, (_, appName: string, oldIcon?: string) => importIconFile(appName, oldIcon))
 }
