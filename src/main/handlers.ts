@@ -15,7 +15,7 @@ import {
 	navState$,
 	notifications$,
 } from "./core/states"
-import { getDownloadPath } from "./services/DownloadManager"
+import { cancelDownload, getDownloadPath, retryDownload } from "./services/DownloadManager"
 import { deploy, isDeploySupported, isDeployed, undeploy } from "./services/deploy"
 import { fetchIcons, importIconFile, saveIcon } from "./services/icons"
 import { dismissNotification } from "./services/notify"
@@ -58,6 +58,8 @@ export function registerHandlers() {
 		const path = getDownloadPath(id)
 		if (path) shell.showItemInFolder(path)
 	})
+	ipcMain.handle(IpcChannels.DOWNLOADS_CANCEL, (_, id: string) => cancelDownload(id))
+	ipcMain.handle(IpcChannels.DOWNLOADS_RETRY, (_, id: string) => retryDownload(id))
 
 	// Find in page
 	ipcMain.handle(IpcChannels.FIND_SEARCH, (_, text: string) => {

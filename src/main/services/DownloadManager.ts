@@ -1,9 +1,9 @@
 import { existsSync, renameSync, statSync, unlinkSync } from "node:fs"
 import { basename, dirname, extname, join } from "node:path"
 import type { ActiveDownload, DownloadConfig, DownloadHistoryItem, DownloadStatus, ResolvedDownloadConfig } from "@shared/types"
-import type { Session } from "electron"
-import { app } from "electron"
-import { activeDownloads$, downloadEvents$, downloadHistory$ } from "../core/states"
+import type { DownloadItem, Session } from "electron"
+import { app, session } from "electron"
+import { activeDownloads$, config$, downloadEvents$, downloadHistory$ } from "../core/states"
 import { checkOfficeMacroWarning } from "../utils/executableDetection"
 import { type FileDetectionResult, detectFileType, detectFileTypeWithRetry } from "../utils/fileDetection"
 import { parseSize } from "../utils/parseSize"
@@ -26,6 +26,7 @@ interface DownloadSpeedState {
 }
 
 const speedStates = new Map<string, DownloadSpeedState>()
+const activeItems = new Map<string, DownloadItem>()
 
 function addActiveDownload(id: string, filename: string, totalBytes: number): void {
 	const now = Date.now()
@@ -71,11 +72,21 @@ function updateActiveDownload(id: string, receivedBytes: number, totalBytes: num
 
 function removeActiveDownload(id: string): void {
 	speedStates.delete(id)
+	activeItems.delete(id)
 	activeDownloads$.emit(activeDownloads$.get().filter((d) => d.id !== id))
 }
 
-function addToHistory(id: string, filename: string, savePath: string, status: DownloadStatus, message?: string): void {
-	const item: DownloadHistoryItem = { id, filename, savePath, status, message, completedAt: Date.now() }
+function addToHistory(
+	id: string,
+	filename: string,
+	savePath: string,
+	url: string,
+	partition: string,
+	status: DownloadStatus,
+	totalBytes: number,
+	message?: string,
+): void {
+	const item: DownloadHistoryItem = { id, filename, savePath, url, partition, status, totalBytes, message, completedAt: Date.now() }
 	downloadHistory$.emit([item, ...downloadHistory$.get()])
 	downloadEvents$.emit({ type: status === "duplicate" ? "completed" : status, id })
 }
@@ -149,13 +160,16 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 	session.on("will-download", (_event, item) => {
 		const downloadId = generateDownloadId()
 		const filename = item.getFilename()
+		const url = item.getURL()
+		const partition = config$.get().partition
 		const { finalPath, tempPath, originalPath } = getDownloadPaths(join(downloadDir, filename))
 		item.setSavePath(tempPath)
 
+		activeItems.set(downloadId, item)
 		addActiveDownload(downloadId, filename, item.getTotalBytes())
 
 		const notifId = addNotification("download", filename, "Téléchargement en cours...", {
-			dismissable: false,
+			dismissable: true,
 		})
 
 		let earlyDetectionResult: Promise<FileDetectionResult> | null = null
@@ -184,7 +198,7 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 								dismissable: true,
 							})
 							removeActiveDownload(downloadId)
-							addToHistory(downloadId, filename, "", "blocked", `Exécutable (${result.executable.name})`)
+							addToHistory(downloadId, filename, "", url, partition, "blocked", 0, `Exécutable (${result.executable.name})`)
 						}
 						return result
 					})
@@ -200,7 +214,18 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 
 			if (state === "completed") {
 				dismissNotification(notifId)
-				handleCompletedDownload(downloadId, tempPath, finalPath, filename, item.getTotalBytes(), config, earlyDetectionResult, originalPath)
+				handleCompletedDownload(
+					downloadId,
+					tempPath,
+					finalPath,
+					filename,
+					url,
+					partition,
+					item.getTotalBytes(),
+					config,
+					earlyDetectionResult,
+					originalPath,
+				)
 			} else if (state === "cancelled") {
 				try {
 					unlinkSync(tempPath)
@@ -210,7 +235,7 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 						title: `${filename} - Annulé`,
 						dismissable: true,
 					})
-					addToHistory(downloadId, filename, "", "cancelled")
+					addToHistory(downloadId, filename, "", url, partition, "cancelled", item.getTotalBytes())
 				}
 			} else {
 				try {
@@ -221,7 +246,7 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 					message: "Interrompu",
 					dismissable: true,
 				})
-				addToHistory(downloadId, filename, "", "failed", "Interrompu")
+				addToHistory(downloadId, filename, "", url, partition, "failed", item.getTotalBytes(), "Interrompu")
 			}
 		})
 	})
@@ -232,6 +257,8 @@ async function handleCompletedDownload(
 	tempPath: string,
 	finalPath: string,
 	filename: string,
+	url: string,
+	partition: string,
 	size: number,
 	config: ResolvedDownloadConfig,
 	earlyDetectionResult: Promise<FileDetectionResult> | null,
@@ -251,7 +278,7 @@ async function handleCompletedDownload(
 				dismissable: true,
 				autoDismiss: 5000,
 			})
-			addToHistory(downloadId, filename, "", "blocked", `Exécutable (${result.executable.name})`)
+			addToHistory(downloadId, filename, "", url, partition, "blocked", size, `Exécutable (${result.executable.name})`)
 		} else {
 			try {
 				renameSync(tempPath, finalPath)
@@ -260,7 +287,7 @@ async function handleCompletedDownload(
 				dismissable: true,
 				autoDismiss: 5000,
 			})
-			addToHistory(downloadId, filename, finalPath, "completed", `Exécutable (${result.executable.name})`)
+			addToHistory(downloadId, filename, finalPath, url, partition, "completed", size, `Exécutable (${result.executable.name})`)
 		}
 		return
 	}
@@ -270,7 +297,7 @@ async function handleCompletedDownload(
 		renameSync(tempPath, finalPath)
 	} catch (err) {
 		console.error(`[Download] rename failed: ${err}`)
-		addToHistory(downloadId, filename, "", "failed", "Erreur de renommage")
+		addToHistory(downloadId, filename, "", url, partition, "failed", size, "Erreur de renommage")
 		return
 	}
 
@@ -288,7 +315,10 @@ async function handleCompletedDownload(
 				id: downloadId,
 				filename: basename(originalPath),
 				savePath: originalPath,
+				url,
+				partition,
 				status: "duplicate",
+				totalBytes: size,
 				completedAt: Date.now(),
 			}
 			downloadHistory$.emit([item, ...history])
@@ -304,7 +334,7 @@ async function handleCompletedDownload(
 		}
 	}
 
-	addToHistory(downloadId, filename, finalPath, "completed")
+	addToHistory(downloadId, filename, finalPath, url, partition, "completed", size)
 
 	if (shouldAutoOpen(result, size, config)) {
 		openFile(finalPath).then((error) => {
@@ -335,4 +365,25 @@ function matchesMimePatterns(mime: string, patterns: string[]): boolean {
 		}
 		return mime === pattern
 	})
+}
+
+export function cancelDownload(id: string): boolean {
+	const item = activeItems.get(id)
+	if (item) {
+		item.cancel()
+		return true
+	}
+	return false
+}
+
+export function retryDownload(id: string): boolean {
+	const historyItem = downloadHistory$.get().find((d) => d.id === id)
+	if (!historyItem?.url) return false
+
+	const sess = session.fromPartition(`persist:${historyItem.partition}`)
+	sess.downloadURL(historyItem.url)
+
+	// Remove from history since it will be re-added as a new download
+	downloadHistory$.emit(downloadHistory$.get().filter((d) => d.id !== id))
+	return true
 }

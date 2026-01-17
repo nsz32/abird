@@ -61,6 +61,8 @@ const en = {
 	"downloads.status.duplicate": "Already downloaded",
 	"downloads.openFile": "Open file",
 	"downloads.openFolder": "Show in folder",
+	"downloads.cancel": "Cancel",
+	"downloads.retry": "Retry",
 
 	// Find
 	"find.placeholder": "Search...",
@@ -130,6 +132,8 @@ const fr: typeof en = {
 	"downloads.status.duplicate": "Déjà téléchargé",
 	"downloads.openFile": "Ouvrir le fichier",
 	"downloads.openFolder": "Afficher dans le dossier",
+	"downloads.cancel": "Annuler",
+	"downloads.retry": "Relancer",
 
 	// Find
 	"find.placeholder": "Rechercher...",

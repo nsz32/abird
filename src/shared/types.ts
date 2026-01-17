@@ -73,7 +73,10 @@ export interface DownloadHistoryItem {
 	id: string
 	filename: string
 	savePath: string
+	url: string
+	partition: string
 	status: DownloadStatus
+	totalBytes: number
 	message?: string
 	completedAt: number
 }
@@ -133,6 +136,8 @@ export const IpcChannels = {
 	DOWNLOADS_PANEL_RESIZE: "bird:downloads:panel-resize",
 	DOWNLOADS_OPEN_FILE: "bird:downloads:open-file",
 	DOWNLOADS_OPEN_FOLDER: "bird:downloads:open-folder",
+	DOWNLOADS_CANCEL: "bird:downloads:cancel",
+	DOWNLOADS_RETRY: "bird:downloads:retry",
 	// Find in page
 	FIND_OPEN: "bird:find:open",
 	FIND_SEARCH: "bird:find:search",
@@ -246,6 +251,8 @@ export interface BirdApi {
 		panelResize: (width: number, height: number) => void
 		openFile: (id: string) => Promise<void>
 		openFolder: (id: string) => Promise<void>
+		cancel: (id: string) => Promise<void>
+		retry: (id: string) => Promise<void>
 	}
 	find: {
 		search: (text: string) => Promise<void>

@@ -1,6 +1,6 @@
 import type { ActiveDownload, DownloadHistoryItem, DownloadStatus } from "@shared/types"
 import { useBirdState, useTranslations } from "@ui/shared/hooks"
-import { AlertCircle, CheckCircle, Download, FileText, FolderOpen, Loader2, ShieldX, XCircle } from "lucide-react"
+import { AlertCircle, CheckCircle, Download, FileText, FolderOpen, Loader2, RefreshCw, ShieldX, X, XCircle } from "lucide-react"
 
 const statusIcons: Record<DownloadStatus, typeof CheckCircle> = {
 	completed: CheckCircle,
@@ -8,6 +8,14 @@ const statusIcons: Record<DownloadStatus, typeof CheckCircle> = {
 	failed: AlertCircle,
 	blocked: ShieldX,
 	duplicate: CheckCircle,
+}
+
+function formatSize(bytes: number): string {
+	if (bytes <= 0) return ""
+	if (bytes < 1024) return `${bytes} B`
+	if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+	if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+	return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`
 }
 
 function formatSpeed(bytesPerSecond: number): string {
@@ -38,6 +46,11 @@ function ActiveDownloadItem({ item }: { item: ActiveDownload }) {
 					</span>
 				</div>
 			</div>
+			<div className="download-actions">
+				<button type="button" className="action-btn" onClick={() => window.bird.downloads.cancel(item.id)} title={t("downloads.cancel")}>
+					<X size={16} />
+				</button>
+			</div>
 		</div>
 	)
 }
@@ -46,6 +59,8 @@ function HistoryDownloadItem({ item }: { item: DownloadHistoryItem }) {
 	const { t } = useTranslations()
 	const Icon = statusIcons[item.status]
 	const canOpen = (item.status === "completed" || item.status === "duplicate") && item.savePath
+	const canRetry = (item.status === "cancelled" || item.status === "failed") && item.url
+	const sizeText = formatSize(item.totalBytes)
 
 	return (
 		<div className={`download-item ${item.status}`}>
@@ -54,7 +69,10 @@ function HistoryDownloadItem({ item }: { item: DownloadHistoryItem }) {
 				<div className="download-filename">{item.filename}</div>
 				<div className="download-status">
 					<Icon size={14} />
-					<span>{item.message || t(`downloads.status.${item.status}`)}</span>
+					<span>
+						{item.message || t(`downloads.status.${item.status}`)}
+						{sizeText && ` · ${sizeText}`}
+					</span>
 				</div>
 			</div>
 			{canOpen && (
@@ -64,6 +82,13 @@ function HistoryDownloadItem({ item }: { item: DownloadHistoryItem }) {
 					</button>
 					<button type="button" className="action-btn" onClick={() => window.bird.downloads.openFolder(item.id)} title={t("downloads.openFolder")}>
 						<FolderOpen size={16} />
+					</button>
+				</div>
+			)}
+			{canRetry && (
+				<div className="download-actions">
+					<button type="button" className="action-btn" onClick={() => window.bird.downloads.retry(item.id)} title={t("downloads.retry")}>
+						<RefreshCw size={16} />
 					</button>
 				</div>
 			)}

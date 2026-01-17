@@ -68,6 +68,13 @@
 			"routing": {
 				"internal": "https://int10h.org"
 			}
+		},
+		"ovh": {
+			"partition": "ovh",
+			"startUrl": "https://proof.ovh.net/",
+			"routing": {
+				"internal": "https://proof.ovh.net"
+			}
 		}
 	}
 }
