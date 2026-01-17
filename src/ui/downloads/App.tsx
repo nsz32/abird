@@ -1,12 +1,19 @@
 import type { ActiveDownload, DownloadHistoryItem, DownloadStatus } from "@shared/types"
 import { useBirdState, useTranslations } from "@ui/shared/hooks"
-import { AlertCircle, CheckCircle, Download, Loader2, ShieldX, XCircle } from "lucide-react"
+import { AlertCircle, CheckCircle, Download, FileText, FolderOpen, Loader2, ShieldX, XCircle } from "lucide-react"
 
 const statusIcons: Record<DownloadStatus, typeof CheckCircle> = {
 	completed: CheckCircle,
 	cancelled: XCircle,
 	failed: AlertCircle,
 	blocked: ShieldX,
+	duplicate: CheckCircle,
+}
+
+function formatSpeed(bytesPerSecond: number): string {
+	if (bytesPerSecond < 1024) return `${bytesPerSecond} B/s`
+	if (bytesPerSecond < 1024 * 1024) return `${(bytesPerSecond / 1024).toFixed(1)} KB/s`
+	return `${(bytesPerSecond / (1024 * 1024)).toFixed(1)} MB/s`
 }
 
 function ActiveDownloadItem({ item }: { item: ActiveDownload }) {
@@ -25,7 +32,10 @@ function ActiveDownloadItem({ item }: { item: ActiveDownload }) {
 					</div>
 				)}
 				<div className="download-status">
-					<span>{hasProgress ? `${progress}%` : t("downloads.inProgress")}</span>
+					<span>
+						{hasProgress ? `${progress}%` : t("downloads.inProgress")}
+						{item.bytesPerSecond > 0 && ` · ${formatSpeed(item.bytesPerSecond)}`}
+					</span>
 				</div>
 			</div>
 		</div>
@@ -35,6 +45,7 @@ function ActiveDownloadItem({ item }: { item: ActiveDownload }) {
 function HistoryDownloadItem({ item }: { item: DownloadHistoryItem }) {
 	const { t } = useTranslations()
 	const Icon = statusIcons[item.status]
+	const canOpen = (item.status === "completed" || item.status === "duplicate") && item.savePath
 
 	return (
 		<div className={`download-item ${item.status}`}>
@@ -46,6 +57,16 @@ function HistoryDownloadItem({ item }: { item: DownloadHistoryItem }) {
 					<span>{item.message || t(`downloads.status.${item.status}`)}</span>
 				</div>
 			</div>
+			{canOpen && (
+				<div className="download-actions">
+					<button type="button" className="action-btn" onClick={() => window.bird.downloads.openFile(item.id)} title={t("downloads.openFile")}>
+						<FileText size={16} />
+					</button>
+					<button type="button" className="action-btn" onClick={() => window.bird.downloads.openFolder(item.id)} title={t("downloads.openFolder")}>
+						<FolderOpen size={16} />
+					</button>
+				</div>
+			)}
 		</div>
 	)
 }

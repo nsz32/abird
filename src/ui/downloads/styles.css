@@ -147,3 +147,33 @@ body,
 	border-radius: 2px;
 	transition: width 0.2s ease;
 }
+
+.download-actions {
+	display: flex;
+	gap: 4px;
+	margin-left: 8px;
+	flex-shrink: 0;
+}
+
+.action-btn {
+	background: transparent;
+	border: none;
+	color: #888;
+	padding: 6px;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: all 0.15s ease;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.action-btn:hover {
+	background: rgba(255, 255, 255, 0.1);
+	color: #6bffb8;
+}
+
+.download-item.duplicate .download-icon,
+.download-item.duplicate .download-status {
+	color: #6bffb8;
+}

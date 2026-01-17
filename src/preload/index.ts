@@ -88,6 +88,8 @@ contextBridge.exposeInMainWorld("bird", {
 			return () => ipcRenderer.removeListener(IpcChannels.DOWNLOADS_EVENT, listener)
 		},
 		panelResize: (width: number, height: number) => ipcRenderer.send(IpcChannels.DOWNLOADS_PANEL_RESIZE, width, height),
+		openFile: (id: string) => ipcRenderer.invoke(IpcChannels.DOWNLOADS_OPEN_FILE, id),
+		openFolder: (id: string) => ipcRenderer.invoke(IpcChannels.DOWNLOADS_OPEN_FOLDER, id),
 	},
 	find: {
 		search: (text: string) => ipcRenderer.invoke(IpcChannels.FIND_SEARCH, text),

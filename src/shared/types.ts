@@ -62,15 +62,17 @@ export interface ActiveDownload {
 	filename: string
 	receivedBytes: number
 	totalBytes: number // 0 si inconnu
+	bytesPerSecond: number
 	startedAt: number
 }
 
 // Historique des téléchargements (session uniquement)
-export type DownloadStatus = "completed" | "cancelled" | "failed" | "blocked"
+export type DownloadStatus = "completed" | "cancelled" | "failed" | "blocked" | "duplicate"
 
 export interface DownloadHistoryItem {
 	id: string
 	filename: string
+	savePath: string
 	status: DownloadStatus
 	message?: string
 	completedAt: number
@@ -129,6 +131,8 @@ export const IpcChannels = {
 	DOWNLOADS_ACTIVE_CHANGED: "bird:downloads:active-changed",
 	DOWNLOADS_EVENT: "bird:downloads:event",
 	DOWNLOADS_PANEL_RESIZE: "bird:downloads:panel-resize",
+	DOWNLOADS_OPEN_FILE: "bird:downloads:open-file",
+	DOWNLOADS_OPEN_FOLDER: "bird:downloads:open-folder",
 	// Find in page
 	FIND_OPEN: "bird:find:open",
 	FIND_SEARCH: "bird:find:search",
@@ -240,6 +244,8 @@ export interface BirdApi {
 		onActiveChanged: (callback: (items: ActiveDownload[]) => void) => () => void
 		onEvent: (callback: (event: DownloadEvent) => void) => () => void
 		panelResize: (width: number, height: number) => void
+		openFile: (id: string) => Promise<void>
+		openFolder: (id: string) => Promise<void>
 	}
 	find: {
 		search: (text: string) => Promise<void>

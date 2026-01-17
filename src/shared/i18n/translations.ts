@@ -55,6 +55,9 @@ const en = {
 	"downloads.status.cancelled": "Cancelled",
 	"downloads.status.failed": "Failed",
 	"downloads.status.blocked": "Blocked",
+	"downloads.status.duplicate": "Already downloaded",
+	"downloads.openFile": "Open file",
+	"downloads.openFolder": "Show in folder",
 
 	// Find
 	"find.placeholder": "Search...",
@@ -118,6 +121,9 @@ const fr: typeof en = {
 	"downloads.status.cancelled": "Annulé",
 	"downloads.status.failed": "Échec",
 	"downloads.status.blocked": "Bloqué",
+	"downloads.status.duplicate": "Déjà téléchargé",
+	"downloads.openFile": "Ouvrir le fichier",
+	"downloads.openFolder": "Afficher dans le dossier",
 
 	// Find
 	"find.placeholder": "Rechercher...",

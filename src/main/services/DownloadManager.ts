@@ -1,4 +1,4 @@
-import { existsSync, statSync, unlinkSync } from "node:fs"
+import { existsSync, renameSync, statSync, unlinkSync } from "node:fs"
 import { basename, dirname, extname, join } from "node:path"
 import type { ActiveDownload, DownloadConfig, DownloadHistoryItem, DownloadStatus, ResolvedDownloadConfig } from "@shared/types"
 import type { Session } from "electron"
@@ -11,6 +11,7 @@ import { getFileMd5, openFile } from "../utils/platform"
 import { addNotification, dismissNotification, updateNotification } from "./notify"
 
 const MIN_BYTES_FOR_DETECTION = 4096
+const SPEED_UPDATE_INTERVAL = 1000
 
 let nextDownloadId = 1
 
@@ -18,21 +19,50 @@ function generateDownloadId(): string {
 	return `dl-${nextDownloadId++}`
 }
 
+interface DownloadSpeedState {
+	lastBytes: number
+	lastTime: number
+	bytesPerSecond: number
+}
+
+const speedStates = new Map<string, DownloadSpeedState>()
+
 function addActiveDownload(id: string, filename: string, totalBytes: number): void {
+	const now = Date.now()
+	speedStates.set(id, { lastBytes: 0, lastTime: now, bytesPerSecond: 0 })
+
 	const download: ActiveDownload = {
 		id,
 		filename,
 		receivedBytes: 0,
 		totalBytes,
-		startedAt: Date.now(),
+		bytesPerSecond: 0,
+		startedAt: now,
 	}
 	activeDownloads$.emit([download, ...activeDownloads$.get()])
 	downloadEvents$.emit({ type: "started", id })
 }
 
 function updateActiveDownload(id: string, receivedBytes: number, totalBytes: number): void {
+	const state = speedStates.get(id)
+	let bytesPerSecond = 0
+
+	if (state) {
+		const now = Date.now()
+		const deltaTime = now - state.lastTime
+		if (deltaTime >= SPEED_UPDATE_INTERVAL) {
+			const deltaBytes = receivedBytes - state.lastBytes
+			bytesPerSecond = Math.round((deltaBytes / deltaTime) * 1000)
+			state.lastBytes = receivedBytes
+			state.lastTime = now
+			state.bytesPerSecond = bytesPerSecond
+		} else {
+			bytesPerSecond = state.bytesPerSecond
+		}
+	}
+
 	const downloads = activeDownloads$.get()
-	const updated = downloads.map((d) => (d.id === id ? { ...d, receivedBytes, totalBytes } : d))
+	const updated = downloads.map((d) => (d.id === id ? { ...d, receivedBytes, totalBytes, bytesPerSecond } : d))
 	activeDownloads$.emit(updated)
 
 	const progress = totalBytes > 0 ? Math.round((receivedBytes / totalBytes) * 100) : 0
@@ -40,13 +70,19 @@ function updateActiveDownload(id: string, receivedBytes: number, totalBytes: num
 }
 
 function removeActiveDownload(id: string): void {
+	speedStates.delete(id)
 	activeDownloads$.emit(activeDownloads$.get().filter((d) => d.id !== id))
 }
 
-function addToHistory(id: string, filename: string, status: DownloadStatus, message?: string): void {
-	const item: DownloadHistoryItem = { id, filename, status, message, completedAt: Date.now() }
+function addToHistory(id: string, filename: string, savePath: string, status: DownloadStatus, message?: string): void {
+	const item: DownloadHistoryItem = { id, filename, savePath, status, message, completedAt: Date.now() }
 	downloadHistory$.emit([item, ...downloadHistory$.get()])
-	downloadEvents$.emit({ type: status, id })
+	downloadEvents$.emit({ type: status === "duplicate" ? "completed" : status, id })
+}
+
+export function getDownloadPath(id: string): string | null {
+	const item = downloadHistory$.get().find((d) => d.id === id)
+	return item?.savePath ?? null
 }
 
 export function resolveDownloadConfig(config: DownloadConfig): ResolvedDownloadConfig {
@@ -62,25 +98,36 @@ export function resolveDownloadConfig(config: DownloadConfig): ResolvedDownloadC
 const configuredSessions = new WeakSet<Session>()
 
 interface UniquePathResult {
-	path: string
-	originalPath: string | null // null if no rename needed
+	finalPath: string
+	tempPath: string
+	originalPath: string | null // null if no rename needed (file didn't exist)
 }
 
-function getDownloadUniquePath(basePath: string): UniquePathResult {
-	if (!existsSync(basePath)) return { path: basePath, originalPath: null }
+function getTempPath(finalPath: string): string {
+	const dir = dirname(finalPath)
+	const filename = basename(finalPath)
+	return join(dir, `.${filename}.birdtmp`)
+}
+
+function getDownloadPaths(basePath: string): UniquePathResult {
+	if (!existsSync(basePath)) {
+		const tempPath = getTempPath(basePath)
+		return { finalPath: basePath, tempPath, originalPath: null }
+	}
 
 	const ext = extname(basePath)
 	const name = basename(basePath, ext)
 	const dir = dirname(basePath)
 
 	let counter = 1
-	let newPath: string
+	let finalPath: string
 	do {
-		newPath = join(dir, `${name} (${counter})${ext}`)
+		finalPath = join(dir, `${name} (${counter})${ext}`)
 		counter++
-	} while (existsSync(newPath))
+	} while (existsSync(finalPath))
 
-	return { path: newPath, originalPath: basePath }
+	const tempPath = getTempPath(finalPath)
+	return { finalPath, tempPath, originalPath: basePath }
 }
 
 async function isDuplicateOf(newPath: string, originalPath: string): Promise<boolean> {
@@ -102,17 +149,15 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 	session.on("will-download", (_event, item) => {
 		const downloadId = generateDownloadId()
 		const filename = item.getFilename()
-		const { path: savePath, originalPath } = getDownloadUniquePath(join(downloadDir, filename))
-		item.setSavePath(savePath)
+		const { finalPath, tempPath, originalPath } = getDownloadPaths(join(downloadDir, filename))
+		item.setSavePath(tempPath)
 
-		// Add to active downloads
 		addActiveDownload(downloadId, filename, item.getTotalBytes())
 
 		const notifId = addNotification("download", filename, "Téléchargement en cours...", {
 			dismissable: false,
 		})
 
-		// Shared result: null = not checked yet
 		let earlyDetectionResult: Promise<FileDetectionResult> | null = null
 		let wasBlockedAsExecutable = false
 
@@ -121,19 +166,17 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 				const received = item.getReceivedBytes()
 				const total = item.getTotalBytes()
 
-				// Update active download progress
 				updateActiveDownload(downloadId, received, total)
 
-				// Early executable detection with retry
 				if (!config.allowExecutablesDownload && !earlyDetectionResult && received >= MIN_BYTES_FOR_DETECTION) {
-					earlyDetectionResult = detectFileTypeWithRetry(savePath, { minSize: MIN_BYTES_FOR_DETECTION }).then((result) => {
+					earlyDetectionResult = detectFileTypeWithRetry(tempPath, { minSize: MIN_BYTES_FOR_DETECTION }).then((result) => {
 						if (result.executable.isExecutable) {
 							console.log(`[Download] blocking executable: ${result.executable.name}`)
 							wasBlockedAsExecutable = true
 							item.cancel()
 							console.log(`[Download] aborted: ${filename}`)
 							try {
-								unlinkSync(savePath)
+								unlinkSync(tempPath)
 							} catch {}
 							updateNotification(notifId, {
 								title: `${filename} - Bloqué`,
@@ -141,7 +184,7 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 								dismissable: true,
 							})
 							removeActiveDownload(downloadId)
-							addToHistory(downloadId, filename, "blocked", `Exécutable (${result.executable.name})`)
+							addToHistory(downloadId, filename, "", "blocked", `Exécutable (${result.executable.name})`)
 						}
 						return result
 					})
@@ -157,23 +200,28 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 
 			if (state === "completed") {
 				dismissNotification(notifId)
-				handleCompletedDownload(downloadId, savePath, filename, item.getTotalBytes(), config, earlyDetectionResult, originalPath)
+				handleCompletedDownload(downloadId, tempPath, finalPath, filename, item.getTotalBytes(), config, earlyDetectionResult, originalPath)
 			} else if (state === "cancelled") {
-				// Notification already handled if blocked as executable
+				try {
+					unlinkSync(tempPath)
+				} catch {}
 				if (!wasBlockedAsExecutable) {
 					updateNotification(notifId, {
 						title: `${filename} - Annulé`,
 						dismissable: true,
 					})
-					addToHistory(downloadId, filename, "cancelled")
+					addToHistory(downloadId, filename, "", "cancelled")
 				}
 			} else {
+				try {
+					unlinkSync(tempPath)
+				} catch {}
 				updateNotification(notifId, {
 					title: `${filename} - Échec`,
 					message: "Interrompu",
 					dismissable: true,
 				})
-				addToHistory(downloadId, filename, "failed", "Interrompu")
+				addToHistory(downloadId, filename, "", "failed", "Interrompu")
 			}
 		})
 	})
@@ -181,46 +229,71 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 
 async function handleCompletedDownload(
 	downloadId: string,
-	savePath: string,
+	tempPath: string,
+	finalPath: string,
 	filename: string,
 	size: number,
 	config: ResolvedDownloadConfig,
 	earlyDetectionResult: Promise<FileDetectionResult> | null,
 	originalPath: string | null,
 ) {
-	// Reuse early detection result if available, otherwise detect now
-	const result = earlyDetectionResult ? await earlyDetectionResult : await detectFileType(savePath)
+	const result = earlyDetectionResult ? await earlyDetectionResult : await detectFileType(tempPath)
 
 	console.log(`[Download] completed: ${filename}, mime: ${result.mime}, executable: ${result.executable.isExecutable}`)
 	checkOfficeMacroWarning(result.mime)
 
 	if (result.executable.isExecutable) {
+		try {
+			unlinkSync(tempPath)
+		} catch {}
 		if (!config.allowExecutablesDownload) {
-			try {
-				unlinkSync(savePath)
-			} catch {}
 			addNotification("download", filename, `Fichier exécutable supprimé (${result.executable.name})`, {
 				dismissable: true,
 				autoDismiss: 5000,
 			})
-			addToHistory(downloadId, filename, "blocked", `Exécutable (${result.executable.name})`)
+			addToHistory(downloadId, filename, "", "blocked", `Exécutable (${result.executable.name})`)
 		} else {
+			try {
+				renameSync(tempPath, finalPath)
+			} catch {}
 			addNotification("download", filename, `Téléchargement terminé (${result.executable.name} détecté)`, {
 				dismissable: true,
 				autoDismiss: 5000,
 			})
-			addToHistory(downloadId, filename, "completed", `Exécutable (${result.executable.name})`)
+			addToHistory(downloadId, filename, finalPath, "completed", `Exécutable (${result.executable.name})`)
 		}
+		return
+	}
+
+	// Rename temp file to final path
+	try {
+		renameSync(tempPath, finalPath)
+	} catch (err) {
+		console.error(`[Download] rename failed: ${err}`)
+		addToHistory(downloadId, filename, "", "failed", "Erreur de renommage")
 		return
 	}
 
 	// Check for duplicate files (only if file was renamed during save)
 	if (config.preventDuplicateDownloads && originalPath) {
-		if (await isDuplicateOf(savePath, originalPath)) {
-			console.log(`[Download] duplicate detected: ${savePath} = ${originalPath}`)
+		if (await isDuplicateOf(finalPath, originalPath)) {
+			console.log(`[Download] duplicate detected: ${finalPath} = ${originalPath}`)
 			try {
-				unlinkSync(savePath)
+				unlinkSync(finalPath)
 			} catch {}
+
+			// Remove previous entry for this file and add new one at top
+			const history = downloadHistory$.get().filter((d) => d.savePath !== originalPath)
+			const item: DownloadHistoryItem = {
+				id: downloadId,
+				filename: basename(originalPath),
+				savePath: originalPath,
+				status: "duplicate",
+				completedAt: Date.now(),
+			}
+			downloadHistory$.emit([item, ...history])
+			downloadEvents$.emit({ type: "completed", id: downloadId })
+
 			if (shouldAutoOpen(result, size, config)) {
 				openFile(originalPath).then((error) => {
 					if (error) console.error(`[Download] openFile failed: ${error}`)
@@ -231,12 +304,12 @@ async function handleCompletedDownload(
 		}
 	}
 
-	addToHistory(downloadId, filename, "completed")
+	addToHistory(downloadId, filename, finalPath, "completed")
 
 	if (shouldAutoOpen(result, size, config)) {
-		openFile(savePath).then((error) => {
+		openFile(finalPath).then((error) => {
 			if (error) console.error(`[Download] openFile failed: ${error}`)
-			else console.log(`[Download] opened: ${savePath}`)
+			else console.log(`[Download] opened: ${finalPath}`)
 		})
 	} else {
 		addNotification("download", filename, "Téléchargement terminé", {

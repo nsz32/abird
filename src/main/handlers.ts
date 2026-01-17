@@ -1,5 +1,5 @@
 import { IpcChannels } from "@shared/types"
-import { ipcMain } from "electron"
+import { ipcMain, shell } from "electron"
 import { readRawConfig, writeRawConfig } from "./config"
 import { DOWNLOADS_VIEW_ID } from "./core/App"
 import { getTranslations } from "./core/I18n"
@@ -15,9 +15,11 @@ import {
 	navState$,
 	notifications$,
 } from "./core/states"
+import { getDownloadPath } from "./services/DownloadManager"
 import { fetchIcons, importIconFile, saveIcon } from "./services/icons"
 import { dismissNotification } from "./services/notify"
 import { activateTab, closeTab, createTab, getActiveTab, getTabsList } from "./tabs/Tabs"
+import { openFile } from "./utils/platform"
 
 export function registerHandlers() {
 	ipcMain.handle(IpcChannels.NAVIGATION_GET_STATE, () => navState$.get())
@@ -47,6 +49,14 @@ export function registerHandlers() {
 	})
 	ipcMain.handle(IpcChannels.DOWNLOADS_GET_HISTORY, () => downloadHistory$.get())
 	ipcMain.handle(IpcChannels.DOWNLOADS_GET_ACTIVE, () => activeDownloads$.get())
+	ipcMain.handle(IpcChannels.DOWNLOADS_OPEN_FILE, (_, id: string) => {
+		const path = getDownloadPath(id)
+		if (path) return openFile(path)
+	})
+	ipcMain.handle(IpcChannels.DOWNLOADS_OPEN_FOLDER, (_, id: string) => {
+		const path = getDownloadPath(id)
+		if (path) shell.showItemInFolder(path)
+	})
 
 	// Find in page
 	ipcMain.handle(IpcChannels.FIND_SEARCH, (_, text: string) => {
