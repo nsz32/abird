@@ -29,6 +29,7 @@ export interface NavigationState {
 	canGoBack: boolean
 	canGoForward: boolean
 	isLoading: boolean
+	isStandalonePanel?: boolean
 }
 
 // Info d'un tab (envoyé aux overlays)
@@ -147,6 +148,13 @@ export const IpcChannels = {
 	ICONS_FETCH: "bird:icons:fetch",
 	ICONS_SAVE: "bird:icons:save",
 	ICONS_IMPORT_FILE: "bird:icons:import-file",
+	// Deploy
+	DEPLOY_SUPPORTED: "bird:deploy:supported",
+	DEPLOY_STATUS: "bird:deploy:status",
+	DEPLOY_APP: "bird:deploy:app",
+	UNDEPLOY_APP: "bird:deploy:undeploy",
+	// Partition
+	PARTITION_RESET: "bird:partition:reset",
 } as const
 
 // Type utilitaire pour les valeurs de IpcChannels
@@ -258,6 +266,15 @@ export interface BirdApi {
 		fetch: (url: string, partition?: string) => Promise<IconFetchResult>
 		save: (appName: string, base64: string, oldIcon?: string) => Promise<string>
 		importFile: (appName: string, oldIcon?: string) => Promise<string | null>
+	}
+	deploy: {
+		isSupported: () => Promise<boolean>
+		getStatus: (appName: string) => Promise<boolean>
+		deploy: (appName: string) => Promise<void>
+		undeploy: (appName: string) => Promise<void>
+	}
+	partition: {
+		reset: (name: string) => Promise<void>
 	}
 }
 

@@ -48,20 +48,22 @@ export function App() {
 		}
 	}
 
+	const navDisabled = navState.isStandalonePanel
+
 	return (
 		<div ref={containerRef} className="navigation-bar">
 			{navBar.showBackButton && (
-				<NavButton onClick={() => window.bird.navigation.back()} disabled={!navState.canGoBack}>
+				<NavButton onClick={() => window.bird.navigation.back()} disabled={navDisabled || !navState.canGoBack}>
 					<ArrowLeft />
 				</NavButton>
 			)}
 			{navBar.showNextButton && (
-				<NavButton onClick={() => window.bird.navigation.forward()} disabled={!navState.canGoForward}>
+				<NavButton onClick={() => window.bird.navigation.forward()} disabled={navDisabled || !navState.canGoForward}>
 					<ArrowRight />
 				</NavButton>
 			)}
 			{navBar.showRefreshButton && (
-				<NavButton onClick={() => (navState.isLoading ? window.bird.navigation.stop() : window.bird.navigation.reload())}>
+				<NavButton onClick={() => (navState.isLoading ? window.bird.navigation.stop() : window.bird.navigation.reload())} disabled={navDisabled}>
 					{navState.isLoading ? <X strokeWidth={2.5} /> : <RotateCw />}
 				</NavButton>
 			)}

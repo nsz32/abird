@@ -92,7 +92,9 @@ function setupSubscriptions() {
 	nativeTheme.themeSource = config$.get().theme
 
 	navbarSync$.subscribe(() => {
-		navBar.sendNavigationState(navbarSync$.get().navState)
+		const { navState, activeContentId, activeTabId } = navbarSync$.get()
+		const isStandalonePanel = activeContentId !== null && activeContentId !== activeTabId
+		navBar.sendNavigationState({ ...navState, isStandalonePanel })
 		navBar.sendTabsList(getTabsList())
 	})
 
