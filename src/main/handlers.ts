@@ -1,6 +1,6 @@
 import { IpcChannels } from "@shared/types"
 import { ipcMain, shell } from "electron"
-import { readRawConfig, writeRawConfig } from "./config"
+import { getBirdConfig, readRawConfig, writeRawConfig } from "./config"
 import { DOWNLOADS_VIEW_ID } from "./core/App"
 import { getTranslations } from "./core/I18n"
 import { ViewManager } from "./core/ViewManager"
@@ -16,6 +16,7 @@ import {
 	notifications$,
 } from "./core/states"
 import { getDownloadPath } from "./services/DownloadManager"
+import { deploy, isDeploySupported, isDeployed, undeploy } from "./services/deploy"
 import { fetchIcons, importIconFile, saveIcon } from "./services/icons"
 import { dismissNotification } from "./services/notify"
 import { activateTab, closeTab, createTab, getActiveTab, getTabsList } from "./tabs/Tabs"
@@ -94,4 +95,14 @@ export function registerHandlers() {
 	ipcMain.handle(IpcChannels.ICONS_FETCH, (_, url: string, partition?: string) => fetchIcons(url, partition))
 	ipcMain.handle(IpcChannels.ICONS_SAVE, (_, appName: string, base64: string, oldIcon?: string) => saveIcon(appName, base64, oldIcon))
 	ipcMain.handle(IpcChannels.ICONS_IMPORT_FILE, (_, appName: string, oldIcon?: string) => importIconFile(appName, oldIcon))
+
+	// Deploy
+	ipcMain.handle(IpcChannels.DEPLOY_SUPPORTED, () => isDeploySupported())
+	ipcMain.handle(IpcChannels.DEPLOY_STATUS, (_, appName: string) => isDeployed(appName))
+	ipcMain.handle(IpcChannels.DEPLOY_APP, (_, appName: string) => {
+		const appConfig = getBirdConfig().apps[appName]
+		if (!appConfig) throw new Error(`App not found: ${appName}`)
+		deploy(appName, appConfig)
+	})
+	ipcMain.handle(IpcChannels.UNDEPLOY_APP, (_, appName: string) => undeploy(appName))
 }

@@ -43,6 +43,9 @@ const en = {
 	"app.namePlaceholder": "my-app",
 	"app.urlPlaceholder": "https://example.com",
 	"app.cancel": "Cancel",
+	"app.deploy": "Add shortcut",
+	"app.undeploy": "Remove shortcut",
+	"app.shortcut": "Desktop shortcut",
 
 	// Inherit state
 	"inherit.reset": "Reset",
@@ -109,6 +112,9 @@ const fr: typeof en = {
 	"app.namePlaceholder": "mon-app",
 	"app.urlPlaceholder": "https://exemple.com",
 	"app.cancel": "Annuler",
+	"app.deploy": "Créer raccourci",
+	"app.undeploy": "Supprimer raccourci",
+	"app.shortcut": "Raccourci bureau",
 
 	// Inherit state
 	"inherit.reset": "Réinitialiser",

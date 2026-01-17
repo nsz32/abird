@@ -19,6 +19,9 @@ export const paths = {
 	get icons() {
 		return join(this.userData, "icons")
 	},
+	get desktopFiles() {
+		return join(app.getPath("home"), ".local", "share", "applications")
+	},
 }
 
 /**

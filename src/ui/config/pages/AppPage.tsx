@@ -2,7 +2,7 @@ import { Button, Flex, HStack, Image, Input, Spinner, Text, VStack } from "@chak
 import type { AppConfig, BirdConfig, NavBarConfig } from "@shared/config.schema"
 import type { IconResult } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { ConfigSection } from "../components/ConfigSection"
 import { NavBarConfigForm } from "../components/NavBarConfigForm"
 import { ThemeSelect } from "../components/ThemeSelect"
@@ -21,13 +21,45 @@ export function AppPage({ name, config, onChange, onNavigate }: AppPageProps) {
 	const [fetchingIcons, setFetchingIcons] = useState(false)
 	const [savingIcon, setSavingIcon] = useState(false)
 
+	const [deploySupported, setDeploySupported] = useState(false)
+	const [deployed, setDeployed] = useState(false)
+	const [deploying, setDeploying] = useState(false)
+	const prevIconRef = useRef<string | undefined>(undefined)
+
 	const app = config.apps[name]
 
 	useEffect(() => {
 		document.title = `Bird - ${name}`
 		setIcons([])
 		setIconSizes({})
+		prevIconRef.current = undefined
 	}, [name])
+
+	useEffect(() => {
+		window.bird.deploy.isSupported().then(setDeploySupported)
+	}, [])
+
+	useEffect(() => {
+		if (deploySupported) {
+			window.bird.deploy.getStatus(name).then(setDeployed)
+		}
+	}, [name, deploySupported])
+
+	// Auto-redeploy when icon changes
+	const appIcon = app?.icon
+	useEffect(() => {
+		if (!deployed) return
+
+		const prevIcon = prevIconRef.current
+		prevIconRef.current = appIcon
+
+		if (prevIcon === undefined) return
+		if (prevIcon === appIcon) return
+
+		window.bird.deploy.deploy(name).catch((err) => {
+			console.error("Failed to redeploy after icon change:", err)
+		})
+	}, [appIcon, deployed, name])
 
 	if (!app) {
 		return (
@@ -107,6 +139,32 @@ export function AppPage({ name, config, onChange, onNavigate }: AppPageProps) {
 		}
 	}
 
+	const handleDeploy = async () => {
+		if (deploying) return
+		setDeploying(true)
+		try {
+			await window.bird.deploy.deploy(name)
+			setDeployed(true)
+		} catch (err) {
+			console.error("Failed to deploy:", err)
+		} finally {
+			setDeploying(false)
+		}
+	}
+
+	const handleUndeploy = async () => {
+		if (deploying) return
+		setDeploying(true)
+		try {
+			await window.bird.deploy.undeploy(name)
+			setDeployed(false)
+		} catch (err) {
+			console.error("Failed to undeploy:", err)
+		} finally {
+			setDeploying(false)
+		}
+	}
+
 	const handleImageLoad = (url: string, e: React.SyntheticEvent<HTMLImageElement>) => {
 		const img = e.currentTarget
 		setIconSizes((prev) => ({ ...prev, [url]: { w: img.naturalWidth, h: img.naturalHeight } }))
@@ -176,6 +234,17 @@ export function AppPage({ name, config, onChange, onNavigate }: AppPageProps) {
 			<ConfigSection title={t("app.navbar")}>
 				<NavBarConfigForm mode="app" config={app.navBar || {}} defaults={config.navBar || {}} onChange={updateNavBar} />
 			</ConfigSection>
+
+			{deploySupported && (
+				<ConfigSection title={t("app.shortcut")}>
+					<HStack justify="space-between" py={2}>
+						<Text fontSize="sm">{deployed ? t("app.undeploy") : t("app.deploy")}</Text>
+						<Button size="sm" variant="outline" onClick={deployed ? handleUndeploy : handleDeploy} disabled={deploying}>
+							{deploying ? <Spinner size="sm" /> : deployed ? t("app.undeploy") : t("app.deploy")}
+						</Button>
+					</HStack>
+				</ConfigSection>
+			)}
 
 			<Button colorPalette="red" variant="outline" size="sm" onClick={handleDeleteApp}>
 				{t("app.delete")}

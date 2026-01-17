@@ -129,4 +129,10 @@ contextBridge.exposeInMainWorld("bird", {
 		save: (appName: string, base64: string, oldIcon?: string): Promise<string> => ipcRenderer.invoke(IpcChannels.ICONS_SAVE, appName, base64, oldIcon),
 		importFile: (appName: string, oldIcon?: string): Promise<string | null> => ipcRenderer.invoke(IpcChannels.ICONS_IMPORT_FILE, appName, oldIcon),
 	},
+	deploy: {
+		isSupported: (): Promise<boolean> => ipcRenderer.invoke(IpcChannels.DEPLOY_SUPPORTED),
+		getStatus: (appName: string): Promise<boolean> => ipcRenderer.invoke(IpcChannels.DEPLOY_STATUS, appName),
+		deploy: (appName: string): Promise<void> => ipcRenderer.invoke(IpcChannels.DEPLOY_APP, appName),
+		undeploy: (appName: string): Promise<void> => ipcRenderer.invoke(IpcChannels.UNDEPLOY_APP, appName),
+	},
 })

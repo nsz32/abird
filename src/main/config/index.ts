@@ -7,6 +7,8 @@ export {
 	saveConfig,
 	getAvailableApps,
 	getCurrentAppName,
+	getConfigPath,
+	getBirdConfig,
 	readRawConfig,
 	writeRawConfig,
 	type RawUserConfig,
