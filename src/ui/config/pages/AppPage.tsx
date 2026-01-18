@@ -12,10 +12,11 @@ import { ThemeSelect } from "../components/ThemeSelect"
 interface AppPageProps {
 	name: string
 	config: BirdConfig
+	partitionsState: PartitionsState
 	onChange: (config: BirdConfig) => void
 }
 
-export function AppPage({ name, config, onChange }: AppPageProps) {
+export function AppPage({ name, config, partitionsState, onChange }: AppPageProps) {
 	const { t } = useTranslations()
 	const [icons, setIcons] = useState<IconResult[]>([])
 	const [iconSizes, setIconSizes] = useState<Record<string, { w: number; h: number }>>({})
@@ -25,7 +26,6 @@ export function AppPage({ name, config, onChange }: AppPageProps) {
 	const [deploySupported, setDeploySupported] = useState(false)
 	const [deployed, setDeployed] = useState(false)
 	const [deploying, setDeploying] = useState(false)
-	const [partitionsState, setPartitionsState] = useState<PartitionsState | null>(null)
 	const prevIconRef = useRef<string | undefined>(undefined)
 
 	const app = config.apps[name]
@@ -39,7 +39,6 @@ export function AppPage({ name, config, onChange }: AppPageProps) {
 
 	useEffect(() => {
 		window.bird.deploy.isSupported().then(setDeploySupported)
-		window.bird.partition.list().then(setPartitionsState)
 	}, [])
 
 	useEffect(() => {
@@ -170,14 +169,10 @@ export function AppPage({ name, config, onChange }: AppPageProps) {
 	const getAvailablePartitions = (): string[] => {
 		const partitions = new Set<string>()
 
-		// Depuis l'état des partitions (physiques + config)
-		if (partitionsState) {
-			for (const p of partitionsState.partitions) {
-				partitions.add(p.name)
-			}
+		for (const p of partitionsState.partitions) {
+			partitions.add(p.name)
 		}
 
-		// Depuis les apps configurées
 		for (const appConfig of Object.values(config.apps)) {
 			partitions.add(appConfig.partition)
 		}

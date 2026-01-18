@@ -1,5 +1,5 @@
 import { Badge, Button, HStack, Spinner, Text, VStack } from "@chakra-ui/react"
-import type { PartitionState, PartitionsState } from "@shared/types"
+import type { PartitionsState } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
 import { useEffect, useState } from "react"
 import { ConfigSection } from "../components/ConfigSection"
@@ -7,8 +7,10 @@ import { PageHeader } from "../components/PageHeader"
 
 interface PartitionPageProps {
 	name: string
+	partitionsState: PartitionsState
 	activePartition: string
 	onNavigate: (hash: string) => void
+	reloadPartitions: () => Promise<void>
 }
 
 function formatBytes(bytes: number): string {
@@ -19,33 +21,20 @@ function formatBytes(bytes: number): string {
 	return `${Number.parseFloat((bytes / k ** i).toFixed(1))} ${sizes[i]}`
 }
 
-export function PartitionPage({ name, activePartition, onNavigate }: PartitionPageProps) {
+export function PartitionPage({ name, partitionsState, activePartition, onNavigate, reloadPartitions }: PartitionPageProps) {
 	const { t } = useTranslations()
-	const [partition, setPartition] = useState<PartitionState | null>(null)
-	const [loading, setLoading] = useState(true)
 	const [size, setSize] = useState<number | null>(null)
 	const [loadingSize, setLoadingSize] = useState(false)
 	const [resetting, setResetting] = useState(false)
 
+	const partition = partitionsState.partitions.find((p) => p.name === name)
 	const isActive = name === activePartition
 	const canReset = partition?.hasPhysical && !isActive
 
 	useEffect(() => {
 		document.title = `Bird - ${name}`
-		loadPartition()
-	}, [name])
-
-	const loadPartition = async () => {
-		setLoading(true)
 		setSize(null)
-		try {
-			const state: PartitionsState = await window.bird.partition.list()
-			const found = state.partitions.find((p) => p.name === name)
-			setPartition(found || null)
-		} finally {
-			setLoading(false)
-		}
-	}
+	}, [name])
 
 	const handleLoadSize = async () => {
 		setLoadingSize(true)
@@ -66,19 +55,12 @@ export function PartitionPage({ name, activePartition, onNavigate }: PartitionPa
 		try {
 			await window.bird.partition.reset(name)
 			setSize(null)
+			reloadPartitions()
 		} catch (err) {
 			console.error("Failed to reset partition:", err)
 		} finally {
 			setResetting(false)
 		}
-	}
-
-	if (loading) {
-		return (
-			<VStack py={8}>
-				<Spinner />
-			</VStack>
-		)
 	}
 
 	if (!partition) {

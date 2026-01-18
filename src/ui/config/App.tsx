@@ -1,6 +1,5 @@
-import { Container, Spinner } from "@chakra-ui/react"
 import type { BirdConfig } from "@shared/config.schema"
-import type { EffectiveConfig } from "@shared/types"
+import type { EffectiveConfig, PartitionsState } from "@shared/types"
 import { useEffect, useState } from "react"
 import { AppPage } from "./pages/AppPage"
 import { HomePage } from "./pages/HomePage"
@@ -8,36 +7,55 @@ import { PartitionPage } from "./pages/PartitionPage"
 import { useHashRouter } from "./useHashRouter"
 import { useTranslations } from "./useTranslations"
 
+interface AppState {
+	config: BirdConfig
+	configPath: string
+	effectiveConfig: EffectiveConfig
+	partitionsState: PartitionsState
+}
+
 export function App() {
 	const { route, navigate } = useHashRouter()
 	const { ready } = useTranslations()
-	const [config, setConfig] = useState<BirdConfig | null>(null)
-	const [configPath, setConfigPath] = useState("")
-	const [effectiveConfig, setEffectiveConfig] = useState<EffectiveConfig | null>(null)
+	const [state, setState] = useState<AppState | null>(null)
 
 	useEffect(() => {
-		window.bird.settings.userconfig.read().then((result) => {
-			setConfig(result.content as BirdConfig)
-			setConfigPath(result.path)
-		})
-		window.bird.config.get().then(setEffectiveConfig)
+		loadAll()
 	}, [])
 
+	const loadAll = async () => {
+		const [userConfig, effectiveConfig, partitionsState] = await Promise.all([
+			window.bird.settings.userconfig.read(),
+			window.bird.config.get(),
+			window.bird.partition.list(),
+		])
+
+		setState({
+			config: userConfig.content as BirdConfig,
+			configPath: userConfig.path,
+			effectiveConfig,
+			partitionsState,
+		})
+	}
+
+	const reloadPartitions = async () => {
+		const partitionsState = await window.bird.partition.list()
+		setState((prev) => (prev ? { ...prev, partitionsState } : null))
+	}
+
 	const handleChange = async (newConfig: BirdConfig) => {
-		setConfig(newConfig)
+		setState((prev) => (prev ? { ...prev, config: newConfig } : null))
 		const result = await window.bird.settings.userconfig.write(newConfig)
 		if (!result.success) {
 			console.error("Failed to save config:", result.errors)
 		}
 	}
 
-	if (!config || !ready) {
-		return (
-			<Container centerContent py={10}>
-				<Spinner />
-			</Container>
-		)
+	if (!state || !ready) {
+		return null
 	}
+
+	const { config, configPath, effectiveConfig, partitionsState } = state
 
 	const appMatch = route.match(/^#app\/(.+)$/)
 	const appName = appMatch?.[1]
@@ -46,14 +64,23 @@ export function App() {
 
 	const renderPage = () => {
 		if (appName) {
-			return <AppPage name={appName} config={config} onChange={handleChange} />
+			return (
+				<AppPage
+					name={appName}
+					config={config}
+					partitionsState={partitionsState}
+					onChange={handleChange}
+				/>
+			)
 		}
 		if (partitionName) {
 			return (
 				<PartitionPage
 					name={partitionName}
-					activePartition={effectiveConfig?.partition || ""}
+					partitionsState={partitionsState}
+					activePartition={effectiveConfig.partition}
 					onNavigate={navigate}
+					reloadPartitions={reloadPartitions}
 				/>
 			)
 		}
@@ -61,16 +88,18 @@ export function App() {
 			<HomePage
 				config={config}
 				configPath={configPath}
-				effectiveConfig={effectiveConfig}
+				partitionsState={partitionsState}
+				activePartition={effectiveConfig.partition}
 				onChange={handleChange}
 				onNavigate={navigate}
+				reloadPartitions={reloadPartitions}
 			/>
 		)
 	}
 
 	return (
-		<Container maxW="900px" h="100vh">
+		<div style={{ maxWidth: "900px", height: "100vh", margin: "0 auto" }}>
 			{renderPage()}
-		</Container>
+		</div>
 	)
 }

@@ -1,6 +1,6 @@
 import { HStack, Text, VStack } from "@chakra-ui/react"
 import type { BirdConfig, NavBarConfig } from "@shared/config.schema"
-import type { EffectiveConfig, PartitionsState } from "@shared/types"
+import type { PartitionsState } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
 import { useEffect, useState } from "react"
 import { AppList } from "../components/AppList"
@@ -14,28 +14,20 @@ import { ThemeSelect } from "../components/ThemeSelect"
 interface HomePageProps {
 	config: BirdConfig
 	configPath: string
-	effectiveConfig: EffectiveConfig | null
+	partitionsState: PartitionsState
+	activePartition: string
 	onChange: (config: BirdConfig) => void
 	onNavigate: (hash: string) => void
+	reloadPartitions: () => Promise<void>
 }
 
-export function HomePage({ config, configPath, effectiveConfig, onChange, onNavigate }: HomePageProps) {
+export function HomePage({ config, configPath, partitionsState, activePartition, onChange, onNavigate, reloadPartitions }: HomePageProps) {
 	const { t } = useTranslations()
 	const [showCreateDialog, setShowCreateDialog] = useState(false)
-	const [partitionsState, setPartitionsState] = useState<PartitionsState | null>(null)
 
 	useEffect(() => {
 		document.title = t("settings.title")
 	}, [t])
-
-	useEffect(() => {
-		loadPartitions()
-	}, [])
-
-	const loadPartitions = async () => {
-		const state = await window.bird.partition.list()
-		setPartitionsState(state)
-	}
 
 	const updateTheme = (theme: BirdConfig["theme"]) => {
 		onChange({ ...config, theme })
@@ -49,7 +41,7 @@ export function HomePage({ config, configPath, effectiveConfig, onChange, onNavi
 	}
 
 	const handleCreateApp = async (name: string, startUrl: string) => {
-		const isNewPartition = !partitionsState?.partitions.some((p) => p.name === name)
+		const isNewPartition = !partitionsState.partitions.some((p) => p.name === name)
 		if (isNewPartition) {
 			await window.bird.partition.markFragile(name)
 		}
@@ -68,16 +60,16 @@ export function HomePage({ config, configPath, effectiveConfig, onChange, onNavi
 	const handleDeleteApp = (name: string) => {
 		const { [name]: _, ...rest } = config.apps
 		onChange({ ...config, apps: rest })
-		loadPartitions()
+		reloadPartitions()
 	}
 
 	const handleDeletePartition = async (name: string) => {
 		await window.bird.partition.delete(name)
-		loadPartitions()
+		reloadPartitions()
 	}
 
 	const appCount = Object.keys(config.apps).length
-	const partitionCount = partitionsState?.partitions.length ?? 0
+	const partitionCount = partitionsState.partitions.length
 
 	return (
 		<PageHeader
@@ -110,14 +102,12 @@ export function HomePage({ config, configPath, effectiveConfig, onChange, onNavi
 					</ConfigSection>
 
 					<ConfigSection title={t("settings.partitions")}>
-						{partitionsState && (
-							<PartitionList
-								partitions={partitionsState.partitions}
-								activePartition={effectiveConfig?.partition || ""}
-								onSelect={(name) => onNavigate(`#partition/${name}`)}
-								onDelete={handleDeletePartition}
-							/>
-						)}
+						<PartitionList
+							partitions={partitionsState.partitions}
+							activePartition={activePartition}
+							onSelect={(name) => onNavigate(`#partition/${name}`)}
+							onDelete={handleDeletePartition}
+						/>
 					</ConfigSection>
 				</VStack>
 			</HStack>
