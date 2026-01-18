@@ -1,4 +1,6 @@
 import type { RoutingConfig, TabOrigin } from "@shared/types"
+import { app } from "electron"
+import contextMenu from "electron-context-menu"
 import { shouldHandleUrl } from "../core/UrlRouter"
 import { config$ } from "../core/states"
 import { setupDownloads } from "../services/DownloadManager"
@@ -29,6 +31,17 @@ export class WebView extends BrowserView {
 
 		setupDownloads(this.webContents.session, config$.get().downloads)
 		this.setupNavigation()
+		this.setupContextMenu()
+	}
+
+	private setupContextMenu() {
+		contextMenu({
+			window: this.webContents,
+			showSaveImageAs: true,
+			showCopyImageAddress: true,
+			showSaveLinkAs: true,
+			showInspectElement: !app.isPackaged,
+		})
 	}
 
 	goTo(url: string) {
