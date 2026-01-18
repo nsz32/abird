@@ -1,6 +1,7 @@
 import { Box, HStack, IconButton, Text } from "@chakra-ui/react"
 import type { AppConfig } from "@shared/config.schema"
 import { useTranslations } from "@ui/shared/hooks"
+import { Trash2 } from "lucide-react"
 
 interface AppCardProps {
 	name: string
@@ -14,6 +15,7 @@ export function AppCard({ name, app, onSelect, onDelete }: AppCardProps) {
 
 	const handleDelete = (e: React.MouseEvent) => {
 		e.stopPropagation()
+		if (!confirm(t("app.deleteConfirm"))) return
 		onDelete()
 	}
 
@@ -28,7 +30,7 @@ export function AppCard({ name, app, onSelect, onDelete }: AppCardProps) {
 				</Text>
 			</Box>
 			<IconButton aria-label={t("app.delete")} variant="ghost" size="sm" colorPalette="red" onClick={handleDelete}>
-				×
+				<Trash2 size={16} />
 			</IconButton>
 		</HStack>
 	)

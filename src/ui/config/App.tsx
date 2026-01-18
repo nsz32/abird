@@ -1,4 +1,4 @@
-import { Container, Heading, Spinner } from "@chakra-ui/react"
+import { Container, Spinner } from "@chakra-ui/react"
 import type { BirdConfig } from "@shared/config.schema"
 import type { EffectiveConfig } from "@shared/types"
 import { useEffect, useState } from "react"
@@ -10,7 +10,7 @@ import { useTranslations } from "./useTranslations"
 
 export function App() {
 	const { route, navigate } = useHashRouter()
-	const { t, ready } = useTranslations()
+	const { ready } = useTranslations()
 	const [config, setConfig] = useState<BirdConfig | null>(null)
 	const [configPath, setConfigPath] = useState("")
 	const [effectiveConfig, setEffectiveConfig] = useState<EffectiveConfig | null>(null)
@@ -44,15 +44,9 @@ export function App() {
 	const partitionMatch = route.match(/^#partition\/(.+)$/)
 	const partitionName = partitionMatch?.[1]
 
-	const getTitle = () => {
-		if (appName) return appName
-		if (partitionName) return partitionName
-		return t("settings.title")
-	}
-
 	const renderPage = () => {
 		if (appName) {
-			return <AppPage name={appName} config={config} onChange={handleChange} onNavigate={navigate} />
+			return <AppPage name={appName} config={config} onChange={handleChange} />
 		}
 		if (partitionName) {
 			return (
@@ -75,10 +69,7 @@ export function App() {
 	}
 
 	return (
-		<Container maxW="900px" py={6}>
-			<Heading size="lg" mb={6}>
-				{getTitle()}
-			</Heading>
+		<Container maxW="900px" h="100vh">
 			{renderPage()}
 		</Container>
 	)

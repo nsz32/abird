@@ -7,6 +7,7 @@ import { AppList } from "../components/AppList"
 import { ConfigSection } from "../components/ConfigSection"
 import { CreateAppDialog } from "../components/CreateAppDialog"
 import { NavBarConfigForm } from "../components/NavBarConfigForm"
+import { PageHeader } from "../components/PageHeader"
 import { PartitionList } from "../components/PartitionList"
 import { ThemeSelect } from "../components/ThemeSelect"
 
@@ -75,8 +76,15 @@ export function HomePage({ config, configPath, effectiveConfig, onChange, onNavi
 		loadPartitions()
 	}
 
+	const appCount = Object.keys(config.apps).length
+	const partitionCount = partitionsState?.partitions.length ?? 0
+
 	return (
-		<>
+		<PageHeader
+			title={t("settings.title")}
+			leftInfo={`${appCount} apps · ${partitionCount} partitions`}
+			rightInfo={configPath}
+		>
 			<HStack align="start" gap={6}>
 				<VStack flex={1} align="stretch" gap={4}>
 					<ConfigSection title={t("settings.appearance")}>
@@ -89,10 +97,6 @@ export function HomePage({ config, configPath, effectiveConfig, onChange, onNavi
 					<ConfigSection title={t("settings.navbar")}>
 						<NavBarConfigForm mode="global" config={config.navBar || {}} onChange={updateNavBar} />
 					</ConfigSection>
-
-					<Text fontSize="xs" color="fg.muted">
-						{t("settings.configPath")} : {configPath}
-					</Text>
 				</VStack>
 
 				<VStack flex={1} align="stretch" gap={4}>
@@ -124,6 +128,6 @@ export function HomePage({ config, configPath, effectiveConfig, onChange, onNavi
 				onCreate={handleCreateApp}
 				existingNames={Object.keys(config.apps)}
 			/>
-		</>
+		</PageHeader>
 	)
 }

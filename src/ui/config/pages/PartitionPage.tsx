@@ -3,6 +3,7 @@ import type { PartitionState, PartitionsState } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
 import { useEffect, useState } from "react"
 import { ConfigSection } from "../components/ConfigSection"
+import { PageHeader } from "../components/PageHeader"
 
 interface PartitionPageProps {
 	name: string
@@ -25,12 +26,9 @@ export function PartitionPage({ name, activePartition, onNavigate }: PartitionPa
 	const [size, setSize] = useState<number | null>(null)
 	const [loadingSize, setLoadingSize] = useState(false)
 	const [resetting, setResetting] = useState(false)
-	const [deleting, setDeleting] = useState(false)
 
 	const isActive = name === activePartition
-	const isUnused = partition ? partition.usedByApps.length === 0 : false
 	const canReset = partition?.hasPhysical && !isActive
-	const canDelete = isUnused && !isActive
 
 	useEffect(() => {
 		document.title = `Bird - ${name}`
@@ -75,21 +73,6 @@ export function PartitionPage({ name, activePartition, onNavigate }: PartitionPa
 		}
 	}
 
-	const handleDelete = async () => {
-		if (partition?.hasPhysical) {
-			if (!confirm(t("partition.confirmDelete").replace("{name}", name))) return
-		}
-
-		setDeleting(true)
-		try {
-			await window.bird.partition.delete(name)
-			onNavigate("#")
-		} catch (err) {
-			console.error("Failed to delete partition:", err)
-			setDeleting(false)
-		}
-	}
-
 	if (loading) {
 		return (
 			<VStack py={8}>
@@ -106,14 +89,24 @@ export function PartitionPage({ name, activePartition, onNavigate }: PartitionPa
 		)
 	}
 
+	const sizeInfo = !partition.hasPhysical
+		? t("partition.notCreated")
+		: size !== null
+			? formatBytes(size)
+			: undefined
+
 	return (
-		<VStack align="stretch" gap={4}>
-			<ConfigSection title={t("partition.details")}>
+		<PageHeader
+			title={name}
+			leftInfo={sizeInfo ?? t("partition.sizeUnknown")}
+		>
+			<VStack align="stretch" gap={4}>
+				<ConfigSection title={t("partition.details")}>
 				<HStack gap={2} py={2}>
 					{isActive && (
 						<Badge colorPalette="blue">{t("partition.active")}</Badge>
 					)}
-					{isUnused && (
+					{partition.usedByApps.length === 0 && (
 						<Badge colorPalette="orange">{t("partition.orphan")}</Badge>
 					)}
 					{!partition.hasPhysical && (
@@ -164,29 +157,14 @@ export function PartitionPage({ name, activePartition, onNavigate }: PartitionPa
 				</Text>
 			</ConfigSection>
 
-			<ConfigSection title={t("partition.actions")}>
-				<VStack align="stretch" gap={2}>
-					{canReset && (
-						<Button variant="outline" size="sm" onClick={handleReset} disabled={resetting}>
-							{resetting ? <Spinner size="sm" /> : t("partition.reset")}
-						</Button>
-					)}
-
-					{canDelete && (
-						<Button colorPalette="red" variant="outline" size="sm" onClick={handleDelete} disabled={deleting}>
-							{deleting ? <Spinner size="sm" /> : t("partition.delete")}
-						</Button>
-					)}
-
-					{!canReset && !canDelete && (
-						<Text fontSize="sm" color="fg.muted">
-							{isActive
-								? t("partition.cannotModifyActive")
-								: t("partition.noActions")}
-						</Text>
-					)}
-				</VStack>
-			</ConfigSection>
-		</VStack>
+			{canReset && (
+				<ConfigSection title={t("partition.actions")}>
+					<Button variant="outline" size="sm" onClick={handleReset} disabled={resetting}>
+						{resetting ? <Spinner size="sm" /> : t("partition.reset")}
+					</Button>
+				</ConfigSection>
+			)}
+			</VStack>
+		</PageHeader>
 	)
 }

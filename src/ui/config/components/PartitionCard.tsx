@@ -1,6 +1,7 @@
 import { Badge, Box, HStack, IconButton, Spinner, Text } from "@chakra-ui/react"
 import type { PartitionState } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
+import { Trash2 } from "lucide-react"
 import { useState } from "react"
 
 interface PartitionCardProps {
@@ -84,7 +85,7 @@ export function PartitionCard({ partition, isActive, onSelect, onDelete }: Parti
 					onClick={handleDelete}
 					disabled={deleting}
 				>
-					{deleting ? <Spinner size="xs" /> : "×"}
+					{deleting ? <Spinner size="xs" /> : <Trash2 size={16} />}
 				</IconButton>
 			)}
 		</HStack>

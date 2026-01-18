@@ -48,6 +48,8 @@ const en = {
 	"app.deploy": "Add shortcut",
 	"app.undeploy": "Remove shortcut",
 	"app.shortcut": "Desktop shortcut",
+	"app.shortcutCreated": "Shortcut created",
+	"app.shortcutNotCreated": "No shortcut",
 
 	// Inherit state
 	"inherit.reset": "Reset",
@@ -93,6 +95,7 @@ const en = {
 	"partition.notFound": "Partition not found",
 	"partition.cannotModifyActive": "Cannot modify the active partition",
 	"partition.noActions": "No actions available",
+	"partition.sizeUnknown": "Size unknown",
 }
 
 const fr: typeof en = {
@@ -143,6 +146,8 @@ const fr: typeof en = {
 	"app.deploy": "Créer raccourci",
 	"app.undeploy": "Supprimer raccourci",
 	"app.shortcut": "Raccourci bureau",
+	"app.shortcutCreated": "Raccourci créé",
+	"app.shortcutNotCreated": "Pas de raccourci",
 
 	// Inherit state
 	"inherit.reset": "Réinitialiser",
@@ -188,6 +193,7 @@ const fr: typeof en = {
 	"partition.notFound": "Partition non trouvée",
 	"partition.cannotModifyActive": "Impossible de modifier la partition active",
 	"partition.noActions": "Aucune action disponible",
+	"partition.sizeUnknown": "Taille inconnue",
 }
 
 export const translations: Record<Locale, typeof en> = { en, fr }

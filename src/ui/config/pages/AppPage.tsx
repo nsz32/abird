@@ -5,6 +5,7 @@ import { useTranslations } from "@ui/shared/hooks"
 import { useEffect, useRef, useState } from "react"
 import { ConfigSection } from "../components/ConfigSection"
 import { NavBarConfigForm } from "../components/NavBarConfigForm"
+import { PageHeader } from "../components/PageHeader"
 import { PartitionSelect } from "../components/PartitionSelect"
 import { ThemeSelect } from "../components/ThemeSelect"
 
@@ -12,10 +13,9 @@ interface AppPageProps {
 	name: string
 	config: BirdConfig
 	onChange: (config: BirdConfig) => void
-	onNavigate: (hash: string) => void
 }
 
-export function AppPage({ name, config, onChange, onNavigate }: AppPageProps) {
+export function AppPage({ name, config, onChange }: AppPageProps) {
 	const { t } = useTranslations()
 	const [icons, setIcons] = useState<IconResult[]>([])
 	const [iconSizes, setIconSizes] = useState<Record<string, { w: number; h: number }>>({})
@@ -91,13 +91,6 @@ export function AppPage({ name, config, onChange, onNavigate }: AppPageProps) {
 
 		const hasValues = Object.keys(newNavBar).length > 0
 		updateApp({ navBar: hasValues ? newNavBar : undefined })
-	}
-
-	const handleDeleteApp = () => {
-		if (!confirm(t("app.deleteConfirm"))) return
-		const { [name]: _, ...rest } = config.apps
-		onChange({ ...config, apps: rest })
-		onNavigate("#")
 	}
 
 	const handleFetchIcons = async () => {
@@ -205,9 +198,18 @@ export function AppPage({ name, config, onChange, onNavigate }: AppPageProps) {
 		return usage
 	}
 
+	const shortcutInfo = deploySupported
+		? deployed ? t("app.shortcutCreated") : t("app.shortcutNotCreated")
+		: undefined
+
 	return (
-		<VStack align="stretch" gap={4}>
-			<ConfigSection title={t("app.general")}>
+		<PageHeader
+			title={name}
+			leftInfo={app.startUrl}
+			rightInfo={shortcutInfo}
+		>
+			<VStack align="stretch" gap={4}>
+				<ConfigSection title={t("app.general")}>
 				<HStack justify="space-between" py={2}>
 					<Text fontSize="sm">{t("app.startUrl")}</Text>
 					<Input size="sm" width="200px" value={app.startUrl} onChange={(e) => updateApp({ startUrl: e.target.value })} />
@@ -286,10 +288,7 @@ export function AppPage({ name, config, onChange, onNavigate }: AppPageProps) {
 					</HStack>
 				</ConfigSection>
 			)}
-
-			<Button colorPalette="red" variant="outline" size="sm" onClick={handleDeleteApp}>
-				{t("app.delete")}
-			</Button>
-		</VStack>
+			</VStack>
+		</PageHeader>
 	)
 }
