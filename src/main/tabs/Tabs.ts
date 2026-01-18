@@ -87,7 +87,7 @@ export function getTabsList(): TabInfo[] {
 			url: t.navState$.get().url || t.initialUrl,
 			favicon: t.favicon,
 			isActive: t.id === selectedId,
-			isVisible: t.id === visibleId,
+			isCurrent: t.id === visibleId,
 			isLoading: t.navState$.get().isLoading || hasInvalidChild(t.id),
 		}))
 }

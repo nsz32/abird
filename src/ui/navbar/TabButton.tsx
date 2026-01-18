@@ -10,9 +10,7 @@ interface TabButtonProps {
 }
 
 export function TabButton({ tab, showClose, showExternalIndicator, onActivate, onClose }: TabButtonProps) {
-	const classes = ["tab-button", tab.isActive && "active", tab.isActive && !tab.isVisible && "hidden-tab", showExternalIndicator && "external-wave"]
-		.filter(Boolean)
-		.join(" ")
+	const classes = ["tab-button", tab.isActive && "active", tab.isCurrent && "current", showExternalIndicator && "external-wave"].filter(Boolean).join(" ")
 
 	return (
 		<button type="button" className={classes} onClick={onActivate}>
