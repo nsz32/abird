@@ -155,13 +155,12 @@ body,
 }
 
 .tab-button.active {
-	background: rgba(100, 150, 255, 0.2);
 	color: #fff;
-	cursor: default;
 }
 
-.tab-button.active.hidden-tab {
-	color: #888;
+.tab-button.current {
+	background: rgba(100, 150, 255, 0.2);
+	cursor: default;
 }
 
 .tab-favicon {
@@ -221,6 +220,17 @@ body,
 	to {
 		transform: rotate(360deg);
 	}
+}
+
+/* Download progress indicator */
+.download-progress-track {
+	opacity: 0.3;
+}
+
+.download-progress-arc {
+	stroke: currentColor;
+	transition: stroke-dashoffset 0.3s ease-out;
+	will-change: stroke-dashoffset;
 }
 
 .tab-placeholder {
