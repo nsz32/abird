@@ -16,7 +16,7 @@ import {
 	notifications$,
 } from "./core/states"
 import { cancelDownload, getDownloadPath, removeFromHistory, retryDownload } from "./services/DownloadManager"
-import { deletePartition, getPartitionSize, getPartitionsState, resetPartition } from "./services/PartitionManager"
+import { deletePartition, getPartitionSize, getPartitionsState, markPartitionFragile, resetPartition } from "./services/PartitionManager"
 import { deploy, isDeploySupported, isDeployed, undeploy } from "./services/deploy"
 import { fetchIcons, importIconFile, saveIcon } from "./services/icons"
 import { dismissNotification } from "./services/notify"
@@ -111,8 +111,16 @@ export function registerHandlers() {
 	ipcMain.handle(IpcChannels.UNDEPLOY_APP, (_, appName: string) => undeploy(appName))
 
 	// Partition management
-	ipcMain.handle(IpcChannels.PARTITION_LIST, () => getPartitionsState())
+	ipcMain.handle(IpcChannels.PARTITION_LIST, () => {
+		try {
+			return getPartitionsState()
+		} catch (err) {
+			console.error("[Partition] Failed to get state:", err)
+			return { partitions: [], physicalPath: "" }
+		}
+	})
 	ipcMain.handle(IpcChannels.PARTITION_RESET, (_, name: string) => resetPartition(name))
 	ipcMain.handle(IpcChannels.PARTITION_DELETE, (_, name: string) => deletePartition(name))
 	ipcMain.handle(IpcChannels.PARTITION_GET_SIZE, (_, name: string) => getPartitionSize(name))
+	ipcMain.handle(IpcChannels.PARTITION_MARK_FRAGILE, (_, name: string) => markPartitionFragile(name))
 }

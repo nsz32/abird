@@ -10,8 +10,6 @@ const en = {
 	"settings.noApps": "No applications configured",
 	"settings.configPath": "Configuration",
 	"settings.partitions": "Partitions",
-	"settings.managePartitions": "Manage data partitions",
-	"settings.openPartitions": "Manage",
 
 	// Theme
 	"theme.system": "System",
@@ -78,9 +76,6 @@ const en = {
 	// Partitions
 	"partition.orphan": "Unused",
 	"partition.active": "Active",
-	"partition.orphanWarning": "{count} unused partition(s) can be deleted",
-	"partition.orphanSection": "Unused partitions",
-	"partition.inUseSection": "Partitions in use",
 	"partition.noPartitions": "No partitions",
 	"partition.usedBy": "Used by",
 	"partition.notCreated": "Not yet created",
@@ -92,6 +87,12 @@ const en = {
 	"partition.createNew": "New partition",
 	"partition.namePlaceholder": "partition-name",
 	"partition.storagePath": "Storage path",
+	"partition.details": "Details",
+	"partition.actions": "Actions",
+	"partition.fragile": "Auto-created",
+	"partition.notFound": "Partition not found",
+	"partition.cannotModifyActive": "Cannot modify the active partition",
+	"partition.noActions": "No actions available",
 }
 
 const fr: typeof en = {
@@ -104,8 +105,6 @@ const fr: typeof en = {
 	"settings.noApps": "Aucune application configurée",
 	"settings.configPath": "Configuration",
 	"settings.partitions": "Partitions",
-	"settings.managePartitions": "Gérer les partitions de données",
-	"settings.openPartitions": "Gérer",
 
 	// Theme
 	"theme.system": "Système",
@@ -172,9 +171,6 @@ const fr: typeof en = {
 	// Partitions
 	"partition.orphan": "Inutilisée",
 	"partition.active": "Active",
-	"partition.orphanWarning": "{count} partition(s) inutilisée(s) peuvent être supprimées",
-	"partition.orphanSection": "Partitions inutilisées",
-	"partition.inUseSection": "Partitions utilisées",
 	"partition.noPartitions": "Aucune partition",
 	"partition.usedBy": "Utilisée par",
 	"partition.notCreated": "Non encore créée",
@@ -186,6 +182,12 @@ const fr: typeof en = {
 	"partition.createNew": "Nouvelle partition",
 	"partition.namePlaceholder": "nom-partition",
 	"partition.storagePath": "Emplacement",
+	"partition.details": "Détails",
+	"partition.actions": "Actions",
+	"partition.fragile": "Créée automatiquement",
+	"partition.notFound": "Partition non trouvée",
+	"partition.cannotModifyActive": "Impossible de modifier la partition active",
+	"partition.noActions": "Aucune action disponible",
 }
 
 export const translations: Record<Locale, typeof en> = { en, fr }

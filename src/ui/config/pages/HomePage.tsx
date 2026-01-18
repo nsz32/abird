@@ -1,27 +1,40 @@
-import { Box, Button, HStack, Text, VStack } from "@chakra-ui/react"
+import { HStack, Text, VStack } from "@chakra-ui/react"
 import type { BirdConfig, NavBarConfig } from "@shared/config.schema"
+import type { EffectiveConfig, PartitionsState } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
 import { useEffect, useState } from "react"
 import { AppList } from "../components/AppList"
 import { ConfigSection } from "../components/ConfigSection"
 import { CreateAppDialog } from "../components/CreateAppDialog"
 import { NavBarConfigForm } from "../components/NavBarConfigForm"
+import { PartitionList } from "../components/PartitionList"
 import { ThemeSelect } from "../components/ThemeSelect"
 
 interface HomePageProps {
 	config: BirdConfig
 	configPath: string
+	effectiveConfig: EffectiveConfig | null
 	onChange: (config: BirdConfig) => void
 	onNavigate: (hash: string) => void
 }
 
-export function HomePage({ config, configPath, onChange, onNavigate }: HomePageProps) {
+export function HomePage({ config, configPath, effectiveConfig, onChange, onNavigate }: HomePageProps) {
 	const { t } = useTranslations()
 	const [showCreateDialog, setShowCreateDialog] = useState(false)
+	const [partitionsState, setPartitionsState] = useState<PartitionsState | null>(null)
 
 	useEffect(() => {
 		document.title = t("settings.title")
 	}, [t])
+
+	useEffect(() => {
+		loadPartitions()
+	}, [])
+
+	const loadPartitions = async () => {
+		const state = await window.bird.partition.list()
+		setPartitionsState(state)
+	}
 
 	const updateTheme = (theme: BirdConfig["theme"]) => {
 		onChange({ ...config, theme })
@@ -34,7 +47,12 @@ export function HomePage({ config, configPath, onChange, onNavigate }: HomePageP
 		})
 	}
 
-	const handleCreateApp = (name: string, startUrl: string) => {
+	const handleCreateApp = async (name: string, startUrl: string) => {
+		const isNewPartition = !partitionsState?.partitions.some((p) => p.name === name)
+		if (isNewPartition) {
+			await window.bird.partition.markFragile(name)
+		}
+
 		onChange({
 			...config,
 			apps: {
@@ -49,6 +67,12 @@ export function HomePage({ config, configPath, onChange, onNavigate }: HomePageP
 	const handleDeleteApp = (name: string) => {
 		const { [name]: _, ...rest } = config.apps
 		onChange({ ...config, apps: rest })
+		loadPartitions()
+	}
+
+	const handleDeletePartition = async (name: string) => {
+		await window.bird.partition.delete(name)
+		loadPartitions()
 	}
 
 	return (
@@ -66,21 +90,12 @@ export function HomePage({ config, configPath, onChange, onNavigate }: HomePageP
 						<NavBarConfigForm mode="global" config={config.navBar || {}} onChange={updateNavBar} />
 					</ConfigSection>
 
-					<ConfigSection title={t("settings.partitions")}>
-						<HStack justify="space-between" py={2}>
-							<Text fontSize="sm">{t("settings.managePartitions")}</Text>
-							<Button size="sm" variant="outline" onClick={() => onNavigate("#partitions")}>
-								{t("settings.openPartitions")}
-							</Button>
-						</HStack>
-					</ConfigSection>
-
 					<Text fontSize="xs" color="fg.muted">
 						{t("settings.configPath")} : {configPath}
 					</Text>
 				</VStack>
 
-				<Box flex={1}>
+				<VStack flex={1} align="stretch" gap={4}>
 					<ConfigSection title={t("settings.apps")}>
 						<AppList
 							apps={config.apps}
@@ -89,7 +104,18 @@ export function HomePage({ config, configPath, onChange, onNavigate }: HomePageP
 							onDelete={handleDeleteApp}
 						/>
 					</ConfigSection>
-				</Box>
+
+					<ConfigSection title={t("settings.partitions")}>
+						{partitionsState && (
+							<PartitionList
+								partitions={partitionsState.partitions}
+								activePartition={effectiveConfig?.partition || ""}
+								onSelect={(name) => onNavigate(`#partition/${name}`)}
+								onDelete={handleDeletePartition}
+							/>
+						)}
+					</ConfigSection>
+				</VStack>
 			</HStack>
 
 			<CreateAppDialog

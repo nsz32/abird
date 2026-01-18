@@ -4,7 +4,7 @@ import type { EffectiveConfig } from "@shared/types"
 import { useEffect, useState } from "react"
 import { AppPage } from "./pages/AppPage"
 import { HomePage } from "./pages/HomePage"
-import { PartitionsPage } from "./pages/PartitionsPage"
+import { PartitionPage } from "./pages/PartitionPage"
 import { useHashRouter } from "./useHashRouter"
 import { useTranslations } from "./useTranslations"
 
@@ -41,11 +41,12 @@ export function App() {
 
 	const appMatch = route.match(/^#app\/(.+)$/)
 	const appName = appMatch?.[1]
-	const isPartitionsPage = route === "#partitions"
+	const partitionMatch = route.match(/^#partition\/(.+)$/)
+	const partitionName = partitionMatch?.[1]
 
 	const getTitle = () => {
 		if (appName) return appName
-		if (isPartitionsPage) return t("settings.partitions")
+		if (partitionName) return partitionName
 		return t("settings.title")
 	}
 
@@ -53,10 +54,24 @@ export function App() {
 		if (appName) {
 			return <AppPage name={appName} config={config} onChange={handleChange} onNavigate={navigate} />
 		}
-		if (isPartitionsPage) {
-			return <PartitionsPage activePartition={effectiveConfig?.partition || ""} />
+		if (partitionName) {
+			return (
+				<PartitionPage
+					name={partitionName}
+					activePartition={effectiveConfig?.partition || ""}
+					onNavigate={navigate}
+				/>
+			)
 		}
-		return <HomePage config={config} configPath={configPath} onChange={handleChange} onNavigate={navigate} />
+		return (
+			<HomePage
+				config={config}
+				configPath={configPath}
+				effectiveConfig={effectiveConfig}
+				onChange={handleChange}
+				onNavigate={navigate}
+			/>
+		)
 	}
 
 	return (

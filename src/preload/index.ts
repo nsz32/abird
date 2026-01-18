@@ -144,5 +144,6 @@ contextBridge.exposeInMainWorld("bird", {
 		reset: (name: string): Promise<void> => ipcRenderer.invoke(IpcChannels.PARTITION_RESET, name),
 		delete: (name: string): Promise<void> => ipcRenderer.invoke(IpcChannels.PARTITION_DELETE, name),
 		getSize: (name: string): Promise<number> => ipcRenderer.invoke(IpcChannels.PARTITION_GET_SIZE, name),
+		markFragile: (name: string): Promise<void> => ipcRenderer.invoke(IpcChannels.PARTITION_MARK_FRAGILE, name),
 	},
 })

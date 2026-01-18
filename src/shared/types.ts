@@ -109,6 +109,7 @@ export interface PartitionState {
 	hasPhysical: boolean // Existe sur disque
 	usedByApps: string[] // Apps qui l'utilisent
 	isOrphan: boolean // Physique mais non utilisée
+	isFragile: boolean // Créée auto avec app (runtime only)
 	config: _PartitionConfig | null
 	diskSize?: number
 }
@@ -190,6 +191,7 @@ export const IpcChannels = {
 	PARTITION_RESET: "bird:partition:reset",
 	PARTITION_DELETE: "bird:partition:delete",
 	PARTITION_GET_SIZE: "bird:partition:get-size",
+	PARTITION_MARK_FRAGILE: "bird:partition:mark-fragile",
 } as const
 
 // Type utilitaire pour les valeurs de IpcChannels
@@ -318,6 +320,7 @@ export interface BirdApi {
 		reset: (name: string) => Promise<void>
 		delete: (name: string) => Promise<void>
 		getSize: (name: string) => Promise<number>
+		markFragile: (name: string) => Promise<void>
 	}
 }
 
