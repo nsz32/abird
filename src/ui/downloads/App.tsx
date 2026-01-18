@@ -54,6 +54,7 @@ function ActiveDownloadItem({ item }: { item: ActiveDownload }) {
 					<span className="download-size">
 						{formatSize(item.receivedBytes)}
 						{hasProgress && ` / ${formatSize(item.totalBytes)}`}
+						{item.bytesPerSecond > 0 && ` · ${formatSize(item.bytesPerSecond)}/s`}
 					</span>
 				</div>
 			</div>
