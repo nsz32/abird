@@ -92,6 +92,7 @@ contextBridge.exposeInMainWorld("bird", {
 		openFolder: (id: string) => ipcRenderer.invoke(IpcChannels.DOWNLOADS_OPEN_FOLDER, id),
 		cancel: (id: string) => ipcRenderer.invoke(IpcChannels.DOWNLOADS_CANCEL, id),
 		retry: (id: string) => ipcRenderer.invoke(IpcChannels.DOWNLOADS_RETRY, id),
+		remove: (id: string) => ipcRenderer.invoke(IpcChannels.DOWNLOADS_REMOVE, id),
 	},
 	find: {
 		search: (text: string) => ipcRenderer.invoke(IpcChannels.FIND_SEARCH, text),

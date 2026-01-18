@@ -30,6 +30,7 @@ export interface NavigationState {
 	canGoForward: boolean
 	isLoading: boolean
 	isStandalonePanel?: boolean
+	isDownloadsPanelActive?: boolean
 }
 
 // Info d'un tab (envoyé aux overlays)
@@ -138,6 +139,7 @@ export const IpcChannels = {
 	DOWNLOADS_OPEN_FOLDER: "bird:downloads:open-folder",
 	DOWNLOADS_CANCEL: "bird:downloads:cancel",
 	DOWNLOADS_RETRY: "bird:downloads:retry",
+	DOWNLOADS_REMOVE: "bird:downloads:remove",
 	// Find in page
 	FIND_OPEN: "bird:find:open",
 	FIND_SEARCH: "bird:find:search",
@@ -253,6 +255,7 @@ export interface BirdApi {
 		openFolder: (id: string) => Promise<void>
 		cancel: (id: string) => Promise<void>
 		retry: (id: string) => Promise<void>
+		remove: (id: string) => Promise<void>
 	}
 	find: {
 		search: (text: string) => Promise<void>

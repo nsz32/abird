@@ -94,7 +94,8 @@ function setupSubscriptions() {
 	navbarSync$.subscribe(() => {
 		const { navState, activeContentId, activeTabId } = navbarSync$.get()
 		const isStandalonePanel = activeContentId !== null && activeContentId !== activeTabId
-		navBar.sendNavigationState({ ...navState, isStandalonePanel })
+		const isDownloadsPanelActive = activeContentId === DOWNLOADS_VIEW_ID
+		navBar.sendNavigationState({ ...navState, isStandalonePanel, isDownloadsPanelActive })
 		navBar.sendTabsList(getTabsList())
 	})
 

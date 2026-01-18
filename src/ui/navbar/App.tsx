@@ -89,7 +89,9 @@ export function App() {
 				</div>
 			)}
 			{hasDownloads && (
-				<NavButton onClick={() => window.bird.downloads.toggle()}>{hasActiveDownloads ? <Loader2 className="spinning" /> : <Download />}</NavButton>
+				<NavButton onClick={() => window.bird.downloads.toggle()} active={navState.isDownloadsPanelActive}>
+					{hasActiveDownloads ? <Loader2 className="spinning" /> : <Download />}
+				</NavButton>
 			)}
 		</div>
 	)
@@ -98,12 +100,13 @@ export function App() {
 interface NavButtonProps {
 	onClick: () => void
 	disabled?: boolean
+	active?: boolean
 	children: React.ReactNode
 }
 
-function NavButton({ onClick, disabled, children }: NavButtonProps) {
+function NavButton({ onClick, disabled, active, children }: NavButtonProps) {
 	return (
-		<button type="button" className="nav-button" onClick={onClick} disabled={disabled}>
+		<button type="button" className={`nav-button ${active ? "active" : ""}`} onClick={onClick} disabled={disabled}>
 			{children}
 		</button>
 	)

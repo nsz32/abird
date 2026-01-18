@@ -1,6 +1,6 @@
 import type { ActiveDownload, DownloadHistoryItem, DownloadStatus } from "@shared/types"
 import { useBirdState, useTranslations } from "@ui/shared/hooks"
-import { AlertCircle, CheckCircle, Download, FileText, FolderOpen, Loader2, RefreshCw, ShieldX, X, XCircle } from "lucide-react"
+import { AlertCircle, CheckCircle, Download, ExternalLink, FolderOpen, Loader2, RefreshCw, ShieldX, Trash2, X, XCircle } from "lucide-react"
 
 const statusIcons: Record<DownloadStatus, typeof CheckCircle> = {
 	completed: CheckCircle,
@@ -18,31 +18,42 @@ function formatSize(bytes: number): string {
 	return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`
 }
 
-function formatSpeed(bytesPerSecond: number): string {
-	if (bytesPerSecond < 1024) return `${bytesPerSecond} B/s`
-	if (bytesPerSecond < 1024 * 1024) return `${(bytesPerSecond / 1024).toFixed(1)} KB/s`
-	return `${(bytesPerSecond / (1024 * 1024)).toFixed(1)} MB/s`
+function formatRemainingTime(remainingBytes: number, bytesPerSecond: number): string | null {
+	if (bytesPerSecond <= 0 || remainingBytes <= 0) return null
+
+	const seconds = Math.ceil(remainingBytes / bytesPerSecond)
+	if (seconds < 60) return `${seconds}s`
+	if (seconds < 3600) return `${Math.ceil(seconds / 60)} min`
+
+	const hours = Math.floor(seconds / 3600)
+	const minutes = Math.ceil((seconds % 3600) / 60)
+	return minutes > 0 ? `${hours}h ${minutes}min` : `${hours}h`
 }
 
 function ActiveDownloadItem({ item }: { item: ActiveDownload }) {
 	const { t } = useTranslations()
 	const progress = item.totalBytes > 0 ? Math.round((item.receivedBytes / item.totalBytes) * 100) : 0
 	const hasProgress = item.totalBytes > 0
+	const remainingTime = hasProgress ? formatRemainingTime(item.totalBytes - item.receivedBytes, item.bytesPerSecond) : null
 
 	return (
 		<div className="download-item active">
-			<Loader2 size={20} className="download-icon spinning" />
+			<Loader2 size={32} className="download-icon spinning" />
 			<div className="download-content">
-				<div className="download-filename">{item.filename}</div>
-				{hasProgress && (
-					<div className="download-progress-bar">
-						<div className="download-progress-fill" style={{ width: `${progress}%` }} />
-					</div>
-				)}
+				<div className="download-filename-row">
+					<span className="download-filename">{item.filename}</span>
+					{hasProgress && (
+						<div className="download-progress-bar">
+							<div className="download-progress-fill" style={{ width: `${progress}%` }} />
+						</div>
+					)}
+				</div>
 				<div className="download-status">
-					<span>
-						{hasProgress ? `${progress}%` : t("downloads.inProgress")}
-						{item.bytesPerSecond > 0 && ` · ${formatSpeed(item.bytesPerSecond)}`}
+					<span>{hasProgress ? `${progress}%` : t("downloads.inProgress")}</span>
+					{remainingTime && <span>· {remainingTime}</span>}
+					<span className="download-size">
+						{formatSize(item.receivedBytes)}
+						{hasProgress && ` / ${formatSize(item.totalBytes)}`}
 					</span>
 				</div>
 			</div>
@@ -60,13 +71,16 @@ function HistoryDownloadItem({ item }: { item: DownloadHistoryItem }) {
 	const Icon = statusIcons[item.status]
 	const canOpen = (item.status === "completed" || item.status === "duplicate") && item.savePath
 	const canRetry = (item.status === "cancelled" || item.status === "failed") && item.url
+	const canRemove = item.status === "cancelled"
 	const sizeText = formatSize(item.totalBytes)
 
 	return (
 		<div className={`download-item ${item.status}`}>
-			<Download size={20} className="download-icon" />
+			<Download size={32} className="download-icon" />
 			<div className="download-content">
-				<div className="download-filename">{item.filename}</div>
+				<div className="download-filename-row">
+					<span className="download-filename">{item.filename}</span>
+				</div>
 				<div className="download-status">
 					<Icon size={14} />
 					<span>
@@ -78,7 +92,7 @@ function HistoryDownloadItem({ item }: { item: DownloadHistoryItem }) {
 			{canOpen && (
 				<div className="download-actions">
 					<button type="button" className="action-btn" onClick={() => window.bird.downloads.openFile(item.id)} title={t("downloads.openFile")}>
-						<FileText size={16} />
+						<ExternalLink size={16} />
 					</button>
 					<button type="button" className="action-btn" onClick={() => window.bird.downloads.openFolder(item.id)} title={t("downloads.openFolder")}>
 						<FolderOpen size={16} />
@@ -90,6 +104,11 @@ function HistoryDownloadItem({ item }: { item: DownloadHistoryItem }) {
 					<button type="button" className="action-btn" onClick={() => window.bird.downloads.retry(item.id)} title={t("downloads.retry")}>
 						<RefreshCw size={16} />
 					</button>
+					{canRemove && (
+						<button type="button" className="action-btn" onClick={() => window.bird.downloads.remove(item.id)} title={t("downloads.remove")}>
+							<Trash2 size={16} />
+						</button>
+					)}
 				</div>
 			)}
 		</div>

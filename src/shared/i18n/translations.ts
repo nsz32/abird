@@ -63,6 +63,7 @@ const en = {
 	"downloads.openFolder": "Show in folder",
 	"downloads.cancel": "Cancel",
 	"downloads.retry": "Retry",
+	"downloads.remove": "Remove from list",
 
 	// Find
 	"find.placeholder": "Search...",
@@ -134,6 +135,7 @@ const fr: typeof en = {
 	"downloads.openFolder": "Afficher dans le dossier",
 	"downloads.cancel": "Annuler",
 	"downloads.retry": "Relancer",
+	"downloads.remove": "Retirer de la liste",
 
 	// Find
 	"find.placeholder": "Rechercher...",

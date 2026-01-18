@@ -387,3 +387,12 @@ export function retryDownload(id: string): boolean {
 	downloadHistory$.emit(downloadHistory$.get().filter((d) => d.id !== id))
 	return true
 }
+
+export function removeFromHistory(id: string): boolean {
+	const history = downloadHistory$.get()
+	const exists = history.some((d) => d.id === id)
+	if (exists) {
+		downloadHistory$.emit(history.filter((d) => d.id !== id))
+	}
+	return exists
+}
