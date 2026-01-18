@@ -9,6 +9,7 @@ import {
 	IpcChannels,
 	type NavigationState,
 	type Notification,
+	type PartitionsState,
 	type TabInfo,
 } from "@shared/types"
 import { contextBridge, ipcRenderer } from "electron"
@@ -137,5 +138,11 @@ contextBridge.exposeInMainWorld("bird", {
 		getStatus: (appName: string): Promise<boolean> => ipcRenderer.invoke(IpcChannels.DEPLOY_STATUS, appName),
 		deploy: (appName: string): Promise<void> => ipcRenderer.invoke(IpcChannels.DEPLOY_APP, appName),
 		undeploy: (appName: string): Promise<void> => ipcRenderer.invoke(IpcChannels.UNDEPLOY_APP, appName),
+	},
+	partition: {
+		list: (): Promise<PartitionsState> => ipcRenderer.invoke(IpcChannels.PARTITION_LIST),
+		reset: (name: string): Promise<void> => ipcRenderer.invoke(IpcChannels.PARTITION_RESET, name),
+		delete: (name: string): Promise<void> => ipcRenderer.invoke(IpcChannels.PARTITION_DELETE, name),
+		getSize: (name: string): Promise<number> => ipcRenderer.invoke(IpcChannels.PARTITION_GET_SIZE, name),
 	},
 })

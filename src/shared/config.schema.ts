@@ -52,12 +52,19 @@ export const AppConfigSchema = z.object({
 })
 export type AppConfig = z.infer<typeof AppConfigSchema>
 
+// Configuration d'une partition (préparé pour futures options)
+export const PartitionConfigSchema = z.object({
+	// Futurs paramètres : autoClean, maxCacheSize, clearOnExit, etc.
+})
+export type PartitionConfig = z.infer<typeof PartitionConfigSchema>
+
 // Configuration racine (fichier JSON utilisateur)
 export const BirdConfigSchema = z.object({
 	theme: ThemeModeSchema.default("system"),
 	navBar: NavBarConfigSchema.partial().default({}),
 	downloads: DownloadConfigSchema.default({}),
 	apps: z.record(z.string(), AppConfigSchema).default({}),
+	partitions: z.record(z.string(), PartitionConfigSchema).default({}),
 })
 export type BirdConfig = z.infer<typeof BirdConfigSchema>
 
@@ -69,6 +76,8 @@ interface ValidationResult {
 	errors: string[]
 }
 
+const IGNORED_KEYS = new Set(["$schema"])
+
 function collectUnknownKeys(data: unknown, schema: z.ZodObject<z.ZodRawShape>, path = ""): string[] {
 	if (typeof data !== "object" || data === null) return []
 
@@ -76,6 +85,8 @@ function collectUnknownKeys(data: unknown, schema: z.ZodObject<z.ZodRawShape>, p
 	const unknownKeys: string[] = []
 
 	for (const key of Object.keys(data)) {
+		if (IGNORED_KEYS.has(key)) continue
+
 		const fullPath = path ? `${path}.${key}` : key
 		if (!knownKeys.has(key)) {
 			unknownKeys.push(fullPath)
@@ -97,6 +108,16 @@ function collectUnknownKeys(data: unknown, schema: z.ZodObject<z.ZodRawShape>, p
 		if (apps && typeof apps === "object") {
 			for (const [appName, appConfig] of Object.entries(apps)) {
 				unknownKeys.push(...collectUnknownKeys(appConfig, AppConfigSchema, `apps.${appName}`))
+			}
+		}
+	}
+
+	// Special case for partitions record
+	if ("partitions" in (data as Record<string, unknown>)) {
+		const partitions = (data as Record<string, unknown>).partitions as Record<string, unknown>
+		if (partitions && typeof partitions === "object") {
+			for (const [partitionName, partitionConfig] of Object.entries(partitions)) {
+				unknownKeys.push(...collectUnknownKeys(partitionConfig, PartitionConfigSchema, `partitions.${partitionName}`))
 			}
 		}
 	}

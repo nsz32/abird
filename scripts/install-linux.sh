@@ -5,7 +5,7 @@ APPIMAGE=$(find release -name "*.AppImage" -type f | head -1)
 
 if [ -z "$APPIMAGE" ]; then
     echo "Error: No AppImage found in release/"
-    echo "Run 'pnpm appimage' first"
+    echo "Run 'pnpm package:linux' first"
     exit 1
 fi
 

@@ -2,10 +2,13 @@
  * Configuration store - gestion du fichier JSON utilisateur
  * Responsabilités : lecture, écriture, validation, cache
  */
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
-import { dirname } from "node:path"
+import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
+import { dirname, join } from "node:path"
+import { app } from "electron"
 import { type BirdConfig, validateConfig } from "@shared/config.schema"
 import { paths } from "../utils/platform"
+
+const SCHEMA_FILENAME = "bird.config.schema.json"
 
 let configPath: string = paths.config
 let birdConfig: BirdConfig = validateConfig({}).data
@@ -40,6 +43,7 @@ export function loadConfig(customPath?: string | null): void {
 
 export function saveConfig(): void {
 	ensureConfigDir()
+	copySchemaIfNeeded()
 	writeConfigFile()
 }
 
@@ -77,9 +81,37 @@ function ensureConfigDir(): void {
 	}
 }
 
+function getSchemaSourcePath(): string {
+	if (app.isPackaged) {
+		return join(process.resourcesPath, SCHEMA_FILENAME)
+	}
+	return join(app.getAppPath(), SCHEMA_FILENAME)
+}
+
+function getSchemaDestPath(): string {
+	return join(dirname(configPath), SCHEMA_FILENAME)
+}
+
+function copySchemaIfNeeded(): void {
+	const source = getSchemaSourcePath()
+	const dest = getSchemaDestPath()
+
+	if (!existsSync(source)) {
+		console.warn("Schema file not found:", source)
+		return
+	}
+
+	try {
+		copyFileSync(source, dest)
+	} catch (err) {
+		console.warn("Failed to copy schema file:", err)
+	}
+}
+
 function writeConfigFile(): void {
 	try {
-		writeFileSync(configPath, JSON.stringify(birdConfig, null, "\t"))
+		const configWithSchema = { $schema: `./${SCHEMA_FILENAME}`, ...birdConfig }
+		writeFileSync(configPath, JSON.stringify(configWithSchema, null, "\t"))
 	} catch (err) {
 		console.error("Failed to save config:", err)
 	}
@@ -115,8 +147,10 @@ export function writeRawConfig(content: unknown): { success: boolean; errors?: s
 	}
 
 	ensureConfigDir()
+	copySchemaIfNeeded()
 	try {
-		writeFileSync(configPath, JSON.stringify(content, null, "\t"))
+		const contentWithSchema = { $schema: `./${SCHEMA_FILENAME}`, ...(content as object) }
+		writeFileSync(configPath, JSON.stringify(contentWithSchema, null, "\t"))
 		birdConfig = result.data
 		onConfigChanged?.()
 		return { success: true }

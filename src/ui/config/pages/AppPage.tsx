@@ -1,10 +1,11 @@
 import { Button, Flex, HStack, Image, Input, Spinner, Text, VStack } from "@chakra-ui/react"
 import type { AppConfig, BirdConfig, NavBarConfig } from "@shared/config.schema"
-import type { IconResult } from "@shared/types"
+import type { IconResult, PartitionsState } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
 import { useEffect, useRef, useState } from "react"
 import { ConfigSection } from "../components/ConfigSection"
 import { NavBarConfigForm } from "../components/NavBarConfigForm"
+import { PartitionSelect } from "../components/PartitionSelect"
 import { ThemeSelect } from "../components/ThemeSelect"
 
 interface AppPageProps {
@@ -24,6 +25,7 @@ export function AppPage({ name, config, onChange, onNavigate }: AppPageProps) {
 	const [deploySupported, setDeploySupported] = useState(false)
 	const [deployed, setDeployed] = useState(false)
 	const [deploying, setDeploying] = useState(false)
+	const [partitionsState, setPartitionsState] = useState<PartitionsState | null>(null)
 	const prevIconRef = useRef<string | undefined>(undefined)
 
 	const app = config.apps[name]
@@ -37,6 +39,7 @@ export function AppPage({ name, config, onChange, onNavigate }: AppPageProps) {
 
 	useEffect(() => {
 		window.bird.deploy.isSupported().then(setDeploySupported)
+		window.bird.partition.list().then(setPartitionsState)
 	}, [])
 
 	useEffect(() => {
@@ -170,6 +173,38 @@ export function AppPage({ name, config, onChange, onNavigate }: AppPageProps) {
 		setIconSizes((prev) => ({ ...prev, [url]: { w: img.naturalWidth, h: img.naturalHeight } }))
 	}
 
+	// Partitions disponibles : depuis l'état + depuis la config des apps
+	const getAvailablePartitions = (): string[] => {
+		const partitions = new Set<string>()
+
+		// Depuis l'état des partitions (physiques + config)
+		if (partitionsState) {
+			for (const p of partitionsState.partitions) {
+				partitions.add(p.name)
+			}
+		}
+
+		// Depuis les apps configurées
+		for (const appConfig of Object.values(config.apps)) {
+			partitions.add(appConfig.partition)
+		}
+
+		return [...partitions].sort()
+	}
+
+	// Map partition -> apps qui l'utilisent
+	const getPartitionUsage = (): Map<string, string[]> => {
+		const usage = new Map<string, string[]>()
+		for (const [appName, appConfig] of Object.entries(config.apps)) {
+			const partition = appConfig.partition
+			if (!usage.has(partition)) {
+				usage.set(partition, [])
+			}
+			usage.get(partition)?.push(appName)
+		}
+		return usage
+	}
+
 	return (
 		<VStack align="stretch" gap={4}>
 			<ConfigSection title={t("app.general")}>
@@ -179,7 +214,13 @@ export function AppPage({ name, config, onChange, onNavigate }: AppPageProps) {
 				</HStack>
 				<HStack justify="space-between" py={2}>
 					<Text fontSize="sm">{t("app.partition")}</Text>
-					<Input size="sm" width="200px" value={app.partition} onChange={(e) => updateApp({ partition: e.target.value })} />
+					<PartitionSelect
+						value={app.partition}
+						partitions={getAvailablePartitions()}
+						partitionUsage={getPartitionUsage()}
+						currentAppName={name}
+						onChange={(v) => updateApp({ partition: v })}
+					/>
 				</HStack>
 				<HStack justify="space-between" py={2}>
 					<Text fontSize="sm">{t("settings.theme")}</Text>

@@ -5,6 +5,7 @@
 		"output": "release"
 	},
 	"files": ["out/**/*", "package.json"],
+	"extraResources": ["bird.config.schema.json"],
 	"linux": {
 		"target": ["AppImage", "deb"],
 		"category": "Network",

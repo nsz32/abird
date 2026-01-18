@@ -12,19 +12,17 @@
 	},
 	"scripts": {
 		"dev": "electron-vite dev",
-		"start:local": "electron-vite dev -- --config bird.config.json",
-		"build": "electron-vite build",
-		"build:standalone": "electron-vite build",
-		"preview": "electron-vite preview",
+		"dev:local": "electron-vite dev -- --config bird.config.json",
 		"start": "electron .",
 		"lint": "biome check .",
 		"lint:fix": "biome check --write .",
 		"format": "biome format --write .",
+		"typecheck": "tsc --noEmit",
 		"test": "vitest",
 		"test:run": "vitest run",
-		"typecheck": "tsc --noEmit",
-		"generate:schema": "npx tsx scripts/generate-schema.ts",
-		"appimage": "electron-vite build && electron-builder --linux AppImage",
+		"generate:schema": "tsx scripts/generate-schema.ts",
+		"build": "pnpm generate:schema && electron-vite build",
+		"package:linux": "pnpm build && electron-builder --linux AppImage",
 		"install:linux": "bash scripts/install-linux.sh"
 	},
 	"keywords": [
@@ -35,6 +33,9 @@
 	"author": "",
 	"license": "ISC",
 	"type": "module",
+	"engines": {
+		"node": ">=20.0.0"
+	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",
 		"@types/node": "^22.10.0",
@@ -45,6 +46,7 @@
 		"electron-builder": "^26.0.12",
 		"electron-vite": "^3.0.0",
 		"knip": "^5.76.1",
+		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",
 		"vite": "^6.0.0",
 		"vitest": "^2.1.0"

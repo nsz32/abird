@@ -9,6 +9,9 @@ const en = {
 	"settings.apps": "Applications",
 	"settings.noApps": "No applications configured",
 	"settings.configPath": "Configuration",
+	"settings.partitions": "Partitions",
+	"settings.managePartitions": "Manage data partitions",
+	"settings.openPartitions": "Manage",
 
 	// Theme
 	"theme.system": "System",
@@ -71,6 +74,24 @@ const en = {
 	"find.previous": "Previous (Shift+Enter)",
 	"find.next": "Next (Enter)",
 	"find.close": "Close (Escape)",
+
+	// Partitions
+	"partition.orphan": "Unused",
+	"partition.active": "Active",
+	"partition.orphanWarning": "{count} unused partition(s) can be deleted",
+	"partition.orphanSection": "Unused partitions",
+	"partition.inUseSection": "Partitions in use",
+	"partition.noPartitions": "No partitions",
+	"partition.usedBy": "Used by",
+	"partition.notCreated": "Not yet created",
+	"partition.reset": "Reset",
+	"partition.delete": "Delete",
+	"partition.showSize": "Size",
+	"partition.confirmReset": 'Reset partition "{name}"? All cookies and data will be deleted.',
+	"partition.confirmDelete": 'Delete partition "{name}"? This cannot be undone.',
+	"partition.createNew": "New partition",
+	"partition.namePlaceholder": "partition-name",
+	"partition.storagePath": "Storage path",
 }
 
 const fr: typeof en = {
@@ -82,6 +103,9 @@ const fr: typeof en = {
 	"settings.apps": "Applications",
 	"settings.noApps": "Aucune application configurée",
 	"settings.configPath": "Configuration",
+	"settings.partitions": "Partitions",
+	"settings.managePartitions": "Gérer les partitions de données",
+	"settings.openPartitions": "Gérer",
 
 	// Theme
 	"theme.system": "Système",
@@ -144,6 +168,24 @@ const fr: typeof en = {
 	"find.previous": "Précédent (Shift+Entrée)",
 	"find.next": "Suivant (Entrée)",
 	"find.close": "Fermer (Échap)",
+
+	// Partitions
+	"partition.orphan": "Inutilisée",
+	"partition.active": "Active",
+	"partition.orphanWarning": "{count} partition(s) inutilisée(s) peuvent être supprimées",
+	"partition.orphanSection": "Partitions inutilisées",
+	"partition.inUseSection": "Partitions utilisées",
+	"partition.noPartitions": "Aucune partition",
+	"partition.usedBy": "Utilisée par",
+	"partition.notCreated": "Non encore créée",
+	"partition.reset": "Réinitialiser",
+	"partition.delete": "Supprimer",
+	"partition.showSize": "Taille",
+	"partition.confirmReset": 'Réinitialiser la partition "{name}" ? Tous les cookies et données seront supprimés.',
+	"partition.confirmDelete": 'Supprimer la partition "{name}" ? Cette action est irréversible.',
+	"partition.createNew": "Nouvelle partition",
+	"partition.namePlaceholder": "nom-partition",
+	"partition.storagePath": "Emplacement",
 }
 
 export const translations: Record<Locale, typeof en> = { en, fr }

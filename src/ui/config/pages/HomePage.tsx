@@ -1,4 +1,4 @@
-import { Box, HStack, Text, VStack } from "@chakra-ui/react"
+import { Box, Button, HStack, Text, VStack } from "@chakra-ui/react"
 import type { BirdConfig, NavBarConfig } from "@shared/config.schema"
 import { useTranslations } from "@ui/shared/hooks"
 import { useEffect, useState } from "react"
@@ -64,6 +64,15 @@ export function HomePage({ config, configPath, onChange, onNavigate }: HomePageP
 
 					<ConfigSection title={t("settings.navbar")}>
 						<NavBarConfigForm mode="global" config={config.navBar || {}} onChange={updateNavBar} />
+					</ConfigSection>
+
+					<ConfigSection title={t("settings.partitions")}>
+						<HStack justify="space-between" py={2}>
+							<Text fontSize="sm">{t("settings.managePartitions")}</Text>
+							<Button size="sm" variant="outline" onClick={() => onNavigate("#partitions")}>
+								{t("settings.openPartitions")}
+							</Button>
+						</HStack>
 					</ConfigSection>
 
 					<Text fontSize="xs" color="fg.muted">

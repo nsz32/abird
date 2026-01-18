@@ -3,12 +3,7 @@
 	"theme": "system",
 	"downloads": {
 		"autoOpenMaxSize": "1M",
-		"autoOpenMimeTypes": [
-			"image/*",
-			"application/pdf",
-			"video/*",
-			"audio/*"
-		]
+		"autoOpenMimeTypes": ["image/*", "application/pdf", "video/*", "audio/*"]
 	},
 	"navBar": {
 		"position": "bottom",

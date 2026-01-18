@@ -1,5 +1,10 @@
 # Development
 
+## Prerequisites
+
+- **Node.js** >= 20.0.0
+- **pnpm** >= 9.0.0
+
 ## Setup
 
 ```bash
@@ -8,16 +13,31 @@ pnpm install
 
 ## Commands
 
+### Development
+
 | Command | Description |
 |---------|-------------|
 | `pnpm dev` | Development mode with hot reload |
-| `pnpm start:local` | Dev with local `bird.config.json` |
-| `pnpm build` | Build for production |
+| `pnpm dev:local` | Dev with local `bird.config.json` |
+| `pnpm start` | Run the built app |
+
+### Quality
+
+| Command | Description |
+|---------|-------------|
 | `pnpm lint` | Check code style |
-| `pnpm lint --write` | Auto-fix lint issues |
+| `pnpm lint:fix` | Auto-fix lint issues |
 | `pnpm typecheck` | TypeScript validation |
 | `pnpm test` | Run tests (watch mode) |
 | `pnpm test:run` | Run tests once |
+
+### Build & Package
+
+| Command | Description |
+|---------|-------------|
+| `pnpm build` | Build for production |
+| `pnpm package:linux` | Build + create AppImage |
+| `pnpm install:linux` | Install AppImage to /usr/local/bin |
 
 ## Configuration
 
@@ -72,4 +92,4 @@ src/ui/              # React components
 - `config$.get()` — Current effective config
 - `tabs$.get()` — All tabs
 - `activeContentId$.get()` — Current visible content (tab or panel)
-- Run `pnpm lint --write` before committing
+- Run `pnpm lint:fix` before committing

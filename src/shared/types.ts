@@ -11,7 +11,11 @@ export type {
 	DownloadConfig,
 	AppConfig,
 	BirdConfig,
+	PartitionConfig,
 } from "./config.schema"
+
+// Import local pour usage interne dans les interfaces
+import type { PartitionConfig as _PartitionConfig } from "./config.schema"
 
 // I18n types
 export type { Translations } from "./i18n/translations"
@@ -98,6 +102,23 @@ export interface FindState {
 	totalMatches: number
 }
 
+// État d'une partition (config + physique)
+export interface PartitionState {
+	name: string
+	hasConfig: boolean // Existe dans config.partitions
+	hasPhysical: boolean // Existe sur disque
+	usedByApps: string[] // Apps qui l'utilisent
+	isOrphan: boolean // Physique mais non utilisée
+	config: _PartitionConfig | null
+	diskSize?: number
+}
+
+// Liste complète des partitions
+export interface PartitionsState {
+	partitions: PartitionState[]
+	physicalPath: string
+}
+
 // Canaux IPC (évite les typos, autocomplétion)
 export const IpcChannels = {
 	// Navigation
@@ -165,7 +186,10 @@ export const IpcChannels = {
 	DEPLOY_APP: "bird:deploy:app",
 	UNDEPLOY_APP: "bird:deploy:undeploy",
 	// Partition
+	PARTITION_LIST: "bird:partition:list",
 	PARTITION_RESET: "bird:partition:reset",
+	PARTITION_DELETE: "bird:partition:delete",
+	PARTITION_GET_SIZE: "bird:partition:get-size",
 } as const
 
 // Type utilitaire pour les valeurs de IpcChannels
@@ -290,7 +314,10 @@ export interface BirdApi {
 		undeploy: (appName: string) => Promise<void>
 	}
 	partition: {
+		list: () => Promise<PartitionsState>
 		reset: (name: string) => Promise<void>
+		delete: (name: string) => Promise<void>
+		getSize: (name: string) => Promise<number>
 	}
 }
 

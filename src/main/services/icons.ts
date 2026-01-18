@@ -2,7 +2,7 @@ import { randomBytes } from "node:crypto"
 import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 import type { IconFetchResult, IconResult, IconSource } from "@shared/types"
-import { dialog, net, WebContentsView } from "electron"
+import { net, WebContentsView, dialog } from "electron"
 import { Jimp } from "jimp"
 import { paths } from "../utils/platform"
 
@@ -201,12 +201,7 @@ function ensureIconsDir(): void {
 	}
 }
 
-export async function saveIcon(
-	appName: string,
-	base64: string,
-	oldIcon?: string,
-	resize?: { w: number; h: number },
-): Promise<string> {
+export async function saveIcon(appName: string, base64: string, oldIcon?: string, resize?: { w: number; h: number }): Promise<string> {
 	ensureIconsDir()
 
 	// Décoder base64
