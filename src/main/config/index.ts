@@ -1,7 +1,7 @@
 /**
  * Configuration module - API publique
  */
-export { selectApp, selectConfigMode, refreshEffectiveConfig } from "./resolver"
+export { selectApp, selectConfigMode, selectBrowserMode, refreshEffectiveConfig } from "./resolver"
 export {
 	loadConfig,
 	saveConfig,

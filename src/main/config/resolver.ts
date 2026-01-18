@@ -87,6 +87,43 @@ export function selectConfigMode(): void {
 	config$.emit(effective)
 }
 
+export function selectBrowserMode(startUrl: string, userAgent = "desktop:bird"): void {
+	const birdConfig = getBirdConfig()
+	setCurrentAppName("browser")
+
+	const browserApp: Partial<AppConfig> = {
+		startUrl,
+		partition: "browsermode",
+		userAgent,
+		navBar: {
+			visible: true,
+			autoHide: false,
+			allowUrlEdit: true,
+			allowSingleTabClose: true,
+		},
+		routing: { internal: "^" },
+	}
+
+	const effective = buildEffectiveConfig(browserApp, birdConfig, {
+		navBarOverrides: {
+			showBackButton: true,
+			showForwardButton: true,
+			showRefreshButton: true,
+			showHomeButton: true,
+		},
+	})
+
+	effective.downloads = {
+		directory: null,
+		autoOpenMaxSize: 0,
+		autoOpenMimeTypes: [],
+		allowExecutablesDownload: true,
+		allowDuplicateDownloads: true,
+	}
+
+	config$.emit(effective)
+}
+
 export function refreshEffectiveConfig(): void {
 	const birdConfig = getBirdConfig()
 	const currentConfig = config$.get()

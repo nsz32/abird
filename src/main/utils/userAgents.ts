@@ -100,6 +100,11 @@ function parseShortcode(shortcode: string): string | null {
 	return null
 }
 
+// Liste des shortcodes disponibles
+export function getAvailableUserAgents(): string[] {
+	return Object.keys(USER_AGENTS)
+}
+
 // Résout le User-Agent (shortcode ou raw) vers la string finale
 export function resolveUserAgent(userAgent: string): string {
 	// Si ça ressemble à un UA complet (contient Mozilla ou des espaces), c'est du raw
