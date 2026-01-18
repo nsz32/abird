@@ -10,7 +10,7 @@ import { getBirdConfig, setCurrentAppName, setOnConfigChanged } from "./store"
 
 interface ResolvedNavBarOverrides {
 	showBackButton?: boolean
-	showNextButton?: boolean
+	showForwardButton?: boolean
 	showRefreshButton?: boolean
 	showHomeButton?: boolean
 }
@@ -20,11 +20,11 @@ function resolveNavBarConfig(merged: NavBarConfig, overrides?: ResolvedNavBarOve
 		position: merged.position,
 		visible: merged.visible,
 		autoHide: merged.autoHide,
-		urlEditable: merged.urlEditable,
+		allowUrlEdit: merged.allowUrlEdit,
 		allowSingleTabClose: merged.allowSingleTabClose,
-		showBackButton: overrides?.showBackButton ?? merged.showBackForward,
-		showNextButton: overrides?.showNextButton ?? merged.showBackForward,
-		showRefreshButton: overrides?.showRefreshButton ?? merged.showReload,
+		showBackButton: overrides?.showBackButton ?? merged.showBackButton,
+		showForwardButton: overrides?.showForwardButton ?? merged.showForwardButton,
+		showRefreshButton: overrides?.showRefreshButton ?? merged.showRefreshButton,
 		showHomeButton: overrides?.showHomeButton ?? true,
 	}
 }
@@ -69,7 +69,7 @@ export function selectConfigMode(): void {
 		navBar: {
 			visible: true,
 			autoHide: false,
-			urlEditable: false,
+			allowUrlEdit: false,
 			allowSingleTabClose: false,
 		},
 		routing: { internal: "^bird://" },
@@ -78,7 +78,7 @@ export function selectConfigMode(): void {
 	const effective = buildEffectiveConfig(configApp, birdConfig, {
 		navBarOverrides: {
 			showBackButton: true,
-			showNextButton: false,
+			showForwardButton: false,
 			showRefreshButton: false,
 			showHomeButton: false,
 		},

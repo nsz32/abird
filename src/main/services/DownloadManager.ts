@@ -102,7 +102,7 @@ export function resolveDownloadConfig(config: DownloadConfig): ResolvedDownloadC
 		autoOpenMaxSize: parseSize(config.autoOpenMaxSize),
 		autoOpenMimeTypes: config.autoOpenMimeTypes || [],
 		allowExecutablesDownload: config.allowExecutablesDownload ?? false,
-		preventDuplicateDownloads: config.preventDuplicateDownloads ?? false,
+		allowDuplicateDownloads: config.allowDuplicateDownloads ?? false,
 	}
 }
 
@@ -302,7 +302,7 @@ async function handleCompletedDownload(
 	}
 
 	// Check for duplicate files (only if file was renamed during save)
-	if (config.preventDuplicateDownloads && originalPath) {
+	if (!config.allowDuplicateDownloads && originalPath) {
 		if (await isDuplicateOf(finalPath, originalPath)) {
 			console.log(`[Download] duplicate detected: ${finalPath} = ${originalPath}`)
 			try {

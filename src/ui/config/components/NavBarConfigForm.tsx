@@ -49,22 +49,28 @@ export function NavBarConfigForm(props: NavBarConfigFormProps) {
 					onChange={(v) => onChange("autoHide", v)}
 				/>
 				<TriStateSwitch
-					label={t("navbar.urlEditable")}
-					value={config.urlEditable}
-					defaultValue={getDefault("urlEditable")}
-					onChange={(v) => onChange("urlEditable", v)}
+					label={t("navbar.allowUrlEdit")}
+					value={config.allowUrlEdit}
+					defaultValue={getDefault("allowUrlEdit")}
+					onChange={(v) => onChange("allowUrlEdit", v)}
 				/>
 				<TriStateSwitch
-					label={t("navbar.showBackForward")}
-					value={config.showBackForward}
-					defaultValue={getDefault("showBackForward")}
-					onChange={(v) => onChange("showBackForward", v)}
+					label={t("navbar.showBackButton")}
+					value={config.showBackButton}
+					defaultValue={getDefault("showBackButton")}
+					onChange={(v) => onChange("showBackButton", v)}
 				/>
 				<TriStateSwitch
-					label={t("navbar.showReload")}
-					value={config.showReload}
-					defaultValue={getDefault("showReload")}
-					onChange={(v) => onChange("showReload", v)}
+					label={t("navbar.showForwardButton")}
+					value={config.showForwardButton}
+					defaultValue={getDefault("showForwardButton")}
+					onChange={(v) => onChange("showForwardButton", v)}
+				/>
+				<TriStateSwitch
+					label={t("navbar.showRefreshButton")}
+					value={config.showRefreshButton}
+					defaultValue={getDefault("showRefreshButton")}
+					onChange={(v) => onChange("showRefreshButton", v)}
 				/>
 			</>
 		)
@@ -78,9 +84,10 @@ export function NavBarConfigForm(props: NavBarConfigFormProps) {
 			</HStack>
 			<SwitchField label={t("navbar.visible")} checked={config.visible ?? true} onChange={(v) => onChange("visible", v)} />
 			<SwitchField label={t("navbar.autoHide")} checked={config.autoHide ?? false} onChange={(v) => onChange("autoHide", v)} />
-			<SwitchField label={t("navbar.urlEditable")} checked={config.urlEditable ?? true} onChange={(v) => onChange("urlEditable", v)} />
-			<SwitchField label={t("navbar.showBackForward")} checked={config.showBackForward ?? true} onChange={(v) => onChange("showBackForward", v)} />
-			<SwitchField label={t("navbar.showReload")} checked={config.showReload ?? true} onChange={(v) => onChange("showReload", v)} />
+			<SwitchField label={t("navbar.allowUrlEdit")} checked={config.allowUrlEdit ?? false} onChange={(v) => onChange("allowUrlEdit", v)} />
+			<SwitchField label={t("navbar.showBackButton")} checked={config.showBackButton ?? false} onChange={(v) => onChange("showBackButton", v)} />
+			<SwitchField label={t("navbar.showForwardButton")} checked={config.showForwardButton ?? false} onChange={(v) => onChange("showForwardButton", v)} />
+			<SwitchField label={t("navbar.showRefreshButton")} checked={config.showRefreshButton ?? false} onChange={(v) => onChange("showRefreshButton", v)} />
 		</>
 	)
 }

@@ -14,9 +14,10 @@ export const NavBarConfigSchema = z.object({
 	position: z.enum(["top", "bottom"]).default("top"),
 	visible: z.boolean().default(true),
 	autoHide: z.boolean().default(false),
-	urlEditable: z.boolean().default(true),
-	showBackForward: z.boolean().default(true),
-	showReload: z.boolean().default(true),
+	allowUrlEdit: z.boolean().default(false),
+	showBackButton: z.boolean().default(false),
+	showForwardButton: z.boolean().default(false),
+	showRefreshButton: z.boolean().default(false),
 	allowSingleTabClose: z.boolean().default(false),
 })
 export type NavBarConfig = z.infer<typeof NavBarConfigSchema>
@@ -34,7 +35,7 @@ export const DownloadConfigSchema = z.object({
 	autoOpenMaxSize: z.union([z.number(), z.string()]).optional(),
 	autoOpenMimeTypes: z.array(z.string()).optional(),
 	allowExecutablesDownload: z.boolean().optional(),
-	preventDuplicateDownloads: z.boolean().optional(),
+	allowDuplicateDownloads: z.boolean().optional(),
 })
 export type DownloadConfig = z.infer<typeof DownloadConfigSchema>
 

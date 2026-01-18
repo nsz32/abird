@@ -23,9 +23,10 @@ const en = {
 	"navbar.position": "Position",
 	"navbar.visible": "Visible",
 	"navbar.autoHide": "Auto-hide",
-	"navbar.urlEditable": "Editable URL",
-	"navbar.showBackForward": "Back/Forward buttons",
-	"navbar.showReload": "Reload button",
+	"navbar.allowUrlEdit": "Allow URL editing",
+	"navbar.showBackButton": "Back button",
+	"navbar.showForwardButton": "Forward button",
+	"navbar.showRefreshButton": "Refresh button",
 
 	// App config
 	"app.general": "General",
@@ -95,9 +96,10 @@ const fr: typeof en = {
 	"navbar.position": "Position",
 	"navbar.visible": "Visible",
 	"navbar.autoHide": "Masquage automatique",
-	"navbar.urlEditable": "URL modifiable",
-	"navbar.showBackForward": "Boutons précédent/suivant",
-	"navbar.showReload": "Bouton recharger",
+	"navbar.allowUrlEdit": "Autoriser modification URL",
+	"navbar.showBackButton": "Bouton précédent",
+	"navbar.showForwardButton": "Bouton suivant",
+	"navbar.showRefreshButton": "Bouton recharger",
 
 	// App config
 	"app.general": "Général",

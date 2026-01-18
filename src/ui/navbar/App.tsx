@@ -59,7 +59,7 @@ export function App() {
 					<ArrowLeft />
 				</NavButton>
 			)}
-			{navBar.showNextButton && (
+			{navBar.showForwardButton && (
 				<NavButton onClick={() => window.bird.navigation.forward()} disabled={navDisabled || !navState.canGoForward}>
 					<ArrowRight />
 				</NavButton>
@@ -74,7 +74,7 @@ export function App() {
 					{ctrlPressed ? <Home /> : <HousePlus />}
 				</NavButton>
 			)}
-			{isUrlMode && navBar.urlEditable ? (
+			{isUrlMode && navBar.allowUrlEdit ? (
 				<input ref={urlInputRef} type="text" className="url-input" defaultValue={navState.url} onKeyDown={handleUrlKeyDown} onBlur={exitUrlMode} />
 			) : (
 				<div className="tabs-list">

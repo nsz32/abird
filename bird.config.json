@@ -8,16 +8,16 @@
 			"application/pdf",
 			"video/*",
 			"audio/*"
-		],
-		"preventDuplicateDownloads": true
+		]
 	},
 	"navBar": {
 		"position": "bottom",
 		"visible": true,
 		"autoHide": true,
-		"urlEditable": true,
-		"showBackForward": true,
-		"showReload": true
+		"allowUrlEdit": true,
+		"showBackButton": true,
+		"showForwardButton": true,
+		"showRefreshButton": true
 	},
 	"apps": {
 		"koreus": {

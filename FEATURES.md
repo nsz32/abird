@@ -40,8 +40,9 @@ Each site runs in an isolated **Electron session partition**:
 |-----------|------|-------------|
 | `showNavigationBar` | `boolean?` | Show/hide navigation bar |
 | `navigationPosition` | `'top' \| 'bottom'?` | Navigation bar position |
-| `showBackForward` | `boolean?` | Show back/forward buttons |
-| `showReload` | `boolean?` | Show reload button |
+| `showBackButton` | `boolean?` | Show back button |
+| `showForwardButton` | `boolean?` | Show forward button |
+| `showRefreshButton` | `boolean?` | Show refresh button |
 | `showUrlBar` | `boolean?` | Show URL bar |
 | `urlBarEditable` | `boolean?` | URL bar editable or read-only |
 | `showBookmarks` | `boolean?` | Show bookmarks bar |
@@ -258,8 +259,9 @@ interface SiteConfig {
   ui?: {
     showNavigationBar?: boolean
     navigationPosition?: 'top' | 'bottom'
-    showBackForward?: boolean
-    showReload?: boolean
+    showBackButton?: boolean
+    showForwardButton?: boolean
+    showRefreshButton?: boolean
     showUrlBar?: boolean
     urlBarEditable?: boolean
     showBookmarks?: boolean

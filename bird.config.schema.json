@@ -25,17 +25,21 @@
 							"type": "boolean",
 							"default": false
 						},
-						"urlEditable": {
+						"allowUrlEdit": {
 							"type": "boolean",
-							"default": true
+							"default": false
 						},
-						"showBackForward": {
+						"showBackButton": {
 							"type": "boolean",
-							"default": true
+							"default": false
 						},
-						"showReload": {
+						"showForwardButton": {
 							"type": "boolean",
-							"default": true
+							"default": false
+						},
+						"showRefreshButton": {
+							"type": "boolean",
+							"default": false
 						},
 						"allowSingleTabClose": {
 							"type": "boolean",
@@ -63,7 +67,7 @@
 						"allowExecutablesDownload": {
 							"type": "boolean"
 						},
-						"preventDuplicateDownloads": {
+						"allowDuplicateDownloads": {
 							"type": "boolean"
 						}
 					},
@@ -79,6 +83,9 @@
 								"type": "string"
 							},
 							"startUrl": {
+								"type": "string"
+							},
+							"icon": {
 								"type": "string"
 							},
 							"theme": {
@@ -107,17 +114,21 @@
 										"type": "boolean",
 										"default": false
 									},
-									"urlEditable": {
+									"allowUrlEdit": {
 										"type": "boolean",
-										"default": true
+										"default": false
 									},
-									"showBackForward": {
+									"showBackButton": {
 										"type": "boolean",
-										"default": true
+										"default": false
 									},
-									"showReload": {
+									"showForwardButton": {
 										"type": "boolean",
-										"default": true
+										"default": false
+									},
+									"showRefreshButton": {
+										"type": "boolean",
+										"default": false
 									},
 									"allowSingleTabClose": {
 										"type": "boolean",

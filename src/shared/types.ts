@@ -179,10 +179,10 @@ export interface ResolvedNavBarConfig {
 	position: "top" | "bottom"
 	visible: boolean
 	autoHide: boolean
-	urlEditable: boolean
+	allowUrlEdit: boolean
 	allowSingleTabClose: boolean
 	showBackButton: boolean
-	showNextButton: boolean
+	showForwardButton: boolean
 	showRefreshButton: boolean
 	showHomeButton: boolean
 }
@@ -193,7 +193,7 @@ export interface ResolvedDownloadConfig {
 	autoOpenMaxSize: number
 	autoOpenMimeTypes: string[]
 	allowExecutablesDownload: boolean
-	preventDuplicateDownloads: boolean
+	allowDuplicateDownloads: boolean
 }
 
 // Config effective (computée selon BirdConfig + contexte)
