@@ -2,6 +2,7 @@ import { join } from "node:path"
 import { app } from "electron"
 import { getAvailableApps, loadConfig, selectApp, selectBrowserMode, selectConfigMode } from "./config"
 import { startApp } from "./core/App"
+import { parseShortcut, registerKioskExitShortcut } from "./core/kiosk"
 import { kioskMode$ } from "./core/states"
 import { initI18n } from "./core/I18n"
 import { registerBirdScheme, setupBirdProtocol } from "./core/Protocol"
@@ -13,7 +14,7 @@ interface CliArgs {
 	browserUrl: string | null
 	userAgent: string | null
 	listUserAgents: boolean
-	kiosk: boolean
+	kioskShortcut: string | null
 }
 
 function parseCliArgs(): CliArgs {
@@ -21,6 +22,7 @@ function parseCliArgs(): CliArgs {
 	const appIndex = args.indexOf("--app")
 	const configIndex = args.indexOf("--config")
 	const userAgentIndex = args.indexOf("--userAgent")
+	const kioskIndex = args.indexOf("--kiosk")
 
 	const firstArg = args[0]
 	const browserUrl = firstArg?.match(/^https?:\/\//) ? firstArg : null
@@ -37,13 +39,19 @@ function parseCliArgs(): CliArgs {
 		}
 	}
 
+	let kioskShortcut: string | null = null
+	if (kioskIndex !== -1) {
+		const nextArg = args[kioskIndex + 1]
+		kioskShortcut = nextArg && !nextArg.startsWith("--") ? nextArg : ""
+	}
+
 	return {
 		appName: appIndex !== -1 ? args[appIndex + 1] : null,
 		configPath: configIndex !== -1 ? args[configIndex + 1] : null,
 		browserUrl,
 		userAgent,
 		listUserAgents,
-		kiosk: args.includes("--kiosk"),
+		kioskShortcut,
 	}
 }
 
@@ -56,9 +64,17 @@ app.setName("okbird")
 registerBirdScheme()
 
 app.whenReady().then(() => {
-	const { appName, configPath, browserUrl, userAgent, listUserAgents, kiosk } = parseCliArgs()
+	const { appName, configPath, browserUrl, userAgent, listUserAgents, kioskShortcut } = parseCliArgs()
 
-	if (kiosk) kioskMode$.emit(true)
+	if (kioskShortcut !== null) {
+		const keycodes = parseShortcut(kioskShortcut)
+		if (!keycodes) {
+			app.quit()
+			return
+		}
+		registerKioskExitShortcut(keycodes)
+		kioskMode$.emit(true)
+	}
 
 	if (listUserAgents) {
 		console.log("Available user agents:\n")

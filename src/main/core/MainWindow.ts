@@ -1,12 +1,12 @@
 import { BaseWindow } from "electron"
-import { kioskMode$, windowBounds$ } from "../core/states"
+import { setupKiosk } from "./kiosk"
+import { kioskMode$, windowBounds$ } from "./states"
 import { ViewManager } from "./ViewManager"
 
 const BOUNDS_UPDATE_DELAYS = [100, 200, 300, 400, 500, 750, 1000, 1500, 2000]
 
 export class MainWindow {
 	readonly window: BaseWindow
-	private kioskBounds: { width: number; height: number } | null = null
 
 	constructor() {
 		this.window = new BaseWindow({
@@ -22,6 +22,7 @@ export class MainWindow {
 		new ViewManager(this.window.contentView)
 
 		this.setupEventListeners()
+		setupKiosk(this.window)
 	}
 
 	show() {
@@ -30,26 +31,9 @@ export class MainWindow {
 	}
 
 	private setupEventListeners() {
-		this.window.on("resize", () => {
-			if (kioskMode$.get()) {
-				const bounds = this.window.getBounds()
-
-				if (!this.kioskBounds) {
-					this.kioskBounds = { width: bounds.width, height: bounds.height }
-				} else if (bounds.width < this.kioskBounds.width || bounds.height < this.kioskBounds.height) {
-					this.window.setKiosk(false)
-					this.window.setKiosk(true)
-				}
-			}
-			this.emitBounds()
-		})
-
+		this.window.on("resize", () => this.emitBounds())
 		this.window.on("enter-full-screen", () => this.emitBounds())
 		this.window.on("leave-full-screen", () => this.emitBounds())
-
-		this.window.on("blur", () => {
-			if (kioskMode$.get()) this.window.focus()
-		})
 	}
 
 	private emitBounds() {
