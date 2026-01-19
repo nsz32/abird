@@ -8,6 +8,7 @@ import {
 	externalOpened$,
 	findBarVisible$,
 	findState$,
+	kioskMode$,
 	navbarSync$,
 	notifications$,
 } from "../core/states"
@@ -65,12 +66,16 @@ export function startApp() {
 
 	setupSubscriptions()
 
-	Menu.setApplicationMenu(
-		createAppMenu({
-			onFocusUrl: () => navBar.sendFocusUrl(),
-			onNavbarDevTools: () => navBar.openDevTools(),
-		}),
-	)
+	if (kioskMode$.get()) {
+		Menu.setApplicationMenu(null)
+	} else {
+		Menu.setApplicationMenu(
+			createAppMenu({
+				onFocusUrl: () => navBar.sendFocusUrl(),
+				onNavbarDevTools: () => navBar.openDevTools(),
+			}),
+		)
+	}
 
 	// Load HTML and show
 	watermark.load()

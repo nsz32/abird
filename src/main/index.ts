@@ -2,6 +2,7 @@ import { join } from "node:path"
 import { app } from "electron"
 import { getAvailableApps, loadConfig, selectApp, selectBrowserMode, selectConfigMode } from "./config"
 import { startApp } from "./core/App"
+import { kioskMode$ } from "./core/states"
 import { initI18n } from "./core/I18n"
 import { registerBirdScheme, setupBirdProtocol } from "./core/Protocol"
 import { getAvailableUserAgents } from "./utils/userAgents"
@@ -12,6 +13,7 @@ interface CliArgs {
 	browserUrl: string | null
 	userAgent: string | null
 	listUserAgents: boolean
+	kiosk: boolean
 }
 
 function parseCliArgs(): CliArgs {
@@ -41,6 +43,7 @@ function parseCliArgs(): CliArgs {
 		browserUrl,
 		userAgent,
 		listUserAgents,
+		kiosk: args.includes("--kiosk"),
 	}
 }
 
@@ -53,7 +56,9 @@ app.setName("okbird")
 registerBirdScheme()
 
 app.whenReady().then(() => {
-	const { appName, configPath, browserUrl, userAgent, listUserAgents } = parseCliArgs()
+	const { appName, configPath, browserUrl, userAgent, listUserAgents, kiosk } = parseCliArgs()
+
+	if (kiosk) kioskMode$.emit(true)
 
 	if (listUserAgents) {
 		console.log("Available user agents:\n")

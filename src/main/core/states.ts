@@ -106,3 +106,6 @@ export const externalOpened$ = new StateObservable<string | null>(null)
 
 // Keyboard
 export const ctrlPressed$ = new BroadcastObservable<boolean>(false, IpcChannels.CTRL_PRESSED)
+
+// Kiosk mode
+export const kioskMode$ = new StateObservable<boolean>(false)
