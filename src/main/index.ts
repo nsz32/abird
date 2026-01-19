@@ -2,7 +2,7 @@ import { join } from "node:path"
 import { app } from "electron"
 import { getAvailableApps, loadConfig, selectApp, selectBrowserMode, selectConfigMode } from "./config"
 import { startApp } from "./core/App"
-import { parseCliArgs, printHelp } from "./core/cli"
+import { findConfigModeConflicts, parseCliArgs, printHelp } from "./core/cli"
 import { parseShortcut, registerKioskExitShortcut } from "./core/kiosk"
 import { kioskMode$ } from "./core/states"
 import { initI18n } from "./core/I18n"
@@ -60,12 +60,19 @@ app.whenReady().then(() => {
 	}
 
 	if (!args.appName) {
+		const conflicts = findConfigModeConflicts(args)
+		if (conflicts.length > 0) {
+			console.error(`Options ${conflicts.join(", ")} require --app or a URL`)
+			app.quit()
+			return
+		}
 		selectConfigMode()
 		startApp()
 		return
 	}
 
-	if (!selectApp(args.appName)) {
+	const cliOverrides = args.userAgent ? { userAgent: args.userAgent } : undefined
+	if (!selectApp(args.appName, cliOverrides)) {
 		console.error(`App "${args.appName}" not found. Available: ${getAvailableApps().join(", ")}`)
 		app.quit()
 		return

@@ -54,6 +54,15 @@ export function printHelp(): void {
 	}
 }
 
+export function findConfigModeConflicts(args: CliArgs): string[] {
+	const conflicts: string[] = []
+
+	if (args.userAgent !== null || args.listUserAgents) conflicts.push("--userAgent")
+	if (args.kioskShortcut !== null) conflicts.push("--kiosk")
+
+	return conflicts
+}
+
 function findUnknownOptions(argv: string[]): string[] {
 	return argv.filter((arg) => arg.startsWith("--") && !KNOWN_OPTIONS.has(arg))
 }

@@ -32,29 +32,35 @@ function resolveNavBarConfig(merged: NavBarConfig, overrides?: ResolvedNavBarOve
 
 interface BuildOptions {
 	navBarOverrides?: ResolvedNavBarOverrides
+	cliOverrides?: CliOverrides
+}
+
+export interface CliOverrides {
+	userAgent?: string
 }
 
 function buildEffectiveConfig(app: Partial<AppConfig>, birdConfig: BirdConfig, options?: BuildOptions): EffectiveConfig {
 	const mergedNavBar: NavBarConfig = { ...DEFAULT_NAVBAR, ...birdConfig.navBar, ...app.navBar }
+	const cli = options?.cliOverrides
 
 	return {
 		startUrl: app.startUrl || "about:blank",
 		partition: app.partition || "default",
 		theme: app.theme || birdConfig.theme,
-		userAgent: app.userAgentRaw || app.userAgent || "desktop:bird",
+		userAgent: cli?.userAgent || app.userAgentRaw || app.userAgent || "desktop:bird",
 		navBar: resolveNavBarConfig(mergedNavBar, options?.navBarOverrides),
 		routing: app.routing || null,
 		downloads: resolveDownloadConfig({ ...birdConfig.downloads }),
 	}
 }
 
-export function selectApp(appName: string): boolean {
+export function selectApp(appName: string, cliOverrides?: CliOverrides): boolean {
 	const birdConfig = getBirdConfig()
 	const app = birdConfig.apps[appName]
 	if (!app) return false
 
 	setCurrentAppName(appName)
-	const effective = buildEffectiveConfig(app, birdConfig)
+	const effective = buildEffectiveConfig(app, birdConfig, { cliOverrides })
 	config$.emit(effective)
 	return true
 }
