@@ -13,6 +13,12 @@ interface PartitionListProps {
 export function PartitionList({ partitions, activePartition, onSelect, onDelete }: PartitionListProps) {
 	const { t } = useTranslations()
 
+	const sortedPartitions = [...partitions].sort((a, b) => {
+		if (a.name === "browsermode") return 1
+		if (b.name === "browsermode") return -1
+		return 0
+	})
+
 	if (partitions.length === 0) {
 		return (
 			<Text fontSize="sm" color="fg.muted" textAlign="center" py={4}>
@@ -23,7 +29,7 @@ export function PartitionList({ partitions, activePartition, onSelect, onDelete 
 
 	return (
 		<VStack align="stretch" gap={2}>
-			{partitions.map((partition) => (
+			{sortedPartitions.map((partition) => (
 				<PartitionCard
 					key={partition.name}
 					partition={partition}

@@ -41,6 +41,7 @@ export default defineConfig({
 	},
 	renderer: {
 		root: "src/ui",
+		publicDir: "public",
 		plugins: [react()],
 		resolve: { alias: rendererAlias },
 		build: {
