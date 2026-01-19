@@ -14,9 +14,10 @@ interface AppPageProps {
 	config: BirdConfig
 	partitionsState: PartitionsState
 	onChange: (config: BirdConfig) => void
+	reloadPartitions: () => Promise<void>
 }
 
-export function AppPage({ name, config, partitionsState, onChange }: AppPageProps) {
+export function AppPage({ name, config, partitionsState, onChange, reloadPartitions }: AppPageProps) {
 	const { t } = useTranslations()
 	const [icons, setIcons] = useState<IconResult[]>([])
 	const [iconSizes, setIconSizes] = useState<Record<string, { w: number; h: number }>>({})
@@ -79,6 +80,16 @@ export function AppPage({ name, config, partitionsState, onChange }: AppPageProp
 				[name]: { ...app, ...updates },
 			},
 		})
+	}
+
+	const handlePartitionChange = async (newPartition: string) => {
+		const isNewPartition = !partitionsState.partitions.some((p) => p.name === newPartition)
+		if (isNewPartition) {
+			await window.bird.partition.markFragile(newPartition)
+		}
+
+		updateApp({ partition: newPartition })
+		await reloadPartitions()
 	}
 
 	const updateNavBar = (key: keyof NavBarConfig, value: boolean | string | undefined) => {
@@ -193,96 +204,90 @@ export function AppPage({ name, config, partitionsState, onChange }: AppPageProp
 		return usage
 	}
 
-	const shortcutInfo = deploySupported
-		? deployed ? t("app.shortcutCreated") : t("app.shortcutNotCreated")
-		: undefined
+	const shortcutInfo = deploySupported ? (deployed ? t("app.shortcutCreated") : t("app.shortcutNotCreated")) : undefined
 
 	return (
-		<PageHeader
-			title={name}
-			leftInfo={app.startUrl}
-			rightInfo={shortcutInfo}
-		>
+		<PageHeader title={name} leftInfo={app.startUrl} rightInfo={shortcutInfo}>
 			<VStack align="stretch" gap={4}>
 				<ConfigSection title={t("app.general")}>
-				<HStack justify="space-between" py={2}>
-					<Text fontSize="sm">{t("app.startUrl")}</Text>
-					<Input size="sm" width="200px" value={app.startUrl} onChange={(e) => updateApp({ startUrl: e.target.value })} />
-				</HStack>
-				<HStack justify="space-between" py={2}>
-					<Text fontSize="sm">{t("app.partition")}</Text>
-					<PartitionSelect
-						value={app.partition}
-						partitions={getAvailablePartitions()}
-						partitionUsage={getPartitionUsage()}
-						currentAppName={name}
-						onChange={(v) => updateApp({ partition: v })}
-					/>
-				</HStack>
-				<HStack justify="space-between" py={2}>
-					<Text fontSize="sm">{t("settings.theme")}</Text>
-					<ThemeSelect value={app.theme || "system"} onChange={(v) => updateApp({ theme: v })} />
-				</HStack>
-				<HStack justify="space-between" py={2} align="flex-start">
-					<Text fontSize="sm">{t("app.icon")}</Text>
-					<VStack align="flex-end" gap={2}>
-						<HStack gap={2}>
-							<Button size="sm" onClick={handleFetchIcons} disabled={fetchingIcons || savingIcon || !app.startUrl}>
-								{fetchingIcons ? <Spinner size="sm" /> : t("app.fetchIcons")}
-							</Button>
-							<Button size="sm" variant="outline" onClick={handleImportIcon} disabled={savingIcon}>
-								{savingIcon ? <Spinner size="sm" /> : t("app.importIcon")}
-							</Button>
-						</HStack>
-						{icons.length > 0 && (
-							<Flex wrap="wrap" gap={3}>
-								{icons.map((icon) => {
-									const size = iconSizes[icon.url]
-									return (
-										<VStack
-											key={icon.url}
-											gap={1}
-											p={2}
-											borderRadius="md"
-											border="1px solid"
-											borderColor="border.subtle"
-											cursor={savingIcon ? "wait" : "pointer"}
-											_hover={{ borderColor: "blue.500" }}
-											onClick={() => handleSelectIcon(icon.url)}
-											opacity={savingIcon ? 0.5 : 1}
-										>
-											<Image src={icon.url} alt={icon.source} onLoad={(e) => handleImageLoad(icon.url, e)} />
-											<Text fontSize="xs" color="fg.muted">
-												{size ? `${size.w}x${size.h}` : "..."}
-											</Text>
-										</VStack>
-									)
-								})}
-							</Flex>
-						)}
-						{app.icon && (
-							<Text fontSize="xs" color="fg.muted">
-								{app.icon}
-							</Text>
-						)}
-					</VStack>
-				</HStack>
-			</ConfigSection>
-
-			<ConfigSection title={t("app.navbar")}>
-				<NavBarConfigForm mode="app" config={app.navBar || {}} defaults={config.navBar || {}} onChange={updateNavBar} />
-			</ConfigSection>
-
-			{deploySupported && (
-				<ConfigSection title={t("app.shortcut")}>
 					<HStack justify="space-between" py={2}>
-						<Text fontSize="sm">{deployed ? t("app.undeploy") : t("app.deploy")}</Text>
-						<Button size="sm" variant="outline" onClick={deployed ? handleUndeploy : handleDeploy} disabled={deploying}>
-							{deploying ? <Spinner size="sm" /> : deployed ? t("app.undeploy") : t("app.deploy")}
-						</Button>
+						<Text fontSize="sm">{t("app.startUrl")}</Text>
+						<Input size="sm" width="200px" value={app.startUrl} onChange={(e) => updateApp({ startUrl: e.target.value })} />
+					</HStack>
+					<HStack justify="space-between" py={2}>
+						<Text fontSize="sm">{t("app.partition")}</Text>
+						<PartitionSelect
+							value={app.partition}
+							partitions={getAvailablePartitions()}
+							partitionUsage={getPartitionUsage()}
+							currentAppName={name}
+							onChange={handlePartitionChange}
+						/>
+					</HStack>
+					<HStack justify="space-between" py={2}>
+						<Text fontSize="sm">{t("settings.theme")}</Text>
+						<ThemeSelect value={app.theme || "system"} onChange={(v) => updateApp({ theme: v })} />
+					</HStack>
+					<HStack justify="space-between" py={2} align="flex-start">
+						<Text fontSize="sm">{t("app.icon")}</Text>
+						<VStack align="flex-end" gap={2}>
+							<HStack gap={2}>
+								<Button size="sm" onClick={handleFetchIcons} disabled={fetchingIcons || savingIcon || !app.startUrl}>
+									{fetchingIcons ? <Spinner size="sm" /> : t("app.fetchIcons")}
+								</Button>
+								<Button size="sm" variant="outline" onClick={handleImportIcon} disabled={savingIcon}>
+									{savingIcon ? <Spinner size="sm" /> : t("app.importIcon")}
+								</Button>
+							</HStack>
+							{icons.length > 0 && (
+								<Flex wrap="wrap" gap={3}>
+									{icons.map((icon) => {
+										const size = iconSizes[icon.url]
+										return (
+											<VStack
+												key={icon.url}
+												gap={1}
+												p={2}
+												borderRadius="md"
+												border="1px solid"
+												borderColor="border.subtle"
+												cursor={savingIcon ? "wait" : "pointer"}
+												_hover={{ borderColor: "blue.500" }}
+												onClick={() => handleSelectIcon(icon.url)}
+												opacity={savingIcon ? 0.5 : 1}
+											>
+												<Image src={icon.url} alt={icon.source} onLoad={(e) => handleImageLoad(icon.url, e)} />
+												<Text fontSize="xs" color="fg.muted">
+													{size ? `${size.w}x${size.h}` : "..."}
+												</Text>
+											</VStack>
+										)
+									})}
+								</Flex>
+							)}
+							{app.icon && (
+								<Text fontSize="xs" color="fg.muted">
+									{app.icon}
+								</Text>
+							)}
+						</VStack>
 					</HStack>
 				</ConfigSection>
-			)}
+
+				<ConfigSection title={t("app.navbar")}>
+					<NavBarConfigForm mode="app" config={app.navBar || {}} defaults={config.navBar || {}} onChange={updateNavBar} />
+				</ConfigSection>
+
+				{deploySupported && (
+					<ConfigSection title={t("app.shortcut")}>
+						<HStack justify="space-between" py={2}>
+							<Text fontSize="sm">{deployed ? t("app.undeploy") : t("app.deploy")}</Text>
+							<Button size="sm" variant="outline" onClick={deployed ? handleUndeploy : handleDeploy} disabled={deploying}>
+								{deploying ? <Spinner size="sm" /> : deployed ? t("app.undeploy") : t("app.deploy")}
+							</Button>
+						</HStack>
+					</ConfigSection>
+				)}
 			</VStack>
 		</PageHeader>
 	)

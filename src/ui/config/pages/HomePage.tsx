@@ -53,6 +53,8 @@ export function HomePage({ config, configPath, partitionsState, activePartition,
 				[name]: { partition: name, startUrl },
 			},
 		})
+
+		await reloadPartitions()
 		setShowCreateDialog(false)
 		onNavigate(`#app/${name}`)
 	}
@@ -72,11 +74,7 @@ export function HomePage({ config, configPath, partitionsState, activePartition,
 	const partitionCount = partitionsState.partitions.length
 
 	return (
-		<PageHeader
-			title={t("settings.title")}
-			leftInfo={`${appCount} apps · ${partitionCount} partitions`}
-			rightInfo={configPath}
-		>
+		<PageHeader title={t("settings.title")} leftInfo={`${appCount} apps · ${partitionCount} partitions`} rightInfo={configPath}>
 			<HStack align="start" gap={6}>
 				<VStack flex={1} align="stretch" gap={4}>
 					<ConfigSection title={t("settings.appearance")}>

@@ -1,4 +1,4 @@
-import { Box, Heading, HStack, Text } from "@chakra-ui/react"
+import { Box, HStack, Heading, Text } from "@chakra-ui/react"
 import type { ReactNode } from "react"
 
 interface PageHeaderProps {

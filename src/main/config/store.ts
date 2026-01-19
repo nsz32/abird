@@ -4,8 +4,8 @@
  */
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { dirname, join } from "node:path"
-import { app } from "electron"
 import { type BirdConfig, validateConfig } from "@shared/config.schema"
+import { app } from "electron"
 import { paths } from "../utils/platform"
 
 const SCHEMA_FILENAME = "bird.config.schema.json"

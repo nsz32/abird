@@ -2,11 +2,11 @@ import { join } from "node:path"
 import { app } from "electron"
 import { getAvailableApps, loadConfig, selectApp, selectBrowserMode, selectConfigMode } from "./config"
 import { startApp } from "./core/App"
+import { initI18n } from "./core/I18n"
+import { registerBirdScheme, setupBirdProtocol } from "./core/Protocol"
 import { findConfigModeConflicts, parseCliArgs, printHelp } from "./core/cli"
 import { parseShortcut, registerKioskExitShortcut } from "./core/kiosk"
 import { kioskMode$ } from "./core/states"
-import { initI18n } from "./core/I18n"
-import { registerBirdScheme, setupBirdProtocol } from "./core/Protocol"
 import { getAvailableUserAgents } from "./utils/userAgents"
 
 // XDG compliant userData

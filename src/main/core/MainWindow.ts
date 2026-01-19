@@ -1,7 +1,7 @@
 import { BaseWindow } from "electron"
+import { ViewManager } from "./ViewManager"
 import { setupKiosk } from "./kiosk"
 import { kioskMode$, windowBounds$ } from "./states"
-import { ViewManager } from "./ViewManager"
 
 const BOUNDS_UPDATE_DELAYS = [100, 200, 300, 400, 500, 750, 1000, 1500, 2000]
 

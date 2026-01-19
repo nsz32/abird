@@ -6,11 +6,7 @@
 			"properties": {
 				"theme": {
 					"type": "string",
-					"enum": [
-						"system",
-						"light",
-						"dark"
-					],
+					"enum": ["system", "light", "dark"],
 					"default": "system"
 				},
 				"navBar": {
@@ -18,10 +14,7 @@
 					"properties": {
 						"position": {
 							"type": "string",
-							"enum": [
-								"top",
-								"bottom"
-							],
+							"enum": ["top", "bottom"],
 							"default": "top"
 						},
 						"visible": {
@@ -63,10 +56,7 @@
 							"type": "string"
 						},
 						"autoOpenMaxSize": {
-							"type": [
-								"number",
-								"string"
-							]
+							"type": ["number", "string"]
 						},
 						"autoOpenMimeTypes": {
 							"type": "array",
@@ -100,11 +90,7 @@
 							},
 							"theme": {
 								"type": "string",
-								"enum": [
-									"system",
-									"light",
-									"dark"
-								]
+								"enum": ["system", "light", "dark"]
 							},
 							"userAgent": {
 								"type": "string"
@@ -117,10 +103,7 @@
 								"properties": {
 									"position": {
 										"type": "string",
-										"enum": [
-											"top",
-											"bottom"
-										],
+										"enum": ["top", "bottom"],
 										"default": "top"
 									},
 									"visible": {
@@ -187,10 +170,7 @@
 								"additionalProperties": false
 							}
 						},
-						"required": [
-							"partition",
-							"startUrl"
-						],
+						"required": ["partition", "startUrl"],
 						"additionalProperties": false
 					},
 					"default": {}

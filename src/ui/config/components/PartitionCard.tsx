@@ -77,14 +77,7 @@ export function PartitionCard({ partition, isActive, onSelect, onDelete }: Parti
 			</Box>
 
 			{canDelete && (
-				<IconButton
-					aria-label={t("partition.delete")}
-					variant="ghost"
-					size="sm"
-					colorPalette="red"
-					onClick={handleDelete}
-					disabled={deleting}
-				>
+				<IconButton aria-label={t("partition.delete")} variant="ghost" size="sm" colorPalette="red" onClick={handleDelete} disabled={deleting}>
 					{deleting ? <Spinner size="xs" /> : <Trash2 size={16} />}
 				</IconButton>
 			)}

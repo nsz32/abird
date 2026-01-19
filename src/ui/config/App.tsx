@@ -64,14 +64,7 @@ export function App() {
 
 	const renderPage = () => {
 		if (appName) {
-			return (
-				<AppPage
-					name={appName}
-					config={config}
-					partitionsState={partitionsState}
-					onChange={handleChange}
-				/>
-			)
+			return <AppPage name={appName} config={config} partitionsState={partitionsState} onChange={handleChange} reloadPartitions={reloadPartitions} />
 		}
 		if (partitionName) {
 			return (
@@ -97,9 +90,5 @@ export function App() {
 		)
 	}
 
-	return (
-		<div style={{ maxWidth: "900px", height: "100vh", margin: "0 auto" }}>
-			{renderPage()}
-		</div>
-	)
+	return <div style={{ maxWidth: "900px", height: "100vh", margin: "0 auto" }}>{renderPage()}</div>
 }
