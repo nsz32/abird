@@ -7,6 +7,7 @@ import { ConfigSection } from "../components/ConfigSection"
 import { PageHeader } from "../components/PageHeader"
 import { RenameDialog } from "../components/RenameDialog"
 import { SwitchField } from "../components/SwitchField"
+import { formatBytes } from "../utils/format"
 
 interface PartitionPageProps {
 	name: string
@@ -19,41 +20,33 @@ interface PartitionPageProps {
 	onRename: (newName: string) => void
 }
 
-function formatBytes(bytes: number): string {
-	if (bytes === 0) return "0 B"
-	const k = 1024
-	const sizes = ["B", "KB", "MB", "GB"]
-	const i = Math.floor(Math.log(bytes) / Math.log(k))
-	return `${Number.parseFloat((bytes / k ** i).toFixed(1))} ${sizes[i]}`
-}
-
 export function PartitionPage({ name, config, partitionsState, activePartition, onChange, onNavigate, reloadPartitions, onRename }: PartitionPageProps) {
 	const { t } = useTranslations()
-	const [size, setSize] = useState<number | null>(null)
-	const [loadingSize, setLoadingSize] = useState(false)
+	const [cleaning, setCleaning] = useState(false)
 	const [resetting, setResetting] = useState(false)
 	const [showRenameDialog, setShowRenameDialog] = useState(false)
 
 	const partition = partitionsState.partitions.find((p) => p.name === name)
 	const isActive = name === activePartition
+	const canCleanup = partition?.hasPhysical && !isActive
 	const canReset = partition?.hasPhysical && !isActive
 	const partitionConfig = config.partitions?.[name] as PartitionConfig | undefined
 	const adBlockEnabled = partitionConfig?.adBlockEnabled !== false
 
 	useEffect(() => {
 		document.title = `Bird - ${name}`
-		setSize(null)
 	}, [name])
 
-	const handleLoadSize = async () => {
-		setLoadingSize(true)
+	const handleCleanup = async () => {
+		if (!confirm(t("partition.confirmCleanup").replace("{name}", name))) return
+
+		setCleaning(true)
 		try {
-			const bytes = await window.bird.partition.getSize(name)
-			setSize(bytes)
+			await window.bird.partition.cleanup(name)
 		} catch (err) {
-			console.error("Failed to get partition size:", err)
+			console.error("Failed to cleanup partition:", err)
 		} finally {
-			setLoadingSize(false)
+			setCleaning(false)
 		}
 	}
 
@@ -63,7 +56,6 @@ export function PartitionPage({ name, config, partitionsState, activePartition, 
 		setResetting(true)
 		try {
 			await window.bird.partition.reset(name)
-			setSize(null)
 			reloadPartitions()
 		} catch (err) {
 			console.error("Failed to reset partition:", err)
@@ -93,13 +85,29 @@ export function PartitionPage({ name, config, partitionsState, activePartition, 
 		)
 	}
 
-	const sizeInfo = !partition.hasPhysical ? t("partition.notCreated") : size !== null ? formatBytes(size) : undefined
+	const sizeInfo = partition.diskSize !== undefined ? formatBytes(partition.diskSize) : t("partition.notCreated")
 	const existingNames = [...Object.keys(config.apps), ...Object.keys(config.partitions || {})]
+
+	const headerActions = (canCleanup || canReset) && (
+		<HStack gap={2}>
+			{canCleanup && (
+				<Button variant="outline" size="sm" onClick={handleCleanup} disabled={cleaning}>
+					{cleaning ? <Spinner size="sm" /> : t("partition.cleanup")}
+				</Button>
+			)}
+			{canReset && (
+				<Button variant="outline" size="sm" onClick={handleReset} disabled={resetting}>
+					{resetting ? <Spinner size="sm" /> : t("partition.reset")}
+				</Button>
+			)}
+		</HStack>
+	)
 
 	return (
 		<PageHeader
 			title={name}
-			leftInfo={sizeInfo ?? t("partition.sizeUnknown")}
+			leftInfo={sizeInfo}
+			actions={headerActions}
 			onRename={() => setShowRenameDialog(true)}
 			renameLabel={t("partition.rename")}
 		>
@@ -132,21 +140,6 @@ export function PartitionPage({ name, config, partitionsState, activePartition, 
 						</VStack>
 					)}
 
-					{partition.hasPhysical && (
-						<HStack justify="space-between" py={2}>
-							<Text fontSize="sm">{t("partition.showSize")}</Text>
-							{size !== null ? (
-								<Text fontSize="sm" fontWeight="medium">
-									{formatBytes(size)}
-								</Text>
-							) : (
-								<Button size="sm" variant="outline" onClick={handleLoadSize} disabled={loadingSize}>
-									{loadingSize ? <Spinner size="sm" /> : t("partition.showSize")}
-								</Button>
-							)}
-						</HStack>
-					)}
-
 					<Text fontSize="xs" color="fg.muted" pt={2}>
 						{t("partition.storagePath")}: {name}
 					</Text>
@@ -155,14 +148,6 @@ export function PartitionPage({ name, config, partitionsState, activePartition, 
 				<ConfigSection title={t("partition.settings")}>
 					<SwitchField label={t("partition.adBlockEnabled")} checked={adBlockEnabled} onChange={handleAdBlockChange} />
 				</ConfigSection>
-
-				{canReset && (
-					<ConfigSection title={t("partition.actions")}>
-						<Button variant="outline" size="sm" onClick={handleReset} disabled={resetting}>
-							{resetting ? <Spinner size="sm" /> : t("partition.reset")}
-						</Button>
-					</ConfigSection>
-				)}
 			</VStack>
 
 			<RenameDialog

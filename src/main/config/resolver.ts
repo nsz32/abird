@@ -26,7 +26,7 @@ function resolveNavBarConfig(merged: NavBarConfig, overrides?: ResolvedNavBarOve
 		showBackButton: overrides?.showBackButton ?? merged.showBackButton,
 		showForwardButton: overrides?.showForwardButton ?? merged.showForwardButton,
 		showRefreshButton: overrides?.showRefreshButton ?? merged.showRefreshButton,
-		showHomeButton: overrides?.showHomeButton ?? true,
+		showHomeButton: overrides?.showHomeButton ?? merged.showHomeButton,
 	}
 }
 

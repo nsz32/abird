@@ -141,9 +141,9 @@ contextBridge.exposeInMainWorld("bird", {
 	},
 	partition: {
 		list: (): Promise<PartitionsState> => ipcRenderer.invoke(IpcChannels.PARTITION_LIST),
+		cleanup: (name: string): Promise<void> => ipcRenderer.invoke(IpcChannels.PARTITION_CLEANUP, name),
 		reset: (name: string): Promise<void> => ipcRenderer.invoke(IpcChannels.PARTITION_RESET, name),
 		delete: (name: string): Promise<void> => ipcRenderer.invoke(IpcChannels.PARTITION_DELETE, name),
-		getSize: (name: string): Promise<number> => ipcRenderer.invoke(IpcChannels.PARTITION_GET_SIZE, name),
 		markFragile: (name: string): Promise<void> => ipcRenderer.invoke(IpcChannels.PARTITION_MARK_FRAGILE, name),
 		rename: (oldName: string, newName: string): Promise<void> => ipcRenderer.invoke(IpcChannels.PARTITION_RENAME, oldName, newName),
 	},

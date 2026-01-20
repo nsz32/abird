@@ -15,9 +15,10 @@ export const NavBarConfigSchema = z.object({
 	visible: z.boolean().default(true),
 	autoHide: z.boolean().default(false),
 	allowUrlEdit: z.boolean().default(false),
-	showBackButton: z.boolean().default(false),
-	showForwardButton: z.boolean().default(false),
-	showRefreshButton: z.boolean().default(false),
+	showBackButton: z.boolean().default(true),
+	showForwardButton: z.boolean().default(true),
+	showRefreshButton: z.boolean().default(true),
+	showHomeButton: z.boolean().default(true),
 	allowSingleTabClose: z.boolean().default(false),
 })
 export type NavBarConfig = z.infer<typeof NavBarConfigSchema>

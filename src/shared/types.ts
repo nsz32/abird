@@ -189,9 +189,9 @@ export const IpcChannels = {
 	UNDEPLOY_APP: "bird:deploy:undeploy",
 	// Partition
 	PARTITION_LIST: "bird:partition:list",
+	PARTITION_CLEANUP: "bird:partition:cleanup",
 	PARTITION_RESET: "bird:partition:reset",
 	PARTITION_DELETE: "bird:partition:delete",
-	PARTITION_GET_SIZE: "bird:partition:get-size",
 	PARTITION_MARK_FRAGILE: "bird:partition:mark-fragile",
 	PARTITION_RENAME: "bird:partition:rename",
 } as const
@@ -327,9 +327,9 @@ export interface BirdApi {
 	}
 	partition: {
 		list: () => Promise<PartitionsState>
+		cleanup: (name: string) => Promise<void>
 		reset: (name: string) => Promise<void>
 		delete: (name: string) => Promise<void>
-		getSize: (name: string) => Promise<number>
 		markFragile: (name: string) => Promise<void>
 		rename: (oldName: string, newName: string) => Promise<void>
 	}

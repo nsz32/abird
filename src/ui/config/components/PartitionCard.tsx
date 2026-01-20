@@ -3,6 +3,7 @@ import type { PartitionState } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
 import { Trash2 } from "lucide-react"
 import { useState } from "react"
+import { formatBytes } from "../utils/format"
 
 interface PartitionCardProps {
 	partition: PartitionState
@@ -69,11 +70,10 @@ export function PartitionCard({ partition, isActive, onSelect, onDelete }: Parti
 					)}
 				</HStack>
 
-				{partition.usedByApps.length > 0 && (
-					<Text fontSize="xs" color="fg.muted" truncate>
-						{t("partition.usedBy")}: {partition.usedByApps.join(", ")}
-					</Text>
-				)}
+				<Text fontSize="xs" color="fg.muted" truncate>
+					{partition.diskSize !== undefined ? formatBytes(partition.diskSize) : t("partition.notCreated")}
+					{partition.usedByApps.length > 0 && ` · ${partition.usedByApps.join(", ")}`}
+				</Text>
 			</Box>
 
 			{canDelete && (

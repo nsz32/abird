@@ -88,6 +88,7 @@ export function getPartitionsState(): PartitionsState {
 			isOrphan: hasPhysical && usedByApps.length === 0,
 			isFragile: fragilePartitions.has(name),
 			config: (birdConfig.partitions?.[name] as PartitionConfig) || null,
+			diskSize: hasPhysical ? getPartitionSize(name) : undefined,
 		})
 	}
 
@@ -123,17 +124,28 @@ function getDirectorySize(dir: string): number {
 	return size
 }
 
+export async function cleanupPartition(name: string): Promise<void> {
+	const currentPartition = config$.get().partition
+	if (name === currentPartition) {
+		throw new Error("Cannot cleanup the active partition")
+	}
+
+	const sess = session.fromPartition(`persist:${name}`)
+	await Promise.all([sess.clearCache(), sess.clearHostResolverCache(), sess.clearCodeCaches({})])
+	console.log(`[Partition] cleanup: ${name}`)
+}
+
 export async function resetPartition(name: string): Promise<void> {
 	const currentPartition = config$.get().partition
 	if (name === currentPartition) {
 		throw new Error("Cannot reset the active partition")
 	}
 
-	const sess = session.fromPartition(`persist:${name}`)
-	await sess.clearStorageData()
-	await sess.clearCache()
-	await sess.clearAuthCache()
-	console.log(`[Partition] reset: ${name}`)
+	const partitionPath = join(getPartitionsDir(), name)
+	if (existsSync(partitionPath)) {
+		rmSync(partitionPath, { recursive: true, force: true })
+		console.log(`[Partition] reset: ${partitionPath}`)
+	}
 }
 
 export async function deletePartition(name: string): Promise<void> {
@@ -147,15 +159,8 @@ export async function deletePartition(name: string): Promise<void> {
 		throw new Error("Cannot delete a partition used by apps")
 	}
 
-	// D'abord vider via Electron
 	await resetPartition(name)
-
-	// Puis supprimer le dossier
-	const partitionPath = join(getPartitionsDir(), name)
-	if (existsSync(partitionPath)) {
-		rmSync(partitionPath, { recursive: true, force: true })
-		console.log(`[Partition] deleted: ${partitionPath}`)
-	}
+	console.log(`[Partition] deleted: ${name}`)
 }
 
 export function renamePartition(oldName: string, newName: string): void {

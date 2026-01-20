@@ -6,22 +6,26 @@ interface PageHeaderProps {
 	title: string
 	leftInfo: ReactNode
 	rightInfo?: ReactNode
+	actions?: ReactNode
 	onRename?: () => void
 	renameLabel?: string
 	children: ReactNode
 }
 
-export function PageHeader({ title, leftInfo, rightInfo, onRename, renameLabel, children }: PageHeaderProps) {
+export function PageHeader({ title, leftInfo, rightInfo, actions, onRename, renameLabel, children }: PageHeaderProps) {
 	return (
 		<Box display="flex" flexDirection="column" h="100%">
 			<Box pt={6} pb={4} flexShrink={0}>
-				<HStack gap={2} mb={2}>
-					<Heading size="lg">{title}</Heading>
-					{onRename && (
-						<IconButton aria-label={renameLabel || "Rename"} variant="ghost" size="sm" onClick={onRename}>
-							<Pencil size={16} />
-						</IconButton>
-					)}
+				<HStack justify="space-between" mb={2}>
+					<HStack gap={2}>
+						<Heading size="lg">{title}</Heading>
+						{onRename && (
+							<IconButton aria-label={renameLabel || "Rename"} variant="ghost" size="sm" onClick={onRename}>
+								<Pencil size={16} />
+							</IconButton>
+						)}
+					</HStack>
+					{actions}
 				</HStack>
 				<HStack justify="space-between" fontSize="sm" color="fg.muted">
 					<Text>{leftInfo}</Text>
