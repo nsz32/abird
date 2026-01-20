@@ -1,23 +1,43 @@
-import type { RoutingConfig } from "@shared/types"
+import type { ResolvedRoutingConfig, RoutingAction } from "@shared/types"
 
-export function shouldHandleUrl(url: string, config: Partial<RoutingConfig> | null): boolean {
-	if (!url || url.startsWith("bird:") || url.startsWith("about:") || url.startsWith("javascript:") || url.startsWith("data:")) {
-		return true
+const SPECIAL_PREFIXES = ["bird:", "about:", "javascript:", "data:"]
+
+function matchesAny(url: string, patterns: RegExp[]): boolean {
+	return patterns.some((p) => p.test(url))
+}
+
+function isSpecialUrl(url: string): boolean {
+	return !url || SPECIAL_PREFIXES.some((p) => url.startsWith(p))
+}
+
+export function getNavigationAction(url: string, routing: ResolvedRoutingConfig): RoutingAction {
+	if (isSpecialUrl(url)) return "internal"
+
+	if (matchesAny(url, routing.internal) || matchesAny(url, routing.download)) {
+		return "internal"
 	}
-	return isInternalUrl(url, config) || isDownloadAllowed(url, config)
+	if (matchesAny(url, routing.external)) {
+		return "external"
+	}
+	if (matchesAny(url, routing.ignore)) {
+		return "ignore"
+	}
+
+	return "external"
 }
 
-function isInternalUrl(url: string, config: Partial<RoutingConfig> | null): boolean {
-	if (!config?.internal) return false
-	return matchesPatterns(url, config.internal)
-}
+export function getDownloadAction(url: string, routing: ResolvedRoutingConfig): RoutingAction {
+	if (isSpecialUrl(url)) return "internal"
 
-function isDownloadAllowed(url: string, config: Partial<RoutingConfig> | null): boolean {
-	if (!config?.download) return false
-	return matchesPatterns(url, config.download)
-}
+	if (matchesAny(url, routing.internal) || matchesAny(url, routing.download)) {
+		return "download"
+	}
+	if (matchesAny(url, routing.external)) {
+		return "external"
+	}
+	if (matchesAny(url, routing.ignore)) {
+		return "ignore"
+	}
 
-function matchesPatterns(url: string, patterns: string | string[]): boolean {
-	const list = Array.isArray(patterns) ? patterns : [patterns]
-	return list.some((p) => (p.startsWith("^") ? new RegExp(p).test(url) : url.startsWith(p)))
+	return "external"
 }

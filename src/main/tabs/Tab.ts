@@ -1,4 +1,4 @@
-import type { FindState, NavigationState, RoutingConfig, TabOrigin } from "@shared/types"
+import type { FindState, NavigationState, ResolvedRoutingConfig, TabOrigin } from "@shared/types"
 import { shell } from "electron"
 import { ViewManager } from "../core/ViewManager"
 import { externalOpened$, findState$, tabs$ } from "../core/states"
@@ -35,7 +35,7 @@ export class Tab {
 	private onValidCallback?: () => void
 	private destroyed = false
 
-	constructor(partition: string, routing: Partial<RoutingConfig> | null, url: string, userAgent: string, parentId: string | null = null) {
+	constructor(partition: string, routing: ResolvedRoutingConfig, url: string, userAgent: string, parentId: string | null = null) {
 		this.id = `tab-${nextId++}`
 		this.initialUrl = url
 		this.parentId = parentId

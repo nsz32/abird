@@ -50,6 +50,16 @@ const en = {
 	"app.shortcut": "Desktop shortcut",
 	"app.shortcutCreated": "Shortcut created",
 	"app.shortcutNotCreated": "No shortcut",
+	"app.routing": "URL Routing",
+	"routing.addRule": "Add rule",
+	"routing.pattern": "Pattern (regex)",
+	"routing.action": "Action",
+	"routing.internal": "Internal",
+	"routing.download": "Download",
+	"routing.external": "External",
+	"routing.ignore": "Ignore",
+	"routing.noRules": "No rules - all URLs open externally",
+	"routing.invalidPattern": "Invalid regex",
 
 	// Inherit state
 	"inherit.reset": "Reset",
@@ -148,6 +158,16 @@ const fr: typeof en = {
 	"app.shortcut": "Raccourci bureau",
 	"app.shortcutCreated": "Raccourci créé",
 	"app.shortcutNotCreated": "Pas de raccourci",
+	"app.routing": "Routage URL",
+	"routing.addRule": "Ajouter une règle",
+	"routing.pattern": "Pattern (regex)",
+	"routing.action": "Action",
+	"routing.internal": "Interne",
+	"routing.download": "Télécharger",
+	"routing.external": "Externe",
+	"routing.ignore": "Ignorer",
+	"routing.noRules": "Aucune règle - toutes les URLs s'ouvrent en externe",
+	"routing.invalidPattern": "Regex invalide",
 
 	// Inherit state
 	"inherit.reset": "Réinitialiser",

@@ -21,7 +21,7 @@ export function PageHeader({ title, leftInfo, rightInfo, children }: PageHeaderP
 				</HStack>
 			</Box>
 
-			<Box flex={1} overflowY="auto" pr={4} pb={6}>
+			<Box flex={1} overflowY="auto" pt={0} pr={4} pl={4} pb={6}>
 				{children}
 			</Box>
 		</Box>

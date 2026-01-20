@@ -29,7 +29,7 @@ const DEFAULT_CONFIG: EffectiveConfig = {
 		showRefreshButton: false,
 		showHomeButton: true,
 	},
-	routing: null,
+	routing: { internal: [], download: [], external: [], ignore: [] },
 	downloads: {
 		directory: null,
 		autoOpenMaxSize: 0,

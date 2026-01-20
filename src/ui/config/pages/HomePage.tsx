@@ -1,5 +1,6 @@
 import { HStack, Text, VStack } from "@chakra-ui/react"
 import type { BirdConfig, NavBarConfig } from "@shared/config.schema"
+import { deriveInternalPattern } from "@shared/routing"
 import type { PartitionsState } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
 import { useEffect, useState } from "react"
@@ -46,11 +47,13 @@ export function HomePage({ config, configPath, partitionsState, activePartition,
 			await window.bird.partition.markFragile(name)
 		}
 
+		const internal = deriveInternalPattern(startUrl)
+
 		onChange({
 			...config,
 			apps: {
 				...config.apps,
-				[name]: { partition: name, startUrl },
+				[name]: { partition: name, startUrl, routing: { rules: { [internal]: "internal" } } },
 			},
 		})
 

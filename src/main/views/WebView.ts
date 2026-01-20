@@ -1,7 +1,7 @@
-import type { RoutingConfig, TabOrigin } from "@shared/types"
+import type { ResolvedRoutingConfig, TabOrigin } from "@shared/types"
 import { app } from "electron"
 import contextMenu from "electron-context-menu"
-import { shouldHandleUrl } from "../core/UrlRouter"
+import { getNavigationAction } from "../core/UrlRouter"
 import { config$ } from "../core/states"
 import { setupDownloads } from "../services/DownloadManager"
 import { resolveUserAgent } from "../utils/userAgents"
@@ -15,7 +15,7 @@ export class WebView extends BrowserView {
 	constructor(
 		url: string,
 		partition: string,
-		private readonly routing: Partial<RoutingConfig> | null,
+		private readonly routing: ResolvedRoutingConfig,
 		userAgent: string,
 		callbacks: BrowserViewCallbacks,
 	) {
@@ -49,8 +49,6 @@ export class WebView extends BrowserView {
 		this.webContents.loadURL(normalized)
 	}
 
-	// External navigation handling
-
 	private setupNavigation() {
 		this.webContents.on("will-navigate", (event, url) => this.handleNavigation(event, url))
 		this.webContents.on("will-redirect", (event, url) => this.handleNavigation(event, url))
@@ -62,18 +60,27 @@ export class WebView extends BrowserView {
 	}
 
 	private handleNavigation(event: Electron.Event, url: string) {
-		if (shouldHandleUrl(url, this.routing)) return
+		const action = getNavigationAction(url, this.routing)
+
+		if (action === "internal") return
 
 		event.preventDefault()
-		this.callbacks.onExternalUrl(url)
+
+		if (action === "external") {
+			this.callbacks.onExternalUrl(url)
+		}
+		// action === "ignore" → nothing
 	}
 
 	private handleNewWindow(url: string, disposition: string) {
-		if (shouldHandleUrl(url, this.routing)) {
+		const action = getNavigationAction(url, this.routing)
+
+		if (action === "internal") {
 			const origin: TabOrigin = disposition === "background-tab" ? "background" : "blank"
 			this.callbacks.onNewTab(url, origin)
-		} else {
+		} else if (action === "external") {
 			this.callbacks.onExternalUrl(url)
 		}
+		// action === "ignore" → nothing
 	}
 }

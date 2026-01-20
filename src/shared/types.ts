@@ -8,6 +8,7 @@ export type {
 	ThemeMode,
 	NavBarConfig,
 	RoutingConfig,
+	RoutingAction,
 	DownloadConfig,
 	AppConfig,
 	BirdConfig,
@@ -197,7 +198,7 @@ export const IpcChannels = {
 // Type utilitaire pour les valeurs de IpcChannels
 export type IpcChannel = (typeof IpcChannels)[keyof typeof IpcChannels]
 
-import type { RoutingConfig, ThemeMode } from "./config.schema"
+import type { ThemeMode } from "./config.schema"
 import type { Translations } from "./i18n/translations"
 
 // Config navbar résolue (boutons individuels)
@@ -222,6 +223,14 @@ export interface ResolvedDownloadConfig {
 	allowDuplicateDownloads: boolean
 }
 
+// Config routing résolue (patterns compilés en RegExp)
+export interface ResolvedRoutingConfig {
+	internal: RegExp[]
+	download: RegExp[]
+	external: RegExp[]
+	ignore: RegExp[]
+}
+
 // Config effective (computée selon BirdConfig + contexte)
 export interface EffectiveConfig {
 	startUrl: string
@@ -229,7 +238,7 @@ export interface EffectiveConfig {
 	theme: ThemeMode
 	userAgent: string
 	navBar: ResolvedNavBarConfig
-	routing: Partial<RoutingConfig> | null
+	routing: ResolvedRoutingConfig
 	downloads: ResolvedDownloadConfig
 	preload?: string
 }

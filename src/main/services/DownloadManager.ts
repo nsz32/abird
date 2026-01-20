@@ -2,7 +2,8 @@ import { existsSync, renameSync, statSync, unlinkSync } from "node:fs"
 import { basename, dirname, extname, join } from "node:path"
 import type { ActiveDownload, DownloadConfig, DownloadHistoryItem, DownloadStatus, ResolvedDownloadConfig } from "@shared/types"
 import type { DownloadItem, Session } from "electron"
-import { app, session } from "electron"
+import { app, session, shell } from "electron"
+import { getDownloadAction } from "../core/UrlRouter"
 import { activeDownloads$, config$, downloadEvents$, downloadHistory$ } from "../core/states"
 import { checkOfficeMacroWarning } from "../utils/executableDetection"
 import { type FileDetectionResult, detectFileType, detectFileTypeWithRetry } from "../utils/fileDetection"
@@ -157,10 +158,22 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 	configuredSessions.add(session)
 	const downloadDir = config.directory || app.getPath("downloads")
 
-	session.on("will-download", (_event, item) => {
+	session.on("will-download", (event, item) => {
+		const url = item.getURL()
+		const action = getDownloadAction(url, config$.get().routing)
+
+		if (action === "external") {
+			event.preventDefault()
+			shell.openExternal(url)
+			return
+		}
+		if (action === "ignore") {
+			event.preventDefault()
+			return
+		}
+
 		const downloadId = generateDownloadId()
 		const filename = item.getFilename()
-		const url = item.getURL()
 		const partition = config$.get().partition
 		const { finalPath, tempPath, originalPath } = getDownloadPaths(join(downloadDir, filename))
 		item.setSavePath(tempPath)

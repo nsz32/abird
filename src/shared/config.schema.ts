@@ -22,10 +22,13 @@ export const NavBarConfigSchema = z.object({
 })
 export type NavBarConfig = z.infer<typeof NavBarConfigSchema>
 
-// Configuration du routage des URLs
+// Actions de routage
+export const RoutingActionSchema = z.enum(["internal", "download", "external", "ignore"])
+export type RoutingAction = z.infer<typeof RoutingActionSchema>
+
+// Configuration du routage des URLs (pattern regex → action)
 export const RoutingConfigSchema = z.object({
-	internal: z.union([z.string(), z.array(z.string())]),
-	download: z.union([z.string(), z.array(z.string())]).optional(),
+	rules: z.record(z.string(), RoutingActionSchema).default({}),
 })
 export type RoutingConfig = z.infer<typeof RoutingConfigSchema>
 

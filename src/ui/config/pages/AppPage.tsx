@@ -1,5 +1,5 @@
 import { Button, Flex, HStack, Image, Input, Spinner, Text, VStack } from "@chakra-ui/react"
-import type { AppConfig, BirdConfig, NavBarConfig } from "@shared/config.schema"
+import type { AppConfig, BirdConfig, NavBarConfig, RoutingAction } from "@shared/config.schema"
 import type { IconResult, PartitionsState } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
 import { useEffect, useRef, useState } from "react"
@@ -7,6 +7,7 @@ import { ConfigSection } from "../components/ConfigSection"
 import { NavBarConfigForm } from "../components/NavBarConfigForm"
 import { PageHeader } from "../components/PageHeader"
 import { PartitionSelect } from "../components/PartitionSelect"
+import { RoutingRulesEditor } from "../components/RoutingRulesEditor"
 import { ThemeSelect } from "../components/ThemeSelect"
 
 interface AppPageProps {
@@ -101,6 +102,11 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 
 		const hasValues = Object.keys(newNavBar).length > 0
 		updateApp({ navBar: hasValues ? newNavBar : undefined })
+	}
+
+	const updateRoutingRules = (rules: Record<string, RoutingAction>) => {
+		const hasRules = Object.keys(rules).length > 0
+		updateApp({ routing: hasRules ? { rules } : undefined })
 	}
 
 	const handleFetchIcons = async () => {
@@ -276,6 +282,10 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 
 				<ConfigSection title={t("app.navbar")}>
 					<NavBarConfigForm mode="app" config={app.navBar || {}} defaults={config.navBar || {}} onChange={updateNavBar} />
+				</ConfigSection>
+
+				<ConfigSection title={t("app.routing")}>
+					<RoutingRulesEditor rules={app.routing?.rules || {}} onChange={updateRoutingRules} />
 				</ConfigSection>
 
 				{deploySupported && (

@@ -3,7 +3,7 @@
  * Responsabilités : fusion des configs, résolution des valeurs, émission
  */
 import { DEFAULT_NAVBAR } from "@shared/config.schema"
-import type { AppConfig, BirdConfig, EffectiveConfig, NavBarConfig, ResolvedNavBarConfig } from "@shared/types"
+import type { AppConfig, BirdConfig, EffectiveConfig, NavBarConfig, ResolvedNavBarConfig, ResolvedRoutingConfig, RoutingConfig } from "@shared/types"
 import { config$ } from "../core/states"
 import { resolveDownloadConfig } from "../services/DownloadManager"
 import { cleanupFragilePartitions } from "../services/PartitionManager"
@@ -30,6 +30,35 @@ function resolveNavBarConfig(merged: NavBarConfig, overrides?: ResolvedNavBarOve
 	}
 }
 
+function escapeRegex(str: string): string {
+	return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+}
+
+function resolveRoutingConfig(config: Partial<RoutingConfig> | undefined, startUrl?: string): ResolvedRoutingConfig {
+	const resolved: ResolvedRoutingConfig = {
+		internal: [],
+		download: [],
+		external: [],
+		ignore: [],
+	}
+
+	if (startUrl && startUrl !== "about:blank") {
+		resolved.internal.push(new RegExp(`^${escapeRegex(startUrl)}`))
+	}
+
+	if (!config?.rules) return resolved
+
+	for (const [pattern, action] of Object.entries(config.rules)) {
+		try {
+			resolved[action].push(new RegExp(pattern))
+		} catch {
+			console.warn(`[Routing] Invalid pattern ignored: ${pattern}`)
+		}
+	}
+
+	return resolved
+}
+
 interface BuildOptions {
 	navBarOverrides?: ResolvedNavBarOverrides
 	cliOverrides?: CliOverrides
@@ -49,7 +78,7 @@ function buildEffectiveConfig(app: Partial<AppConfig>, birdConfig: BirdConfig, o
 		theme: app.theme || birdConfig.theme,
 		userAgent: cli?.userAgent || app.userAgentRaw || app.userAgent || "desktop:bird",
 		navBar: resolveNavBarConfig(mergedNavBar, options?.navBarOverrides),
-		routing: app.routing || null,
+		routing: resolveRoutingConfig(app.routing, app.startUrl),
 		downloads: resolveDownloadConfig({ ...birdConfig.downloads }),
 	}
 }
@@ -79,7 +108,7 @@ export function selectConfigMode(): void {
 			allowUrlEdit: false,
 			allowSingleTabClose: false,
 		},
-		routing: { internal: "^bird://" },
+		routing: { rules: { "^bird://": "internal" } },
 	}
 
 	const effective = buildEffectiveConfig(configApp, birdConfig, {
@@ -107,7 +136,7 @@ export function selectBrowserMode(startUrl: string, userAgent = "desktop:bird"):
 			allowUrlEdit: true,
 			allowSingleTabClose: true,
 		},
-		routing: { internal: "^" },
+		routing: { rules: { "^": "internal" } },
 	}
 
 	const effective = buildEffectiveConfig(browserApp, birdConfig, {
