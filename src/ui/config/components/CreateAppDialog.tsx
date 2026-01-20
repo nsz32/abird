@@ -55,7 +55,7 @@ export function CreateAppDialog({ isOpen, onClose, onCreate, existingNames }: Cr
 									value={name}
 									onChange={(e) => setName(e.target.value)}
 									placeholder={t("app.namePlaceholder")}
-									invalid={hasNameError}
+									data-invalid={hasNameError || undefined}
 									autoFocus
 								/>
 								{nameExists && (

@@ -81,9 +81,9 @@ export function HomePage({ config, configPath, partitionsState, activePartition,
 	const handleDeletePartition = async (name: string) => {
 		await window.bird.partition.delete(name)
 
-		if (config.partitions?.[name]) {
+		if (config.partitions[name]) {
 			const { [name]: _, ...rest } = config.partitions
-			onChange({ ...config, partitions: Object.keys(rest).length > 0 ? rest : undefined })
+			onChange({ ...config, partitions: rest })
 		}
 
 		reloadPartitions()

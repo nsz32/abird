@@ -55,6 +55,10 @@ const en = {
 	"app.renameTitle": "Rename application",
 	"app.launch": "Launch",
 	"app.launchNotSupported": "Launch is only available in packaged mode (not in development)",
+	"app.editUrl": "Edit URL",
+	"app.editUrlTitle": "Edit start URL",
+	"app.updateDefaultPattern": "Update default routing pattern",
+	"app.save": "Save",
 	"routing.addRule": "Add rule",
 	"routing.pattern": "Pattern (regex)",
 	"routing.action": "Action",
@@ -66,6 +70,8 @@ const en = {
 	"routing.invalidPattern": "Invalid regex",
 	"routing.addDefault": "Add default pattern",
 	"routing.missingDefaultWarning": "The default pattern is not configured. Internal URLs may open in the external browser.",
+	"routing.add": "Add rule",
+	"routing.remove": "Remove rule",
 
 	// Inherit state
 	"inherit.inherited": "(inherited)",
@@ -185,6 +191,10 @@ const fr: typeof en = {
 	"app.renameTitle": "Renommer l'application",
 	"app.launch": "Lancer",
 	"app.launchNotSupported": "Le lancement n'est disponible qu'en mode packagé (pas en développement)",
+	"app.editUrl": "Modifier l'URL",
+	"app.editUrlTitle": "Modifier l'URL de démarrage",
+	"app.updateDefaultPattern": "Mettre à jour le pattern de routage par défaut",
+	"app.save": "Enregistrer",
 	"routing.addRule": "Ajouter une règle",
 	"routing.pattern": "Pattern (regex)",
 	"routing.action": "Action",
@@ -196,6 +206,8 @@ const fr: typeof en = {
 	"routing.invalidPattern": "Regex invalide",
 	"routing.addDefault": "Ajouter le pattern par défaut",
 	"routing.missingDefaultWarning": "Le pattern par défaut n'est pas configuré. Les URLs internes risquent de s'ouvrir dans le navigateur externe.",
+	"routing.add": "Ajouter la règle",
+	"routing.remove": "Supprimer la règle",
 
 	// Inherit state
 	"inherit.inherited": "(hérité)",

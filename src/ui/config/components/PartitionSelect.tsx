@@ -94,7 +94,7 @@ export function PartitionSelect({ value, partitions, partitionUsage, currentAppN
 										onChange={(e) => setNewName(e.target.value)}
 										onKeyDown={handleKeyDown}
 										placeholder={t("partition.namePlaceholder")}
-										invalid={folderError !== null}
+										data-invalid={folderError !== null || undefined}
 										flex={1}
 									/>
 									<Button size="sm" colorPalette="blue" onClick={handleCreate} disabled={!isNameValid}>

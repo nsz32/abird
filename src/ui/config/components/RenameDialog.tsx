@@ -50,7 +50,7 @@ export function RenameDialog({ isOpen, title, currentName, existingNames, onClos
 					<Dialog.Body>
 						<VStack align="stretch" gap={1}>
 							<Text fontSize="sm">{t("rename.newName")}</Text>
-							<Input value={name} onChange={(e) => setName(e.target.value)} onKeyDown={handleKeyDown} invalid={hasError} autoFocus />
+							<Input value={name} onChange={(e) => setName(e.target.value)} onKeyDown={handleKeyDown} data-invalid={hasError || undefined} autoFocus />
 							{nameExists && (
 								<Text fontSize="xs" color="red.500">
 									{t("rename.nameExists")}

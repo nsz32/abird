@@ -1,11 +1,12 @@
-import { Button, Flex, Group, HStack, IconButton, Image, Input, InputAddon, Spinner, Switch, Text, VStack } from "@chakra-ui/react"
+import { Button, Flex, HStack, IconButton, Image, Spinner, Switch, Text, VStack } from "@chakra-ui/react"
 import type { AppConfig, BirdConfig, NavBarConfig, RoutingAction } from "@shared/config.schema"
 import { deriveInternalPattern } from "@shared/routing"
 import type { IconResult, PartitionsState } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
-import { ExternalLink } from "lucide-react"
+import { ExternalLink, Pencil } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { ConfigSection } from "../components/ConfigSection"
+import { EditStartUrlDialog } from "../components/EditStartUrlDialog"
 import { NavBarConfigForm } from "../components/NavBarConfigForm"
 import { PageHeader } from "../components/PageHeader"
 import { PartitionSelect } from "../components/PartitionSelect"
@@ -29,6 +30,7 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 	const [fetchingIcons, setFetchingIcons] = useState(false)
 	const [savingIcon, setSavingIcon] = useState(false)
 	const [showRenameDialog, setShowRenameDialog] = useState(false)
+	const [showEditUrlDialog, setShowEditUrlDialog] = useState(false)
 
 	const [deploySupported, setDeploySupported] = useState(false)
 	const [deployed, setDeployed] = useState(false)
@@ -90,11 +92,12 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 		})
 	}
 
-	const urlPath = app.startUrl.replace(/^https?:\/\//, "")
-
-	const handleUrlChange = (value: string) => {
-		const clean = value.replace(/^https?:\/\//, "")
-		updateApp({ startUrl: `https://${clean}` })
+	const handleStartUrlSave = (newUrl: string, newRules: Record<string, RoutingAction>) => {
+		const hasRules = Object.keys(newRules).length > 0
+		updateApp({
+			startUrl: newUrl,
+			routing: hasRules ? { rules: newRules } : undefined,
+		})
 	}
 
 	const handlePartitionChange = async (newPartition: string) => {
@@ -272,10 +275,14 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 				<ConfigSection title={t("app.general")}>
 					<HStack justify="space-between" py={2}>
 						<Text fontSize="sm">{t("app.startUrl")}</Text>
-						<Group attached width="280px">
-							<InputAddon>https://</InputAddon>
-							<Input size="sm" value={urlPath} onChange={(e) => handleUrlChange(e.target.value)} placeholder={t("app.urlPlaceholder")} />
-						</Group>
+						<HStack gap={2}>
+							<Text fontSize="sm" fontFamily="mono">
+								{app.startUrl}
+							</Text>
+							<IconButton aria-label={t("app.editUrl")} variant="ghost" size="xs" onClick={() => setShowEditUrlDialog(true)}>
+								<Pencil size={14} />
+							</IconButton>
+						</HStack>
 					</HStack>
 					<HStack justify="space-between" py={2}>
 						<Text fontSize="sm">{t("app.partition")}</Text>
@@ -368,6 +375,14 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 					<NavBarConfigForm mode="app" config={app.navBar || {}} defaults={config.navBar || {}} onChange={updateNavBar} />
 				</ConfigSection>
 			</VStack>
+
+			<EditStartUrlDialog
+				isOpen={showEditUrlDialog}
+				currentUrl={app.startUrl}
+				rules={app.routing?.rules || {}}
+				onClose={() => setShowEditUrlDialog(false)}
+				onSave={handleStartUrlSave}
+			/>
 
 			<RenameDialog
 				isOpen={showRenameDialog}

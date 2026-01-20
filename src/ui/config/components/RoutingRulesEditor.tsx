@@ -1,6 +1,7 @@
 import { Box, Button, HStack, IconButton, Input, NativeSelect, Text, VStack } from "@chakra-ui/react"
 import type { RoutingAction } from "@shared/config.schema"
 import { useTranslations } from "@ui/shared/hooks"
+import { Plus, Trash2 } from "lucide-react"
 import { useState } from "react"
 
 interface RoutingRulesEditorProps {
@@ -78,16 +79,7 @@ export function RoutingRulesEditor({ rules, onChange, defaultPattern }: RoutingR
 
 			{entries.map(([pattern, action]) => (
 				<HStack key={pattern} gap={2}>
-					<Input
-						size="sm"
-						flex={1}
-						fontFamily="mono"
-						value={pattern}
-						readOnly
-						bg="bg.subtle"
-						borderColor={isValidRegex(pattern) ? undefined : "red.500"}
-					/>
-					<NativeSelect.Root size="sm" width="120px">
+					<NativeSelect.Root size="sm" width="120px" disabled={pattern === defaultPattern}>
 						<NativeSelect.Field value={action} onChange={(e) => handleChangeAction(pattern, e.target.value as RoutingAction)}>
 							{ACTIONS.map((a) => (
 								<option key={a} value={a}>
@@ -96,14 +88,26 @@ export function RoutingRulesEditor({ rules, onChange, defaultPattern }: RoutingR
 							))}
 						</NativeSelect.Field>
 					</NativeSelect.Root>
-					<IconButton size="sm" variant="ghost" colorPalette="red" onClick={() => handleRemove(pattern)} aria-label="Remove">
-						✕
+					<Text flex={1} fontSize="sm" fontFamily="mono" color={isValidRegex(pattern) ? undefined : "red.500"}>
+						{pattern}
+					</Text>
+					<IconButton size="sm" variant="ghost" colorPalette="red" onClick={() => handleRemove(pattern)} aria-label={t("routing.remove")}>
+						<Trash2 size={16} />
 					</IconButton>
 				</HStack>
 			))}
 
 			<Box borderTop="1px solid" borderColor="border.subtle" pt={3} mt={1}>
 				<HStack gap={2}>
+					<NativeSelect.Root size="sm" width="120px">
+						<NativeSelect.Field value={newAction} onChange={(e) => setNewAction(e.target.value as RoutingAction)}>
+							{ACTIONS.map((a) => (
+								<option key={a} value={a}>
+									{t(`routing.${a}`)}
+								</option>
+							))}
+						</NativeSelect.Field>
+					</NativeSelect.Root>
 					<Input
 						size="sm"
 						flex={1}
@@ -114,18 +118,9 @@ export function RoutingRulesEditor({ rules, onChange, defaultPattern }: RoutingR
 						placeholder="^https://example\.com"
 						borderColor={newPattern && !isValidRegex(newPattern) ? "red.500" : undefined}
 					/>
-					<NativeSelect.Root size="sm" width="120px">
-						<NativeSelect.Field value={newAction} onChange={(e) => setNewAction(e.target.value as RoutingAction)}>
-							{ACTIONS.map((a) => (
-								<option key={a} value={a}>
-									{t(`routing.${a}`)}
-								</option>
-							))}
-						</NativeSelect.Field>
-					</NativeSelect.Root>
-					<Button size="sm" colorPalette="blue" onClick={handleAdd} disabled={!isNewPatternValid}>
-						+
-					</Button>
+					<IconButton size="sm" variant="ghost" onClick={handleAdd} disabled={!isNewPatternValid} aria-label={t("routing.add")}>
+						<Plus size={16} />
+					</IconButton>
 				</HStack>
 				{newPattern && !isValidRegex(newPattern) && (
 					<Text fontSize="xs" color="red.500" mt={1}>
