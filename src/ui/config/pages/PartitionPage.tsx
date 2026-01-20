@@ -1,4 +1,5 @@
 import { Badge, Button, HStack, Spinner, Text, VStack } from "@chakra-ui/react"
+import { RotateCw, Trash2 } from "lucide-react"
 import type { BirdConfig, PartitionConfig } from "@shared/config.schema"
 import type { PartitionsState } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
@@ -92,12 +93,12 @@ export function PartitionPage({ name, config, partitionsState, activePartition, 
 		<HStack gap={2}>
 			{canCleanup && (
 				<Button variant="outline" size="sm" onClick={handleCleanup} disabled={cleaning}>
-					{cleaning ? <Spinner size="sm" /> : t("partition.cleanup")}
+					{cleaning ? <Spinner size="sm" /> : <><Trash2 size={16} /> {t("partition.cleanup")}</>}
 				</Button>
 			)}
 			{canReset && (
-				<Button variant="outline" size="sm" onClick={handleReset} disabled={resetting}>
-					{resetting ? <Spinner size="sm" /> : t("partition.reset")}
+				<Button variant="ghost" size="sm" colorPalette="red" onClick={handleReset} disabled={resetting}>
+					{resetting ? <Spinner size="sm" /> : <><RotateCw size={16} /> {t("partition.reset")}</>}
 				</Button>
 			)}
 		</HStack>

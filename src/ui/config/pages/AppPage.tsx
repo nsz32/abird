@@ -1,4 +1,5 @@
 import { Button, Flex, Group, HStack, Image, Input, InputAddon, Spinner, Switch, Text, VStack } from "@chakra-ui/react"
+import { ExternalLink } from "lucide-react"
 import type { AppConfig, BirdConfig, NavBarConfig, RoutingAction } from "@shared/config.schema"
 import type { IconResult, PartitionsState } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
@@ -238,6 +239,7 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 
 	const headerActions = (
 		<Button variant="outline" size="sm" onClick={handleLaunch}>
+			<ExternalLink size={16} />
 			{t("app.launch")}
 		</Button>
 	)
