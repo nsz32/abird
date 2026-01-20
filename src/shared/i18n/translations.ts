@@ -28,6 +28,7 @@ const en = {
 	"navbar.showBackButton": "Back button",
 	"navbar.showForwardButton": "Forward button",
 	"navbar.showRefreshButton": "Refresh button",
+	"navbar.showHomeButton": "Home button",
 
 	// App config
 	"app.general": "General",
@@ -168,6 +169,7 @@ const fr: typeof en = {
 	"navbar.showBackButton": "Bouton précédent",
 	"navbar.showForwardButton": "Bouton suivant",
 	"navbar.showRefreshButton": "Bouton recharger",
+	"navbar.showHomeButton": "Bouton accueil",
 
 	// App config
 	"app.general": "Général",

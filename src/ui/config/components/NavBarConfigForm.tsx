@@ -72,6 +72,12 @@ export function NavBarConfigForm(props: NavBarConfigFormProps) {
 					defaultValue={getDefault("showRefreshButton")}
 					onChange={(v) => onChange("showRefreshButton", v)}
 				/>
+				<TriStateSwitch
+					label={t("navbar.showHomeButton")}
+					value={config.showHomeButton}
+					defaultValue={getDefault("showHomeButton")}
+					onChange={(v) => onChange("showHomeButton", v)}
+				/>
 			</>
 		)
 	}
@@ -88,6 +94,7 @@ export function NavBarConfigForm(props: NavBarConfigFormProps) {
 			<SwitchField label={t("navbar.showBackButton")} checked={config.showBackButton ?? false} onChange={(v) => onChange("showBackButton", v)} />
 			<SwitchField label={t("navbar.showForwardButton")} checked={config.showForwardButton ?? false} onChange={(v) => onChange("showForwardButton", v)} />
 			<SwitchField label={t("navbar.showRefreshButton")} checked={config.showRefreshButton ?? false} onChange={(v) => onChange("showRefreshButton", v)} />
+			<SwitchField label={t("navbar.showHomeButton")} checked={config.showHomeButton ?? true} onChange={(v) => onChange("showHomeButton", v)} />
 		</>
 	)
 }
