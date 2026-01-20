@@ -18,7 +18,7 @@ import {
 import { cancelDownload, getDownloadPath, removeFromHistory, retryDownload } from "./services/DownloadManager"
 import { cleanupPartition, deletePartition, getPartitionsState, markPartitionFragile, renamePartition, resetPartition } from "./services/PartitionManager"
 import { deploy, isDeploySupported, isDeployed, isLaunchSupported, launchApp, undeploy } from "./services/deploy"
-import { fetchIcons, importIconFile, saveIcon } from "./services/icons"
+import { deleteIcon, fetchIcons, getIconData, importIconFile, saveIcon } from "./services/icons"
 import { dismissNotification } from "./services/notify"
 import { activateTab, closeTab, createTab, getActiveTab, getTabsList } from "./tabs/Tabs"
 import { openFile } from "./utils/platform"
@@ -99,6 +99,8 @@ export function registerHandlers() {
 	ipcMain.handle(IpcChannels.ICONS_FETCH, (_, url: string, partition?: string) => fetchIcons(url, partition))
 	ipcMain.handle(IpcChannels.ICONS_SAVE, (_, appName: string, base64: string, oldIcon?: string) => saveIcon(appName, base64, oldIcon))
 	ipcMain.handle(IpcChannels.ICONS_IMPORT_FILE, (_, appName: string, oldIcon?: string) => importIconFile(appName, oldIcon))
+	ipcMain.handle(IpcChannels.ICONS_DELETE, (_, filename: string) => deleteIcon(filename))
+	ipcMain.handle(IpcChannels.ICONS_GET_DATA, (_, filename: string) => getIconData(filename))
 
 	// Deploy
 	ipcMain.handle(IpcChannels.DEPLOY_SUPPORTED, () => isDeploySupported())

@@ -6,10 +6,27 @@ import { net, WebContentsView, dialog } from "electron"
 import { Jimp } from "jimp"
 import { paths } from "../utils/platform"
 
-const ICON_SIZE = 128
+const STANDARD_SIZES = [256, 128, 96, 64, 48, 32, 24, 16] as const
 
 const PAGE_LOAD_TIMEOUT = 10000
 const FETCH_TIMEOUT = 5000
+
+/**
+ * Sélectionne la taille standard optimale pour une image.
+ * Retourne la plus grande taille standard <= à la dimension minimale de l'image.
+ * Si l'image est plus petite que toutes les tailles standard, retourne la plus petite standard.
+ */
+function selectOptimalSize(width: number, height: number): number {
+	const minDimension = Math.min(width, height)
+
+	for (const size of STANDARD_SIZES) {
+		if (minDimension >= size) {
+			return size
+		}
+	}
+
+	return STANDARD_SIZES[STANDARD_SIZES.length - 1]
+}
 
 // Script d'extraction des URLs d'icônes (exécuté dans la page)
 const EXTRACT_SCRIPT = `
@@ -201,7 +218,7 @@ function ensureIconsDir(): void {
 	}
 }
 
-export async function saveIcon(appName: string, base64: string, oldIcon?: string, resize?: { w: number; h: number }): Promise<string> {
+export async function saveIcon(appName: string, base64: string, oldIcon?: string): Promise<string> {
 	ensureIconsDir()
 
 	// Décoder base64
@@ -211,9 +228,9 @@ export async function saveIcon(appName: string, base64: string, oldIcon?: string
 	// Convertir en PNG avec jimp
 	const image = await Jimp.fromBuffer(buffer)
 
-	if (resize) {
-		image.resize({ w: resize.w, h: resize.h })
-	}
+	// Redimensionner à la taille standard optimale (crop centré pour images non carrées)
+	const targetSize = selectOptimalSize(image.width, image.height)
+	image.cover({ w: targetSize, h: targetSize })
 
 	const pngBuffer = await image.getBuffer("image/png")
 
@@ -250,6 +267,14 @@ export function getIconPath(filename: string): string | null {
 	return existsSync(path) ? path : null
 }
 
+export function getIconData(filename: string): string | null {
+	const path = getIconPath(filename)
+	if (!path) return null
+
+	const buffer = readFileSync(path)
+	return `data:image/png;base64,${buffer.toString("base64")}`
+}
+
 export async function importIconFile(appName: string, oldIcon?: string): Promise<string | null> {
 	const result = await dialog.showOpenDialog({
 		filters: [{ name: "Images", extensions: ["png", "jpg", "jpeg", "gif", "webp", "ico", "svg"] }],
@@ -263,5 +288,5 @@ export async function importIconFile(appName: string, oldIcon?: string): Promise
 	const buffer = readFileSync(result.filePaths[0])
 	const base64 = `data:image/png;base64,${buffer.toString("base64")}`
 
-	return saveIcon(appName, base64, oldIcon, { w: ICON_SIZE, h: ICON_SIZE })
+	return saveIcon(appName, base64, oldIcon)
 }

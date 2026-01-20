@@ -182,6 +182,8 @@ export const IpcChannels = {
 	ICONS_FETCH: "bird:icons:fetch",
 	ICONS_SAVE: "bird:icons:save",
 	ICONS_IMPORT_FILE: "bird:icons:import-file",
+	ICONS_DELETE: "bird:icons:delete",
+	ICONS_GET_DATA: "bird:icons:get-data",
 	// Deploy
 	DEPLOY_SUPPORTED: "bird:deploy:supported",
 	DEPLOY_STATUS: "bird:deploy:status",
@@ -321,6 +323,8 @@ export interface BirdApi {
 		fetch: (url: string, partition?: string) => Promise<IconFetchResult>
 		save: (appName: string, base64: string, oldIcon?: string) => Promise<string>
 		importFile: (appName: string, oldIcon?: string) => Promise<string | null>
+		delete: (filename: string) => Promise<void>
+		getData: (filename: string) => Promise<string | null>
 	}
 	deploy: {
 		isSupported: () => Promise<boolean>

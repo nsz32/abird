@@ -1,18 +1,21 @@
-import { Button, Flex, HStack, IconButton, Image, Spinner, Switch, Text, VStack } from "@chakra-ui/react"
+import { Box, Button, HStack, IconButton, Image, Menu, Portal, Switch, Text, VStack } from "@chakra-ui/react"
 import type { AppConfig, BirdConfig, NavBarConfig, RoutingAction } from "@shared/config.schema"
 import { deriveInternalPattern } from "@shared/routing"
-import type { IconResult, PartitionsState } from "@shared/types"
+import type { PartitionsState } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
-import { ExternalLink, Pencil } from "lucide-react"
+import { ChevronDown, ExternalLink, Pencil } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { ConfigSection } from "../components/ConfigSection"
 import { EditStartUrlDialog } from "../components/EditStartUrlDialog"
+import { IconPickerDialog } from "../components/IconPickerDialog"
 import { NavBarConfigForm } from "../components/NavBarConfigForm"
 import { PageHeader } from "../components/PageHeader"
 import { PartitionSelect } from "../components/PartitionSelect"
 import { RenameDialog } from "../components/RenameDialog"
 import { RoutingRulesEditor } from "../components/RoutingRulesEditor"
 import { ThemeSelect } from "../components/ThemeSelect"
+
+const DEFAULT_ICON = "/favicon.png"
 
 interface AppPageProps {
 	name: string
@@ -25,12 +28,9 @@ interface AppPageProps {
 
 export function AppPage({ name, config, partitionsState, onChange, reloadPartitions, onRename }: AppPageProps) {
 	const { t } = useTranslations()
-	const [icons, setIcons] = useState<IconResult[]>([])
-	const [iconSizes, setIconSizes] = useState<Record<string, { w: number; h: number }>>({})
-	const [fetchingIcons, setFetchingIcons] = useState(false)
-	const [savingIcon, setSavingIcon] = useState(false)
 	const [showRenameDialog, setShowRenameDialog] = useState(false)
 	const [showEditUrlDialog, setShowEditUrlDialog] = useState(false)
+	const [showIconPicker, setShowIconPicker] = useState(false)
 
 	const [deploySupported, setDeploySupported] = useState(false)
 	const [deployed, setDeployed] = useState(false)
@@ -38,14 +38,25 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 	const [launchSupported, setLaunchSupported] = useState(false)
 	const prevIconRef = useRef<string | undefined>(undefined)
 
+	const [iconData, setIconData] = useState<string | null>(null)
+	const [iconSize, setIconSize] = useState<{ w: number; h: number } | null>(null)
+
 	const app = config.apps[name]
 
 	useEffect(() => {
 		document.title = `Bird - ${name}`
-		setIcons([])
-		setIconSizes({})
 		prevIconRef.current = undefined
+		setIconData(null)
+		setIconSize(null)
 	}, [name])
+
+	useEffect(() => {
+		if (app?.icon) {
+			window.bird.icons.getData(app.icon).then(setIconData)
+		} else {
+			setIconData(null)
+		}
+	}, [app?.icon])
 
 	useEffect(() => {
 		window.bird.deploy.isSupported().then(setDeploySupported)
@@ -126,36 +137,16 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 		updateApp({ routing: hasRules ? { rules } : undefined })
 	}
 
-	const handleFetchIcons = async () => {
-		if (!app.startUrl) return
-		setFetchingIcons(true)
-		setIcons([])
-		try {
-			const result = await window.bird.icons.fetch(app.startUrl, app.partition)
-			setIcons(result.icons)
-		} catch (err) {
-			console.error("Failed to fetch icons:", err)
-		} finally {
-			setFetchingIcons(false)
-		}
-	}
-
 	const handleSelectIcon = async (base64: string) => {
-		if (savingIcon) return
-		setSavingIcon(true)
 		try {
 			const filename = await window.bird.icons.save(name, base64, app.icon)
 			updateApp({ icon: filename })
 		} catch (err) {
 			console.error("Failed to save icon:", err)
-		} finally {
-			setSavingIcon(false)
 		}
 	}
 
 	const handleImportIcon = async () => {
-		if (savingIcon) return
-		setSavingIcon(true)
 		try {
 			const filename = await window.bird.icons.importFile(name, app.icon)
 			if (filename) {
@@ -163,9 +154,19 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 			}
 		} catch (err) {
 			console.error("Failed to import icon:", err)
-		} finally {
-			setSavingIcon(false)
 		}
+	}
+
+	const handleRemoveIcon = async () => {
+		if (app.icon) {
+			await window.bird.icons.delete(app.icon)
+		}
+		updateApp({ icon: undefined })
+	}
+
+	const handleIconLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+		const img = e.currentTarget
+		setIconSize({ w: img.naturalWidth, h: img.naturalHeight })
 	}
 
 	const handleDeploy = async () => {
@@ -192,11 +193,6 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 		} finally {
 			setDeploying(false)
 		}
-	}
-
-	const handleImageLoad = (url: string, e: React.SyntheticEvent<HTMLImageElement>) => {
-		const img = e.currentTarget
-		setIconSizes((prev) => ({ ...prev, [url]: { w: img.naturalWidth, h: img.naturalHeight } }))
 	}
 
 	const handleLaunch = async () => {
@@ -294,49 +290,48 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 							onChange={handlePartitionChange}
 						/>
 					</HStack>
-					<HStack justify="space-between" py={2} align="flex-start">
+					<HStack justify="space-between" py={2}>
 						<Text fontSize="sm">{t("app.icon")}</Text>
-						<VStack align="flex-end" gap={2}>
+						<HStack gap={3}>
 							<HStack gap={2}>
-								<Button size="sm" onClick={handleFetchIcons} disabled={fetchingIcons || savingIcon || !app.startUrl}>
-									{fetchingIcons ? <Spinner size="sm" /> : t("app.fetchIcons")}
-								</Button>
-								<Button size="sm" variant="outline" onClick={handleImportIcon} disabled={savingIcon}>
-									{savingIcon ? <Spinner size="sm" /> : t("app.importIcon")}
-								</Button>
+								<Box w="32px" h="32px" borderRadius="md" overflow="hidden">
+									<Image src={iconData || DEFAULT_ICON} alt="App icon" title={app.icon} w="32px" h="32px" objectFit="contain" onLoad={handleIconLoad} />
+								</Box>
+								{app.icon && iconSize && (
+									<Text fontSize="xs" color="fg.muted">
+										{iconSize.w}x{iconSize.h}
+									</Text>
+								)}
 							</HStack>
-							{icons.length > 0 && (
-								<Flex wrap="wrap" gap={3}>
-									{icons.map((icon) => {
-										const size = iconSizes[icon.url]
-										return (
-											<VStack
-												key={icon.url}
-												gap={1}
-												p={2}
-												borderRadius="md"
-												border="1px solid"
-												borderColor="border.subtle"
-												cursor={savingIcon ? "wait" : "pointer"}
-												_hover={{ borderColor: "blue.500" }}
-												onClick={() => handleSelectIcon(icon.url)}
-												opacity={savingIcon ? 0.5 : 1}
-											>
-												<Image src={icon.url} alt={icon.source} onLoad={(e) => handleImageLoad(icon.url, e)} />
-												<Text fontSize="xs" color="fg.muted">
-													{size ? `${size.w}x${size.h}` : "..."}
-												</Text>
-											</VStack>
-										)
-									})}
-								</Flex>
-							)}
-							{app.icon && (
-								<Text fontSize="xs" color="fg.muted">
-									{app.icon}
-								</Text>
-							)}
-						</VStack>
+
+							<Menu.Root>
+								<Menu.Trigger asChild>
+									<Button size="sm" variant="outline">
+										<ChevronDown size={16} />
+									</Button>
+								</Menu.Trigger>
+								<Portal>
+									<Menu.Positioner>
+										<Menu.Content minWidth="180px">
+											<Menu.Item value="fetch" onSelect={() => setShowIconPicker(true)} disabled={!app.startUrl}>
+												{t("app.fetchIcons")}
+											</Menu.Item>
+											<Menu.Item value="import" onSelect={handleImportIcon}>
+												{t("app.importIcon")}
+											</Menu.Item>
+											{app.icon && (
+												<>
+													<Menu.Separator />
+													<Menu.Item value="remove" onSelect={handleRemoveIcon}>
+														{t("app.useDefaultIcon")}
+													</Menu.Item>
+												</>
+											)}
+										</Menu.Content>
+									</Menu.Positioner>
+								</Portal>
+							</Menu.Root>
+						</HStack>
 					</HStack>
 				</ConfigSection>
 
@@ -391,6 +386,14 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 				existingNames={existingNames}
 				onClose={() => setShowRenameDialog(false)}
 				onRename={onRename}
+			/>
+
+			<IconPickerDialog
+				isOpen={showIconPicker}
+				startUrl={app.startUrl}
+				partition={app.partition}
+				onClose={() => setShowIconPicker(false)}
+				onSelect={handleSelectIcon}
 			/>
 		</PageHeader>
 	)
