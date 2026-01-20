@@ -106,6 +106,8 @@ const en = {
 	"partition.cannotModifyActive": "Cannot modify the active partition",
 	"partition.noActions": "No actions available",
 	"partition.sizeUnknown": "Size unknown",
+	"partition.adBlockEnabled": "Block ads and trackers",
+	"partition.settings": "Settings",
 }
 
 const fr: typeof en = {
@@ -214,6 +216,8 @@ const fr: typeof en = {
 	"partition.cannotModifyActive": "Impossible de modifier la partition active",
 	"partition.noActions": "Aucune action disponible",
 	"partition.sizeUnknown": "Taille inconnue",
+	"partition.adBlockEnabled": "Bloquer pubs et traceurs",
+	"partition.settings": "Paramètres",
 }
 
 export const translations: Record<Locale, typeof en> = { en, fr }

@@ -21,6 +21,11 @@ export function isPartitionFragile(name: string): boolean {
 	return fragilePartitions.has(name)
 }
 
+export function getPartitionConfig(name: string): PartitionConfig | null {
+	const birdConfig = getBirdConfig()
+	return (birdConfig.partitions?.[name] as PartitionConfig) ?? null
+}
+
 export function cleanupFragilePartitions(): void {
 	const state = getPartitionsState()
 	for (const partition of state.partitions) {

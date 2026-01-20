@@ -70,8 +70,10 @@ export function App() {
 			return (
 				<PartitionPage
 					name={partitionName}
+					config={config}
 					partitionsState={partitionsState}
 					activePartition={effectiveConfig.partition}
+					onChange={handleChange}
 					onNavigate={navigate}
 					reloadPartitions={reloadPartitions}
 				/>

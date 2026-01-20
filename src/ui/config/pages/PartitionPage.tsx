@@ -1,14 +1,18 @@
 import { Badge, Button, HStack, Spinner, Text, VStack } from "@chakra-ui/react"
+import type { BirdConfig, PartitionConfig } from "@shared/config.schema"
 import type { PartitionsState } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
 import { useEffect, useState } from "react"
 import { ConfigSection } from "../components/ConfigSection"
 import { PageHeader } from "../components/PageHeader"
+import { SwitchField } from "../components/SwitchField"
 
 interface PartitionPageProps {
 	name: string
+	config: BirdConfig
 	partitionsState: PartitionsState
 	activePartition: string
+	onChange: (config: BirdConfig) => void
 	onNavigate: (hash: string) => void
 	reloadPartitions: () => Promise<void>
 }
@@ -21,7 +25,7 @@ function formatBytes(bytes: number): string {
 	return `${Number.parseFloat((bytes / k ** i).toFixed(1))} ${sizes[i]}`
 }
 
-export function PartitionPage({ name, partitionsState, activePartition, onNavigate, reloadPartitions }: PartitionPageProps) {
+export function PartitionPage({ name, config, partitionsState, activePartition, onChange, onNavigate, reloadPartitions }: PartitionPageProps) {
 	const { t } = useTranslations()
 	const [size, setSize] = useState<number | null>(null)
 	const [loadingSize, setLoadingSize] = useState(false)
@@ -30,6 +34,8 @@ export function PartitionPage({ name, partitionsState, activePartition, onNaviga
 	const partition = partitionsState.partitions.find((p) => p.name === name)
 	const isActive = name === activePartition
 	const canReset = partition?.hasPhysical && !isActive
+	const partitionConfig = config.partitions?.[name] as PartitionConfig | undefined
+	const adBlockEnabled = partitionConfig?.adBlockEnabled !== false
 
 	useEffect(() => {
 		document.title = `Bird - ${name}`
@@ -61,6 +67,19 @@ export function PartitionPage({ name, partitionsState, activePartition, onNaviga
 		} finally {
 			setResetting(false)
 		}
+	}
+
+	const handleAdBlockChange = (enabled: boolean) => {
+		const currentPartitionConfig = config.partitions?.[name] || {}
+		const newPartitionConfig = { ...currentPartitionConfig, adBlockEnabled: enabled }
+
+		onChange({
+			...config,
+			partitions: {
+				...config.partitions,
+				[name]: newPartitionConfig,
+			},
+		})
 	}
 
 	if (!partition) {
@@ -122,6 +141,10 @@ export function PartitionPage({ name, partitionsState, activePartition, onNaviga
 					<Text fontSize="xs" color="fg.muted" pt={2}>
 						{t("partition.storagePath")}: {name}
 					</Text>
+				</ConfigSection>
+
+				<ConfigSection title={t("partition.settings")}>
+					<SwitchField label={t("partition.adBlockEnabled")} checked={adBlockEnabled} onChange={handleAdBlockChange} />
 				</ConfigSection>
 
 				{canReset && (

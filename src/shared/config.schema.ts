@@ -55,9 +55,9 @@ export const AppConfigSchema = z.object({
 })
 export type AppConfig = z.infer<typeof AppConfigSchema>
 
-// Configuration d'une partition (préparé pour futures options)
+// Configuration d'une partition
 export const PartitionConfigSchema = z.object({
-	// Futurs paramètres : autoClean, maxCacheSize, clearOnExit, etc.
+	adBlockEnabled: z.boolean().default(true),
 })
 export type PartitionConfig = z.infer<typeof PartitionConfigSchema>
 

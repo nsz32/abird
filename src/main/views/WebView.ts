@@ -3,7 +3,9 @@ import { app } from "electron"
 import contextMenu from "electron-context-menu"
 import { getNavigationAction } from "../core/UrlRouter"
 import { config$ } from "../core/states"
+import { disableAdBlock, enableAdBlock } from "../services/AdBlocker"
 import { setupDownloads } from "../services/DownloadManager"
+import { getPartitionConfig } from "../services/PartitionManager"
 import { resolveUserAgent } from "../utils/userAgents"
 import { BrowserView, type BrowserViewCallbacks } from "./BrowserView"
 
@@ -30,6 +32,7 @@ export class WebView extends BrowserView {
 		)
 
 		setupDownloads(this.webContents.session, config$.get().downloads)
+		this.setupAdBlock(partition)
 		this.setupNavigation()
 		this.setupContextMenu()
 	}
@@ -42,6 +45,17 @@ export class WebView extends BrowserView {
 			showSaveLinkAs: true,
 			showInspectElement: !app.isPackaged,
 		})
+	}
+
+	private setupAdBlock(partition: string) {
+		const config = getPartitionConfig(partition)
+
+		if (config?.adBlockEnabled === false) {
+			disableAdBlock(this.webContents.session, partition)
+			return
+		}
+
+		enableAdBlock(this.webContents.session, partition)
 	}
 
 	goTo(url: string) {
