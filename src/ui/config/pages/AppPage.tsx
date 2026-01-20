@@ -1,4 +1,4 @@
-import { Button, Flex, HStack, Image, Input, Spinner, Text, VStack } from "@chakra-ui/react"
+import { Button, Flex, Group, HStack, Image, Input, InputAddon, Spinner, Text, VStack } from "@chakra-ui/react"
 import type { AppConfig, BirdConfig, NavBarConfig, RoutingAction } from "@shared/config.schema"
 import type { IconResult, PartitionsState } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
@@ -7,6 +7,7 @@ import { ConfigSection } from "../components/ConfigSection"
 import { NavBarConfigForm } from "../components/NavBarConfigForm"
 import { PageHeader } from "../components/PageHeader"
 import { PartitionSelect } from "../components/PartitionSelect"
+import { RenameDialog } from "../components/RenameDialog"
 import { RoutingRulesEditor } from "../components/RoutingRulesEditor"
 import { ThemeSelect } from "../components/ThemeSelect"
 
@@ -16,14 +17,16 @@ interface AppPageProps {
 	partitionsState: PartitionsState
 	onChange: (config: BirdConfig) => void
 	reloadPartitions: () => Promise<void>
+	onRename: (newName: string) => void
 }
 
-export function AppPage({ name, config, partitionsState, onChange, reloadPartitions }: AppPageProps) {
+export function AppPage({ name, config, partitionsState, onChange, reloadPartitions, onRename }: AppPageProps) {
 	const { t } = useTranslations()
 	const [icons, setIcons] = useState<IconResult[]>([])
 	const [iconSizes, setIconSizes] = useState<Record<string, { w: number; h: number }>>({})
 	const [fetchingIcons, setFetchingIcons] = useState(false)
 	const [savingIcon, setSavingIcon] = useState(false)
+	const [showRenameDialog, setShowRenameDialog] = useState(false)
 
 	const [deploySupported, setDeploySupported] = useState(false)
 	const [deployed, setDeployed] = useState(false)
@@ -81,6 +84,13 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 				[name]: { ...app, ...updates },
 			},
 		})
+	}
+
+	const urlPath = app.startUrl.replace(/^https?:\/\//, "")
+
+	const handleUrlChange = (value: string) => {
+		const clean = value.replace(/^https?:\/\//, "")
+		updateApp({ startUrl: `https://${clean}` })
 	}
 
 	const handlePartitionChange = async (newPartition: string) => {
@@ -211,14 +221,18 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 	}
 
 	const shortcutInfo = deploySupported ? (deployed ? t("app.shortcutCreated") : t("app.shortcutNotCreated")) : undefined
+	const existingNames = [...Object.keys(config.apps), ...Object.keys(config.partitions || {})]
 
 	return (
-		<PageHeader title={name} leftInfo={app.startUrl} rightInfo={shortcutInfo}>
+		<PageHeader title={name} leftInfo={app.startUrl} rightInfo={shortcutInfo} onRename={() => setShowRenameDialog(true)} renameLabel={t("app.rename")}>
 			<VStack align="stretch" gap={4}>
 				<ConfigSection title={t("app.general")}>
 					<HStack justify="space-between" py={2}>
 						<Text fontSize="sm">{t("app.startUrl")}</Text>
-						<Input size="sm" width="200px" value={app.startUrl} onChange={(e) => updateApp({ startUrl: e.target.value })} />
+						<Group attached width="280px">
+							<InputAddon>https://</InputAddon>
+							<Input size="sm" value={urlPath} onChange={(e) => handleUrlChange(e.target.value)} placeholder={t("app.urlPlaceholder")} />
+						</Group>
 					</HStack>
 					<HStack justify="space-between" py={2}>
 						<Text fontSize="sm">{t("app.partition")}</Text>
@@ -299,6 +313,15 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 					</ConfigSection>
 				)}
 			</VStack>
+
+			<RenameDialog
+				isOpen={showRenameDialog}
+				title={t("app.renameTitle")}
+				currentName={name}
+				existingNames={existingNames}
+				onClose={() => setShowRenameDialog(false)}
+				onRename={onRename}
+			/>
 		</PageHeader>
 	)
 }

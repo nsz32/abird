@@ -2,7 +2,7 @@
  * Gestion des partitions Electron
  * Responsabilités : listing, détection orphelins, reset, suppression
  */
-import { existsSync, readdirSync, rmSync, statSync } from "node:fs"
+import { existsSync, readdirSync, renameSync, rmSync, statSync } from "node:fs"
 import { join } from "node:path"
 import type { PartitionConfig, PartitionState, PartitionsState } from "@shared/types"
 import { session } from "electron"
@@ -142,6 +142,11 @@ export async function deletePartition(name: string): Promise<void> {
 		throw new Error("Cannot delete the active partition")
 	}
 
+	const appUsage = getAppPartitionUsage()
+	if ((appUsage.get(name)?.length ?? 0) > 0) {
+		throw new Error("Cannot delete a partition used by apps")
+	}
+
 	// D'abord vider via Electron
 	await resetPartition(name)
 
@@ -150,5 +155,31 @@ export async function deletePartition(name: string): Promise<void> {
 	if (existsSync(partitionPath)) {
 		rmSync(partitionPath, { recursive: true, force: true })
 		console.log(`[Partition] deleted: ${partitionPath}`)
+	}
+}
+
+export function renamePartition(oldName: string, newName: string): void {
+	const currentPartition = config$.get().partition
+	if (oldName === currentPartition) {
+		throw new Error("Cannot rename the active partition")
+	}
+
+	const partitionsDir = getPartitionsDir()
+	const oldPath = join(partitionsDir, oldName)
+	const newPath = join(partitionsDir, newName)
+
+	// Renommer le dossier physique s'il existe
+	if (existsSync(oldPath)) {
+		if (existsSync(newPath)) {
+			throw new Error(`Partition folder already exists: ${newName}`)
+		}
+		renameSync(oldPath, newPath)
+		console.log(`[Partition] renamed: ${oldName} -> ${newName}`)
+	}
+
+	// Mettre à jour le set des partitions fragiles
+	if (fragilePartitions.has(oldName)) {
+		fragilePartitions.delete(oldName)
+		fragilePartitions.add(newName)
 	}
 }

@@ -5,6 +5,7 @@ import { useTranslations } from "@ui/shared/hooks"
 import { useEffect, useState } from "react"
 import { ConfigSection } from "../components/ConfigSection"
 import { PageHeader } from "../components/PageHeader"
+import { RenameDialog } from "../components/RenameDialog"
 import { SwitchField } from "../components/SwitchField"
 
 interface PartitionPageProps {
@@ -15,6 +16,7 @@ interface PartitionPageProps {
 	onChange: (config: BirdConfig) => void
 	onNavigate: (hash: string) => void
 	reloadPartitions: () => Promise<void>
+	onRename: (newName: string) => void
 }
 
 function formatBytes(bytes: number): string {
@@ -25,11 +27,12 @@ function formatBytes(bytes: number): string {
 	return `${Number.parseFloat((bytes / k ** i).toFixed(1))} ${sizes[i]}`
 }
 
-export function PartitionPage({ name, config, partitionsState, activePartition, onChange, onNavigate, reloadPartitions }: PartitionPageProps) {
+export function PartitionPage({ name, config, partitionsState, activePartition, onChange, onNavigate, reloadPartitions, onRename }: PartitionPageProps) {
 	const { t } = useTranslations()
 	const [size, setSize] = useState<number | null>(null)
 	const [loadingSize, setLoadingSize] = useState(false)
 	const [resetting, setResetting] = useState(false)
+	const [showRenameDialog, setShowRenameDialog] = useState(false)
 
 	const partition = partitionsState.partitions.find((p) => p.name === name)
 	const isActive = name === activePartition
@@ -91,9 +94,15 @@ export function PartitionPage({ name, config, partitionsState, activePartition, 
 	}
 
 	const sizeInfo = !partition.hasPhysical ? t("partition.notCreated") : size !== null ? formatBytes(size) : undefined
+	const existingNames = [...Object.keys(config.apps), ...Object.keys(config.partitions || {})]
 
 	return (
-		<PageHeader title={name} leftInfo={sizeInfo ?? t("partition.sizeUnknown")}>
+		<PageHeader
+			title={name}
+			leftInfo={sizeInfo ?? t("partition.sizeUnknown")}
+			onRename={() => setShowRenameDialog(true)}
+			renameLabel={t("partition.rename")}
+		>
 			<VStack align="stretch" gap={4}>
 				<ConfigSection title={t("partition.details")}>
 					<HStack gap={2} py={2}>
@@ -155,6 +164,15 @@ export function PartitionPage({ name, config, partitionsState, activePartition, 
 					</ConfigSection>
 				)}
 			</VStack>
+
+			<RenameDialog
+				isOpen={showRenameDialog}
+				title={t("partition.renameTitle")}
+				currentName={name}
+				existingNames={existingNames}
+				onClose={() => setShowRenameDialog(false)}
+				onRename={onRename}
+			/>
 		</PageHeader>
 	)
 }

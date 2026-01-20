@@ -16,7 +16,7 @@ import {
 	notifications$,
 } from "./core/states"
 import { cancelDownload, getDownloadPath, removeFromHistory, retryDownload } from "./services/DownloadManager"
-import { deletePartition, getPartitionSize, getPartitionsState, markPartitionFragile, resetPartition } from "./services/PartitionManager"
+import { deletePartition, getPartitionSize, getPartitionsState, markPartitionFragile, renamePartition, resetPartition } from "./services/PartitionManager"
 import { deploy, isDeploySupported, isDeployed, undeploy } from "./services/deploy"
 import { fetchIcons, importIconFile, saveIcon } from "./services/icons"
 import { dismissNotification } from "./services/notify"
@@ -123,4 +123,5 @@ export function registerHandlers() {
 	ipcMain.handle(IpcChannels.PARTITION_DELETE, (_, name: string) => deletePartition(name))
 	ipcMain.handle(IpcChannels.PARTITION_GET_SIZE, (_, name: string) => getPartitionSize(name))
 	ipcMain.handle(IpcChannels.PARTITION_MARK_FRAGILE, (_, name: string) => markPartitionFragile(name))
+	ipcMain.handle(IpcChannels.PARTITION_RENAME, (_, oldName: string, newName: string) => renamePartition(oldName, newName))
 }

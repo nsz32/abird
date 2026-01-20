@@ -43,7 +43,7 @@ const en = {
 	"app.notFound": "Application not found",
 	"app.name": "Name",
 	"app.namePlaceholder": "my-app",
-	"app.urlPlaceholder": "https://example.com",
+	"app.urlPlaceholder": "example.com",
 	"app.cancel": "Cancel",
 	"app.deploy": "Add shortcut",
 	"app.undeploy": "Remove shortcut",
@@ -51,6 +51,8 @@ const en = {
 	"app.shortcutCreated": "Shortcut created",
 	"app.shortcutNotCreated": "No shortcut",
 	"app.routing": "URL Routing",
+	"app.rename": "Rename",
+	"app.renameTitle": "Rename application",
 	"routing.addRule": "Add rule",
 	"routing.pattern": "Pattern (regex)",
 	"routing.action": "Action",
@@ -108,6 +110,19 @@ const en = {
 	"partition.sizeUnknown": "Size unknown",
 	"partition.adBlockEnabled": "Block ads and trackers",
 	"partition.settings": "Settings",
+	"partition.rename": "Rename",
+	"partition.renameTitle": "Rename partition",
+
+	// Rename dialog
+	"rename.newName": "New name",
+	"rename.confirm": "Rename",
+	"rename.nameExists": "This name already exists",
+
+	// Name validation
+	"name.invalidChars": "Contains invalid characters (< > : \" / \\ | ? *)",
+	"name.reserved": "This name is reserved by the system",
+	"name.tooLong": "Name is too long (max 255 characters)",
+	"name.invalidFormat": "Cannot start/end with a dot or end with a space",
 }
 
 const fr: typeof en = {
@@ -153,7 +168,7 @@ const fr: typeof en = {
 	"app.notFound": "Application non trouvée",
 	"app.name": "Nom",
 	"app.namePlaceholder": "mon-app",
-	"app.urlPlaceholder": "https://exemple.com",
+	"app.urlPlaceholder": "exemple.com",
 	"app.cancel": "Annuler",
 	"app.deploy": "Créer raccourci",
 	"app.undeploy": "Supprimer raccourci",
@@ -161,6 +176,8 @@ const fr: typeof en = {
 	"app.shortcutCreated": "Raccourci créé",
 	"app.shortcutNotCreated": "Pas de raccourci",
 	"app.routing": "Routage URL",
+	"app.rename": "Renommer",
+	"app.renameTitle": "Renommer l'application",
 	"routing.addRule": "Ajouter une règle",
 	"routing.pattern": "Pattern (regex)",
 	"routing.action": "Action",
@@ -218,6 +235,19 @@ const fr: typeof en = {
 	"partition.sizeUnknown": "Taille inconnue",
 	"partition.adBlockEnabled": "Bloquer pubs et traceurs",
 	"partition.settings": "Paramètres",
+	"partition.rename": "Renommer",
+	"partition.renameTitle": "Renommer la partition",
+
+	// Rename dialog
+	"rename.newName": "Nouveau nom",
+	"rename.confirm": "Renommer",
+	"rename.nameExists": "Ce nom existe déjà",
+
+	// Name validation
+	"name.invalidChars": "Contient des caractères invalides (< > : \" / \\ | ? *)",
+	"name.reserved": "Ce nom est réservé par le système",
+	"name.tooLong": "Nom trop long (max 255 caractères)",
+	"name.invalidFormat": "Ne peut pas commencer/finir par un point ou finir par un espace",
 }
 
 export const translations: Record<Locale, typeof en> = { en, fr }

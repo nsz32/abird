@@ -15,7 +15,7 @@ interface AppState {
 }
 
 export function App() {
-	const { route, navigate } = useHashRouter()
+	const { route, navigate, replace } = useHashRouter()
 	const { ready } = useTranslations()
 	const [state, setState] = useState<AppState | null>(null)
 
@@ -51,6 +51,53 @@ export function App() {
 		}
 	}
 
+	const handleRenameApp = async (oldName: string, newName: string) => {
+		const app = config.apps[oldName]
+		if (!app) return
+
+		const { [oldName]: _, ...restApps } = config.apps
+		const newConfig: BirdConfig = {
+			...config,
+			apps: {
+				...restApps,
+				[newName]: app,
+			},
+		}
+
+		await handleChange(newConfig)
+		await reloadPartitions()
+		replace(`#app/${newName}`)
+	}
+
+	const handleRenamePartition = async (oldName: string, newName: string) => {
+		// Renommer le dossier physique d'abord (peut échouer si partition active)
+		await window.bird.partition.rename(oldName, newName)
+
+		const partitionConfig = config.partitions?.[oldName]
+
+		// Mettre à jour toutes les apps qui utilisent cette partition
+		const updatedApps = { ...config.apps }
+		for (const [appName, appConfig] of Object.entries(updatedApps)) {
+			if (appConfig.partition === oldName) {
+				updatedApps[appName] = { ...appConfig, partition: newName }
+			}
+		}
+
+		// Renommer la partition dans config.partitions
+		const { [oldName]: _, ...restPartitions } = config.partitions || {}
+		const newPartitions = partitionConfig ? { ...restPartitions, [newName]: partitionConfig } : { ...restPartitions, [newName]: {} }
+
+		const newConfig: BirdConfig = {
+			...config,
+			apps: updatedApps,
+			partitions: newPartitions,
+		}
+
+		await handleChange(newConfig)
+		await reloadPartitions()
+		replace(`#partition/${newName}`)
+	}
+
 	if (!state || !ready) {
 		return null
 	}
@@ -64,7 +111,16 @@ export function App() {
 
 	const renderPage = () => {
 		if (appName) {
-			return <AppPage name={appName} config={config} partitionsState={partitionsState} onChange={handleChange} reloadPartitions={reloadPartitions} />
+			return (
+				<AppPage
+					name={appName}
+					config={config}
+					partitionsState={partitionsState}
+					onChange={handleChange}
+					reloadPartitions={reloadPartitions}
+					onRename={(newName) => handleRenameApp(appName, newName)}
+				/>
+			)
 		}
 		if (partitionName) {
 			return (
@@ -76,6 +132,7 @@ export function App() {
 					onChange={handleChange}
 					onNavigate={navigate}
 					reloadPartitions={reloadPartitions}
+					onRename={(newName) => handleRenamePartition(partitionName, newName)}
 				/>
 			)
 		}

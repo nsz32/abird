@@ -16,9 +16,14 @@ export function useHashRouter() {
 		window.location.hash = hash
 	}
 
+	const replace = (hash: string) => {
+		history.replaceState(null, "", hash)
+		setRoute(hash)
+	}
+
 	const goBack = () => {
 		window.history.back()
 	}
 
-	return { route, navigate, goBack }
+	return { route, navigate, replace, goBack }
 }

@@ -1,20 +1,28 @@
-import { Box, HStack, Heading, Text } from "@chakra-ui/react"
+import { Box, HStack, Heading, IconButton, Text } from "@chakra-ui/react"
+import { Pencil } from "lucide-react"
 import type { ReactNode } from "react"
 
 interface PageHeaderProps {
 	title: string
 	leftInfo: ReactNode
 	rightInfo?: ReactNode
+	onRename?: () => void
+	renameLabel?: string
 	children: ReactNode
 }
 
-export function PageHeader({ title, leftInfo, rightInfo, children }: PageHeaderProps) {
+export function PageHeader({ title, leftInfo, rightInfo, onRename, renameLabel, children }: PageHeaderProps) {
 	return (
 		<Box display="flex" flexDirection="column" h="100%">
 			<Box pt={6} pb={4} flexShrink={0}>
-				<Heading size="lg" mb={2}>
-					{title}
-				</Heading>
+				<HStack gap={2} mb={2}>
+					<Heading size="lg">{title}</Heading>
+					{onRename && (
+						<IconButton aria-label={renameLabel || "Rename"} variant="ghost" size="sm" onClick={onRename}>
+							<Pencil size={16} />
+						</IconButton>
+					)}
+				</HStack>
 				<HStack justify="space-between" fontSize="sm" color="fg.muted">
 					<Text>{leftInfo}</Text>
 					{rightInfo && <Text>{rightInfo}</Text>}

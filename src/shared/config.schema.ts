@@ -67,7 +67,7 @@ export const BirdConfigSchema = z.object({
 	navBar: NavBarConfigSchema.partial().default({}),
 	downloads: DownloadConfigSchema.default({}),
 	apps: z.record(z.string(), AppConfigSchema).default({}),
-	partitions: z.record(z.string(), PartitionConfigSchema).default({}),
+	partitions: z.record(z.string(), PartitionConfigSchema.partial()).default({}),
 })
 export type BirdConfig = z.infer<typeof BirdConfigSchema>
 

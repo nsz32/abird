@@ -49,13 +49,23 @@ export function HomePage({ config, configPath, partitionsState, activePartition,
 
 		const internal = deriveInternalPattern(startUrl)
 
-		onChange({
+		const newConfig: BirdConfig = {
 			...config,
 			apps: {
 				...config.apps,
 				[name]: { partition: name, startUrl, routing: { rules: { [internal]: "internal" } } },
 			},
-		})
+		}
+
+		// Assurer la cohérence : la partition doit exister dans le JSON
+		if (!config.partitions?.[name]) {
+			newConfig.partitions = {
+				...config.partitions,
+				[name]: {},
+			}
+		}
+
+		onChange(newConfig)
 
 		await reloadPartitions()
 		setShowCreateDialog(false)
@@ -70,6 +80,12 @@ export function HomePage({ config, configPath, partitionsState, activePartition,
 
 	const handleDeletePartition = async (name: string) => {
 		await window.bird.partition.delete(name)
+
+		if (config.partitions?.[name]) {
+			const { [name]: _, ...rest } = config.partitions
+			onChange({ ...config, partitions: Object.keys(rest).length > 0 ? rest : undefined })
+		}
+
 		reloadPartitions()
 	}
 

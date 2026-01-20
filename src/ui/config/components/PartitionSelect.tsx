@@ -1,6 +1,7 @@
 import { Badge, Box, Button, HStack, Input, Menu, Portal, Text } from "@chakra-ui/react"
 import { useTranslations } from "@ui/shared/hooks"
 import { useEffect, useRef, useState } from "react"
+import { validateFolderName } from "../utils/nameValidation"
 
 interface PartitionSelectProps {
 	value: string
@@ -28,9 +29,8 @@ export function PartitionSelect({ value, partitions, partitionUsage, currentAppN
 	}
 
 	const handleCreate = () => {
-		const name = newName.trim()
-		if (name && !partitions.includes(name)) {
-			handleSelect(name)
+		if (isNameValid) {
+			handleSelect(trimmedNewName)
 		}
 	}
 
@@ -53,7 +53,9 @@ export function PartitionSelect({ value, partitions, partitionUsage, currentAppN
 		return apps.filter((app) => app !== currentAppName).length
 	}
 
-	const isNameValid = newName.trim() !== "" && !partitions.includes(newName.trim())
+	const trimmedNewName = newName.trim()
+	const folderError = trimmedNewName !== "" ? validateFolderName(trimmedNewName) : null
+	const isNameValid = trimmedNewName !== "" && !partitions.includes(trimmedNewName) && !folderError
 
 	return (
 		<Menu.Root onOpenChange={({ open }) => !open && resetCreating()}>
@@ -92,6 +94,7 @@ export function PartitionSelect({ value, partitions, partitionUsage, currentAppN
 										onChange={(e) => setNewName(e.target.value)}
 										onKeyDown={handleKeyDown}
 										placeholder={t("partition.namePlaceholder")}
+										invalid={folderError !== null}
 										flex={1}
 									/>
 									<Button size="sm" colorPalette="blue" onClick={handleCreate} disabled={!isNameValid}>
