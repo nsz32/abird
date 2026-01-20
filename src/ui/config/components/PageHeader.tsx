@@ -29,7 +29,7 @@ export function PageHeader({ title, leftInfo, rightInfo, actions, onRename, rena
 				</HStack>
 				<HStack justify="space-between" fontSize="sm" color="fg.muted">
 					<Text>{leftInfo}</Text>
-					{rightInfo && <Text>{rightInfo}</Text>}
+					{rightInfo}
 				</HStack>
 			</Box>
 

@@ -17,7 +17,7 @@ import {
 } from "./core/states"
 import { cancelDownload, getDownloadPath, removeFromHistory, retryDownload } from "./services/DownloadManager"
 import { cleanupPartition, deletePartition, getPartitionsState, markPartitionFragile, renamePartition, resetPartition } from "./services/PartitionManager"
-import { deploy, isDeploySupported, isDeployed, undeploy } from "./services/deploy"
+import { deploy, isDeploySupported, isDeployed, isLaunchSupported, launchApp, undeploy } from "./services/deploy"
 import { fetchIcons, importIconFile, saveIcon } from "./services/icons"
 import { dismissNotification } from "./services/notify"
 import { activateTab, closeTab, createTab, getActiveTab, getTabsList } from "./tabs/Tabs"
@@ -124,4 +124,8 @@ export function registerHandlers() {
 	ipcMain.handle(IpcChannels.PARTITION_DELETE, (_, name: string) => deletePartition(name))
 	ipcMain.handle(IpcChannels.PARTITION_MARK_FRAGILE, (_, name: string) => markPartitionFragile(name))
 	ipcMain.handle(IpcChannels.PARTITION_RENAME, (_, oldName: string, newName: string) => renamePartition(oldName, newName))
+
+	// App launch
+	ipcMain.handle(IpcChannels.APP_LAUNCH_SUPPORTED, () => isLaunchSupported())
+	ipcMain.handle(IpcChannels.APP_LAUNCH, (_, appName: string) => launchApp(appName))
 }

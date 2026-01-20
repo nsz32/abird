@@ -3,7 +3,7 @@
  * Responsabilités : lecture, écriture, validation, cache
  */
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
-import { basename, dirname, join } from "node:path"
+import { basename, dirname, join, resolve } from "node:path"
 import { type BirdConfig, validateConfig } from "@shared/config.schema"
 import { app } from "electron"
 import { paths } from "../utils/platform"
@@ -32,7 +32,7 @@ export function setCurrentAppName(name: string | null): void {
 }
 
 export function loadConfig(customPath?: string | null): void {
-	if (customPath) configPath = customPath
+	if (customPath) configPath = resolve(customPath)
 
 	if (!existsSync(configPath)) {
 		if (customPath) {

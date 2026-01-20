@@ -147,4 +147,8 @@ contextBridge.exposeInMainWorld("bird", {
 		markFragile: (name: string): Promise<void> => ipcRenderer.invoke(IpcChannels.PARTITION_MARK_FRAGILE, name),
 		rename: (oldName: string, newName: string): Promise<void> => ipcRenderer.invoke(IpcChannels.PARTITION_RENAME, oldName, newName),
 	},
+	app: {
+		isLaunchSupported: (): Promise<boolean> => ipcRenderer.invoke(IpcChannels.APP_LAUNCH_SUPPORTED),
+		launch: (appName: string): Promise<void> => ipcRenderer.invoke(IpcChannels.APP_LAUNCH, appName),
+	},
 })

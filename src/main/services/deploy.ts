@@ -1,13 +1,19 @@
+import { spawn } from "node:child_process"
 import { createHash } from "node:crypto"
 import { existsSync, mkdirSync, unlinkSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 import type { AppConfig } from "@shared/config.schema"
+import { app } from "electron"
 import { getConfigPath } from "../config"
 import { paths } from "../utils/platform"
 import { getIconPath } from "./icons"
 
 export function isDeploySupported(): boolean {
 	return process.platform === "linux"
+}
+
+export function isLaunchSupported(): boolean {
+	return app.isPackaged
 }
 
 function sanitizeAppName(name: string): string {
@@ -100,4 +106,13 @@ export function undeploy(appName: string): void {
 	if (existsSync(filePath)) {
 		unlinkSync(filePath)
 	}
+}
+
+export function launchApp(appName: string): void {
+	const configPath = getConfigPath()
+	const isCustomConfig = configPath !== paths.config
+
+	const args = isCustomConfig ? ["--config", configPath, "--app", appName] : ["--app", appName]
+
+	spawn(process.execPath, args, { detached: true, stdio: "ignore" }).unref()
 }

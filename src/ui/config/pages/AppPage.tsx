@@ -1,4 +1,4 @@
-import { Button, Flex, Group, HStack, Image, Input, InputAddon, Spinner, Text, VStack } from "@chakra-ui/react"
+import { Button, Flex, Group, HStack, Image, Input, InputAddon, Spinner, Switch, Text, VStack } from "@chakra-ui/react"
 import type { AppConfig, BirdConfig, NavBarConfig, RoutingAction } from "@shared/config.schema"
 import type { IconResult, PartitionsState } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
@@ -31,6 +31,7 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 	const [deploySupported, setDeploySupported] = useState(false)
 	const [deployed, setDeployed] = useState(false)
 	const [deploying, setDeploying] = useState(false)
+	const [launchSupported, setLaunchSupported] = useState(false)
 	const prevIconRef = useRef<string | undefined>(undefined)
 
 	const app = config.apps[name]
@@ -44,6 +45,7 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 
 	useEffect(() => {
 		window.bird.deploy.isSupported().then(setDeploySupported)
+		window.bird.app.isLaunchSupported().then(setLaunchSupported)
 	}, [])
 
 	useEffect(() => {
@@ -192,6 +194,18 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 		setIconSizes((prev) => ({ ...prev, [url]: { w: img.naturalWidth, h: img.naturalHeight } }))
 	}
 
+	const handleLaunch = async () => {
+		if (!launchSupported) {
+			alert(t("app.launchNotSupported"))
+			return
+		}
+		try {
+			await window.bird.app.launch(name)
+		} catch (err) {
+			console.error("Failed to launch app:", err)
+		}
+	}
+
 	// Partitions disponibles : depuis l'état + depuis la config des apps
 	const getAvailablePartitions = (): string[] => {
 		const partitions = new Set<string>()
@@ -220,11 +234,33 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 		return usage
 	}
 
-	const shortcutInfo = deploySupported ? (deployed ? t("app.shortcutCreated") : t("app.shortcutNotCreated")) : undefined
 	const existingNames = [...Object.keys(config.apps), ...Object.keys(config.partitions || {})]
 
+	const headerActions = (
+		<Button variant="outline" size="sm" onClick={handleLaunch}>
+			{t("app.launch")}
+		</Button>
+	)
+
+	const rightInfo = deploySupported && (
+		<HStack gap={2}>
+			<Switch.Root
+				colorPalette="blue"
+				checked={deployed}
+				disabled={deploying}
+				onCheckedChange={(e) => (e.checked ? handleDeploy() : handleUndeploy())}
+			>
+				<Switch.HiddenInput />
+				<Switch.Control>
+					<Switch.Thumb />
+				</Switch.Control>
+			</Switch.Root>
+			<Text>{deployed ? t("app.shortcutCreated") : t("app.shortcutNotCreated")}</Text>
+		</HStack>
+	)
+
 	return (
-		<PageHeader title={name} leftInfo={app.startUrl} rightInfo={shortcutInfo} onRename={() => setShowRenameDialog(true)} renameLabel={t("app.rename")}>
+		<PageHeader title={name} leftInfo={app.startUrl} rightInfo={rightInfo} actions={headerActions} onRename={() => setShowRenameDialog(true)} renameLabel={t("app.rename")}>
 			<VStack align="stretch" gap={4}>
 				<ConfigSection title={t("app.general")}>
 					<HStack justify="space-between" py={2}>
@@ -301,17 +337,6 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 				<ConfigSection title={t("app.routing")}>
 					<RoutingRulesEditor rules={app.routing?.rules || {}} onChange={updateRoutingRules} />
 				</ConfigSection>
-
-				{deploySupported && (
-					<ConfigSection title={t("app.shortcut")}>
-						<HStack justify="space-between" py={2}>
-							<Text fontSize="sm">{deployed ? t("app.undeploy") : t("app.deploy")}</Text>
-							<Button size="sm" variant="outline" onClick={deployed ? handleUndeploy : handleDeploy} disabled={deploying}>
-								{deploying ? <Spinner size="sm" /> : deployed ? t("app.undeploy") : t("app.deploy")}
-							</Button>
-						</HStack>
-					</ConfigSection>
-				)}
 			</VStack>
 
 			<RenameDialog
