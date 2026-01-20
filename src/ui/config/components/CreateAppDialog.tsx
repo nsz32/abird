@@ -51,7 +51,13 @@ export function CreateAppDialog({ isOpen, onClose, onCreate, existingNames }: Cr
 						<VStack align="stretch" gap={4}>
 							<VStack align="stretch" gap={1}>
 								<Text fontSize="sm">{t("app.name")}</Text>
-								<Input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("app.namePlaceholder")} invalid={hasNameError} autoFocus />
+								<Input
+									value={name}
+									onChange={(e) => setName(e.target.value)}
+									placeholder={t("app.namePlaceholder")}
+									invalid={hasNameError}
+									autoFocus
+								/>
 								{nameExists && (
 									<Text fontSize="xs" color="red.500">
 										{t("rename.nameExists")}

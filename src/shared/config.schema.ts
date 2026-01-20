@@ -63,6 +63,10 @@ export type PartitionConfig = z.infer<typeof PartitionConfigSchema>
 
 // Configuration racine (fichier JSON utilisateur)
 export const BirdConfigSchema = z.object({
+	projectName: z
+		.string()
+		.regex(/^[a-zA-Z0-9_-]+$/)
+		.optional(),
 	theme: ThemeModeSchema.default("system"),
 	navBar: NavBarConfigSchema.partial().default({}),
 	downloads: DownloadConfigSchema.default({}),
@@ -79,7 +83,7 @@ interface ValidationResult {
 	errors: string[]
 }
 
-const IGNORED_KEYS = new Set(["$schema"])
+const IGNORED_KEYS = new Set(["$schema", "projectName"])
 
 function collectUnknownKeys(data: unknown, schema: z.ZodObject<z.ZodRawShape>, path = ""): string[] {
 	if (typeof data !== "object" || data === null) return []

@@ -75,6 +75,13 @@ function getOptionValue(argv: string[], option: string): string | null {
 	return value && !value.startsWith("--") ? value : null
 }
 
+/**
+ * Extract --config path from argv (for early bootstrap before app.whenReady)
+ */
+export function getConfigPathFromArgs(argv: string[] = process.argv.slice(2)): string | null {
+	return getOptionValue(argv, "--config")
+}
+
 function hasOptionWithoutValue(argv: string[], option: string): boolean {
 	const index = argv.indexOf(option)
 	if (index === -1) return false

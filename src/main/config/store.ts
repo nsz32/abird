@@ -3,12 +3,13 @@
  * Responsabilités : lecture, écriture, validation, cache
  */
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
-import { dirname, join } from "node:path"
+import { basename, dirname, join } from "node:path"
 import { type BirdConfig, validateConfig } from "@shared/config.schema"
 import { app } from "electron"
 import { paths } from "../utils/platform"
 
 const SCHEMA_FILENAME = "bird.config.schema.json"
+const PROJECT_NAME_PATTERN = /^[a-zA-Z0-9_-]+$/
 
 let configPath: string = paths.config
 let birdConfig: BirdConfig = validateConfig({}).data
@@ -34,6 +35,12 @@ export function loadConfig(customPath?: string | null): void {
 	if (customPath) configPath = customPath
 
 	if (!existsSync(configPath)) {
+		if (customPath) {
+			const folderName = basename(dirname(configPath))
+			if (PROJECT_NAME_PATTERN.test(folderName)) {
+				birdConfig = { projectName: folderName, ...birdConfig }
+			}
+		}
 		saveConfig()
 		return
 	}

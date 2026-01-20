@@ -119,7 +119,7 @@ const en = {
 	"rename.nameExists": "This name already exists",
 
 	// Name validation
-	"name.invalidChars": "Contains invalid characters (< > : \" / \\ | ? *)",
+	"name.invalidChars": 'Contains invalid characters (< > : " / \\ | ? *)',
 	"name.reserved": "This name is reserved by the system",
 	"name.tooLong": "Name is too long (max 255 characters)",
 	"name.invalidFormat": "Cannot start/end with a dot or end with a space",
@@ -244,7 +244,7 @@ const fr: typeof en = {
 	"rename.nameExists": "Ce nom existe déjà",
 
 	// Name validation
-	"name.invalidChars": "Contient des caractères invalides (< > : \" / \\ | ? *)",
+	"name.invalidChars": 'Contient des caractères invalides (< > : " / \\ | ? *)',
 	"name.reserved": "Ce nom est réservé par le système",
 	"name.tooLong": "Nom trop long (max 255 caractères)",
 	"name.invalidFormat": "Ne peut pas commencer/finir par un point ou finir par un espace",

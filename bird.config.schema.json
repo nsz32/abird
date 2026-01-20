@@ -4,6 +4,11 @@
 		"BirdConfig": {
 			"type": "object",
 			"properties": {
+				"projectName": {
+					"type": "string",
+					"pattern": "^[a-zA-Z0-9_-]+$",
+					"description": "Project name for userData isolation (defaults to 'bird')"
+				},
 				"theme": {
 					"type": "string",
 					"enum": ["system", "light", "dark"],

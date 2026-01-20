@@ -1,17 +1,63 @@
-import { join } from "node:path"
+import { existsSync, readFileSync } from "node:fs"
+import { basename, dirname, join } from "node:path"
 import { app } from "electron"
 import { getAvailableApps, loadConfig, selectApp, selectBrowserMode, selectConfigMode } from "./config"
 import { startApp } from "./core/App"
 import { initI18n } from "./core/I18n"
 import { registerBirdScheme, setupBirdProtocol } from "./core/Protocol"
-import { findConfigModeConflicts, parseCliArgs, printHelp } from "./core/cli"
+import { findConfigModeConflicts, getConfigPathFromArgs, parseCliArgs, printHelp } from "./core/cli"
 import { parseShortcut, registerKioskExitShortcut } from "./core/kiosk"
 import { kioskMode$ } from "./core/states"
 import { getAvailableUserAgents } from "./utils/userAgents"
 
-// XDG compliant userData
-const xdgDataHome = process.env.XDG_DATA_HOME || join(app.getPath("home"), ".local", "share")
-app.setPath("userData", join(xdgDataHome, "bird"))
+// === Bootstrap: resolve userData before app.whenReady ===
+
+const DEFAULT_PROJECT_NAME = "bird"
+const PROJECT_NAME_PATTERN = /^[a-zA-Z0-9_-]+$/
+
+function getXdgDataHome(): string {
+	return process.env.XDG_DATA_HOME || join(app.getPath("home"), ".local", "share")
+}
+
+function inferProjectNameFromPath(configPath: string): string {
+	const parentDir = dirname(configPath)
+	const folderName = basename(parentDir)
+	return PROJECT_NAME_PATTERN.test(folderName) ? folderName : DEFAULT_PROJECT_NAME
+}
+
+function readProjectName(configPath: string, isCustomPath: boolean): string {
+	if (!existsSync(configPath)) {
+		return isCustomPath ? inferProjectNameFromPath(configPath) : DEFAULT_PROJECT_NAME
+	}
+
+	try {
+		const content = JSON.parse(readFileSync(configPath, "utf-8"))
+		if (typeof content.projectName === "string" && PROJECT_NAME_PATTERN.test(content.projectName)) {
+			return content.projectName
+		}
+	} catch {
+		// Invalid JSON, use default
+	}
+
+	return DEFAULT_PROJECT_NAME
+}
+
+function resolveUserDataPath(): string {
+	const xdgDataHome = getXdgDataHome()
+	const customConfigPath = getConfigPathFromArgs()
+
+	if (customConfigPath) {
+		const projectName = readProjectName(customConfigPath, true)
+		return join(xdgDataHome, projectName)
+	}
+
+	// Default config path: check if it exists and has projectName
+	const defaultConfigPath = join(xdgDataHome, DEFAULT_PROJECT_NAME, "config.json")
+	const projectName = readProjectName(defaultConfigPath, false)
+	return join(xdgDataHome, projectName)
+}
+
+app.setPath("userData", resolveUserDataPath())
 app.setName("okbird")
 
 // Must be called before app.whenReady()
