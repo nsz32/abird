@@ -1,8 +1,9 @@
-import { Button, Flex, Group, HStack, Image, Input, InputAddon, Spinner, Switch, Text, VStack } from "@chakra-ui/react"
-import { ExternalLink } from "lucide-react"
+import { Button, Flex, Group, HStack, IconButton, Image, Input, InputAddon, Spinner, Switch, Text, VStack } from "@chakra-ui/react"
 import type { AppConfig, BirdConfig, NavBarConfig, RoutingAction } from "@shared/config.schema"
+import { deriveInternalPattern } from "@shared/routing"
 import type { IconResult, PartitionsState } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
+import { ExternalLink } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { ConfigSection } from "../components/ConfigSection"
 import { NavBarConfigForm } from "../components/NavBarConfigForm"
@@ -246,12 +247,7 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 
 	const rightInfo = deploySupported && (
 		<HStack gap={2}>
-			<Switch.Root
-				colorPalette="blue"
-				checked={deployed}
-				disabled={deploying}
-				onCheckedChange={(e) => (e.checked ? handleDeploy() : handleUndeploy())}
-			>
+			<Switch.Root colorPalette="blue" checked={deployed} disabled={deploying} onCheckedChange={(e) => (e.checked ? handleDeploy() : handleUndeploy())}>
 				<Switch.HiddenInput />
 				<Switch.Control>
 					<Switch.Thumb />
@@ -261,8 +257,17 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 		</HStack>
 	)
 
+	const defaultPattern = deriveInternalPattern(app.startUrl)
+
 	return (
-		<PageHeader title={name} leftInfo={app.startUrl} rightInfo={rightInfo} actions={headerActions} onRename={() => setShowRenameDialog(true)} renameLabel={t("app.rename")}>
+		<PageHeader
+			title={name}
+			leftInfo={app.startUrl}
+			rightInfo={rightInfo}
+			actions={headerActions}
+			onRename={() => setShowRenameDialog(true)}
+			renameLabel={t("app.rename")}
+		>
 			<VStack align="stretch" gap={4}>
 				<ConfigSection title={t("app.general")}>
 					<HStack justify="space-between" py={2}>
@@ -281,10 +286,6 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 							currentAppName={name}
 							onChange={handlePartitionChange}
 						/>
-					</HStack>
-					<HStack justify="space-between" py={2}>
-						<Text fontSize="sm">{t("settings.theme")}</Text>
-						<ThemeSelect value={app.theme || "system"} onChange={(v) => updateApp({ theme: v })} />
 					</HStack>
 					<HStack justify="space-between" py={2} align="flex-start">
 						<Text fontSize="sm">{t("app.icon")}</Text>
@@ -332,12 +333,39 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 					</HStack>
 				</ConfigSection>
 
-				<ConfigSection title={t("app.navbar")}>
-					<NavBarConfigForm mode="app" config={app.navBar || {}} defaults={config.navBar || {}} onChange={updateNavBar} />
+				<ConfigSection title={t("app.routing")}>
+					<RoutingRulesEditor rules={app.routing?.rules || {}} onChange={updateRoutingRules} defaultPattern={defaultPattern} />
 				</ConfigSection>
 
-				<ConfigSection title={t("app.routing")}>
-					<RoutingRulesEditor rules={app.routing?.rules || {}} onChange={updateRoutingRules} />
+				<ConfigSection title={t("settings.appearance")}>
+					<HStack justify="space-between" py={2}>
+						<HStack gap={1}>
+							<Text fontSize="sm">{t("settings.theme")}</Text>
+							{!app.theme && (
+								<Text fontSize="xs" color="fg.muted">
+									{t("inherit.inherited")}
+								</Text>
+							)}
+						</HStack>
+						<HStack gap={2}>
+							{app.theme && (
+								<IconButton
+									aria-label={t("inherit.reset")}
+									variant="ghost"
+									size="xs"
+									onClick={() => updateApp({ theme: undefined })}
+									title={t("inherit.reset")}
+								>
+									↺
+								</IconButton>
+							)}
+							<ThemeSelect value={app.theme || config.theme || "system"} onChange={(v) => updateApp({ theme: v })} />
+						</HStack>
+					</HStack>
+				</ConfigSection>
+
+				<ConfigSection title={t("app.navbar")}>
+					<NavBarConfigForm mode="app" config={app.navBar || {}} defaults={config.navBar || {}} onChange={updateNavBar} />
 				</ConfigSection>
 			</VStack>
 

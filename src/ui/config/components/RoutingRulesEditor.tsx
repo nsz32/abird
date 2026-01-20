@@ -6,6 +6,7 @@ import { useState } from "react"
 interface RoutingRulesEditorProps {
 	rules: Record<string, RoutingAction>
 	onChange: (rules: Record<string, RoutingAction>) => void
+	defaultPattern?: string
 }
 
 const ACTIONS: RoutingAction[] = ["internal", "download", "external", "ignore"]
@@ -19,13 +20,20 @@ function isValidRegex(pattern: string): boolean {
 	}
 }
 
-export function RoutingRulesEditor({ rules, onChange }: RoutingRulesEditorProps) {
+export function RoutingRulesEditor({ rules, onChange, defaultPattern }: RoutingRulesEditorProps) {
 	const { t } = useTranslations()
 	const [newPattern, setNewPattern] = useState("")
 	const [newAction, setNewAction] = useState<RoutingAction>("internal")
 
 	const entries = Object.entries(rules)
 	const isNewPatternValid = newPattern.trim() !== "" && isValidRegex(newPattern) && !(newPattern in rules)
+	const showDefaultPatternWarning = defaultPattern && !(defaultPattern in rules)
+
+	const handleAddDefaultPattern = () => {
+		if (defaultPattern) {
+			onChange({ ...rules, [defaultPattern]: "internal" })
+		}
+	}
 
 	const handleAdd = () => {
 		if (!isNewPatternValid) return
@@ -51,6 +59,17 @@ export function RoutingRulesEditor({ rules, onChange }: RoutingRulesEditorProps)
 
 	return (
 		<VStack align="stretch" gap={2}>
+			{showDefaultPatternWarning && (
+				<VStack align="stretch" gap={2} py={2}>
+					<Text fontSize="sm" color="orange.500">
+						{t("routing.missingDefaultWarning")}
+					</Text>
+					<Button size="sm" variant="outline" onClick={handleAddDefaultPattern} alignSelf="flex-start">
+						{t("routing.addDefault")}
+					</Button>
+				</VStack>
+			)}
+
 			{entries.length === 0 && (
 				<Text fontSize="sm" color="fg.muted" py={2}>
 					{t("routing.noRules")}

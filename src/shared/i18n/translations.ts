@@ -64,8 +64,11 @@ const en = {
 	"routing.ignore": "Ignore",
 	"routing.noRules": "No rules - all URLs open externally",
 	"routing.invalidPattern": "Invalid regex",
+	"routing.addDefault": "Add default pattern",
+	"routing.missingDefaultWarning": "The default pattern is not configured. Internal URLs may open in the external browser.",
 
 	// Inherit state
+	"inherit.inherited": "(inherited)",
 	"inherit.reset": "Reset",
 
 	// Downloads
@@ -191,8 +194,11 @@ const fr: typeof en = {
 	"routing.ignore": "Ignorer",
 	"routing.noRules": "Aucune règle - toutes les URLs s'ouvrent en externe",
 	"routing.invalidPattern": "Regex invalide",
+	"routing.addDefault": "Ajouter le pattern par défaut",
+	"routing.missingDefaultWarning": "Le pattern par défaut n'est pas configuré. Les URLs internes risquent de s'ouvrir dans le navigateur externe.",
 
 	// Inherit state
+	"inherit.inherited": "(hérité)",
 	"inherit.reset": "Réinitialiser",
 
 	// Downloads

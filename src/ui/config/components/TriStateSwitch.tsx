@@ -1,4 +1,4 @@
-import { Box, HStack, IconButton, Switch, Text } from "@chakra-ui/react"
+import { HStack, IconButton, Switch, Text } from "@chakra-ui/react"
 import { useTranslations } from "@ui/shared/hooks"
 
 interface TriStateSwitchProps {
@@ -27,14 +27,14 @@ export function TriStateSwitch({ label, value, defaultValue, onChange }: TriStat
 
 	return (
 		<HStack justify="space-between" py={2}>
-			<Box>
+			<HStack gap={1}>
 				<Text fontSize="sm">{label}</Text>
 				{isInherited && (
 					<Text fontSize="xs" color="fg.muted">
-						(inherited)
+						{t("inherit.inherited")}
 					</Text>
 				)}
-			</Box>
+			</HStack>
 			<HStack gap={2}>
 				{!isInherited && (
 					<IconButton aria-label={t("inherit.reset")} variant="ghost" size="xs" onClick={handleReset} title={t("inherit.reset")}>
