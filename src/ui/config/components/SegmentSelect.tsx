@@ -9,11 +9,12 @@ interface SegmentSelectProps<T extends string = string> {
 	value: T
 	options: SegmentOption<T>[]
 	onChange: (value: T) => void
+	opacity?: number
 }
 
-export function SegmentSelect<T extends string>({ value, options, onChange }: SegmentSelectProps<T>) {
+export function SegmentSelect<T extends string>({ value, options, onChange, opacity }: SegmentSelectProps<T>) {
 	return (
-		<SegmentGroup.Root size="sm" value={value} onValueChange={(e) => onChange(e.value as T)}>
+		<SegmentGroup.Root size="sm" value={value} onValueChange={(e) => onChange(e.value as T)} opacity={opacity}>
 			<SegmentGroup.Indicator bg={{ base: "blue.100", _dark: "blue.800" }} />
 			{options.map((option) => (
 				<SegmentGroup.Item key={option.value} value={option.value} cursor={value === option.value ? "default" : "pointer"}>

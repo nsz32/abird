@@ -23,6 +23,7 @@ import { NavBar } from "../views/NavBar"
 import { NotificationCenter } from "../views/NotificationCenter"
 import { OverlayPanel } from "../views/OverlayPanel"
 import { Watermark } from "../views/Watermark"
+import { setNavBar } from "../views/views"
 import { MainWindow } from "./MainWindow"
 import { ViewManager } from "./ViewManager"
 
@@ -46,6 +47,7 @@ export function startApp() {
 	// Views auto-register with ViewManager on construction
 	watermark = new Watermark()
 	navBar = new NavBar()
+	setNavBar(navBar)
 	notificationCenter = new NotificationCenter()
 	downloadsPanel = new OverlayPanel("bird://downloads/")
 	findBar = new FindBar()
@@ -72,12 +74,7 @@ export function startApp() {
 	if (kioskMode$.get()) {
 		Menu.setApplicationMenu(null)
 	} else {
-		Menu.setApplicationMenu(
-			createAppMenu({
-				onFocusUrl: () => navBar.sendFocusUrl(),
-				onNavbarDevTools: () => navBar.openDevTools(),
-			}),
-		)
+		Menu.setApplicationMenu(createAppMenu())
 	}
 
 	// Load HTML and show

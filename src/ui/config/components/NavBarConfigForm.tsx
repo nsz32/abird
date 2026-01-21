@@ -3,6 +3,7 @@ import { DEFAULT_NAVBAR, type NavBarConfig } from "@shared/config.schema"
 import { useTranslations } from "@ui/shared/hooks"
 import { SegmentSelect } from "./SegmentSelect"
 import { SwitchField } from "./SwitchField"
+import { TriStateSegmentSelect } from "./TriStateSegmentSelect"
 import { TriStateSwitch } from "./TriStateSwitch"
 
 type NavBarConfigFormProps =
@@ -32,17 +33,16 @@ export function NavBarConfigForm(props: NavBarConfigFormProps) {
 	if (mode === "app") {
 		return (
 			<>
-				<HStack justify="space-between" py={2}>
-					<Text fontSize="sm">{t("navbar.position")}</Text>
-					<SegmentSelect
-						value={config.position || props.defaults.position || "bottom"}
-						options={[
-							{ value: "bottom", label: t("position.bottom") },
-							{ value: "top", label: t("position.top") },
-						]}
-						onChange={(v) => onChange("position", v)}
-					/>
-				</HStack>
+				<TriStateSegmentSelect
+					label={t("navbar.position")}
+					value={config.position}
+					defaultValue={props.defaults.position || DEFAULT_NAVBAR.position}
+					options={[
+						{ value: "bottom", label: t("position.bottom") },
+						{ value: "top", label: t("position.top") },
+					]}
+					onChange={(v) => onChange("position", v)}
+				/>
 				<TriStateSwitch
 					label={t("navbar.visible")}
 					value={config.visible}

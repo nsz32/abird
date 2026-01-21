@@ -59,7 +59,7 @@ function resolveUserDataPath(): string {
 }
 
 app.setPath("userData", resolveUserDataPath())
-app.setName("okbird")
+app.setName("Bird")
 
 // Must be called before app.whenReady()
 registerBirdScheme()

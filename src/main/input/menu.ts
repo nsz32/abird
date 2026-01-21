@@ -1,26 +1,55 @@
-import { Menu, shell } from "electron"
+import { join } from "node:path"
+import { Menu, app, dialog, nativeImage, shell } from "electron"
+import { getTranslations } from "../core/I18n"
 import { findBarVisible$ } from "../core/states"
 import { closeTab, createTab, getActiveTab } from "../tabs/Tabs"
+import { getNavBar } from "../views/views"
 
-interface MenuCallbacks {
-	onFocusUrl: () => void
-	onNavbarDevTools: () => void
+function getAppIconPath(): string {
+	return app.isPackaged ? join(process.resourcesPath, "assets", "icons", "256x256.png") : join(app.getAppPath(), "assets", "icons", "256x256.png")
 }
 
-export function createAppMenu(callbacks: MenuCallbacks): Menu {
-	const { onFocusUrl, onNavbarDevTools } = callbacks
+function showAboutDialog(): void {
+	const detail = ["Desktop, Repackable, Isolated Browser", "", "© 2026 Nicolas Szabo", "<nszabo2@gmail.com>", "", "License: GPL-3.0"].join("\n")
+
+	dialog.showMessageBox({
+		type: "info",
+		icon: nativeImage.createFromPath(getAppIconPath()),
+		title: "About Bird",
+		message: `Bird v${app.getVersion()}`,
+		detail,
+		buttons: ["OK"],
+	})
+}
+
+export function createAppMenu(): Menu {
+	const t = getTranslations()
 
 	return Menu.buildFromTemplate([
 		{
-			label: "Onglet",
+			label: t["menu.app"],
+			submenu: [
+				{ label: t["menu.app.about"], click: showAboutDialog },
+				{ type: "separator" },
+				{
+					label: t["menu.app.settings"],
+					accelerator: "CmdOrCtrl+,",
+					click: () => createTab("bird://config/", "user"),
+				},
+				{ type: "separator" },
+				{ label: t["menu.app.quit"], role: "quit", accelerator: "CmdOrCtrl+Q" },
+			],
+		},
+		{
+			label: t["menu.tab"],
 			submenu: [
 				{
-					label: "Nouveau",
+					label: t["menu.tab.new"],
 					accelerator: "CmdOrCtrl+T",
 					click: () => createTab(undefined, "user", 0),
 				},
 				{
-					label: "Ouvrir externe",
+					label: t["menu.tab.openExternal"],
 					accelerator: "CmdOrCtrl+E",
 					click: () => {
 						const activeTab = getActiveTab()
@@ -31,13 +60,13 @@ export function createAppMenu(callbacks: MenuCallbacks): Menu {
 					},
 				},
 				{
-					label: "Éditer l'URL",
+					label: t["menu.tab.editUrl"],
 					accelerator: "CmdOrCtrl+L",
-					click: () => onFocusUrl(),
+					click: () => getNavBar()?.sendFocusUrl(),
 				},
 				{ type: "separator" },
 				{
-					label: "Fermer",
+					label: t["menu.tab.close"],
 					accelerator: "CmdOrCtrl+W",
 					click: () => {
 						const activeTab = getActiveTab()
@@ -47,25 +76,25 @@ export function createAppMenu(callbacks: MenuCallbacks): Menu {
 			],
 		},
 		{
-			label: "Page",
+			label: t["menu.page"],
 			submenu: [
 				{
-					label: "Rechercher",
+					label: t["menu.page.find"],
 					accelerator: "CmdOrCtrl+F",
 					click: () => findBarVisible$.emit(true),
 				},
 			],
 		},
 		{
-			label: "Développeur",
+			label: t["menu.developer"],
 			submenu: [
 				{
-					label: "DevTools Site",
+					label: t["menu.developer.devtoolsSite"],
 					click: () => getActiveTab()?.view.webContents.openDevTools(),
 				},
 				{
-					label: "DevTools Navbar",
-					click: () => onNavbarDevTools(),
+					label: t["menu.developer.devtoolsNavbar"],
+					click: () => getNavBar()?.openDevTools(),
 				},
 			],
 		},

@@ -148,6 +148,22 @@ const en = {
 	"name.reserved": "This name is reserved by the system",
 	"name.tooLong": "Name is too long (max 255 characters)",
 	"name.invalidFormat": "Cannot start/end with a dot or end with a space",
+
+	// Menu
+	"menu.app": "Bird",
+	"menu.app.about": "About Bird",
+	"menu.app.settings": "Settings...",
+	"menu.app.quit": "Quit",
+	"menu.tab": "Tab",
+	"menu.tab.new": "New",
+	"menu.tab.openExternal": "Open external",
+	"menu.tab.editUrl": "Edit URL",
+	"menu.tab.close": "Close",
+	"menu.page": "Page",
+	"menu.page.find": "Find",
+	"menu.developer": "Developer",
+	"menu.developer.devtoolsSite": "DevTools Site",
+	"menu.developer.devtoolsNavbar": "DevTools Navbar",
 }
 
 const fr: typeof en = {
@@ -298,6 +314,22 @@ const fr: typeof en = {
 	"name.reserved": "Ce nom est réservé par le système",
 	"name.tooLong": "Nom trop long (max 255 caractères)",
 	"name.invalidFormat": "Ne peut pas commencer/finir par un point ou finir par un espace",
+
+	// Menu
+	"menu.app": "Bird",
+	"menu.app.about": "À propos de Bird",
+	"menu.app.settings": "Paramètres...",
+	"menu.app.quit": "Quitter",
+	"menu.tab": "Onglet",
+	"menu.tab.new": "Nouveau",
+	"menu.tab.openExternal": "Ouvrir externe",
+	"menu.tab.editUrl": "Éditer l'URL",
+	"menu.tab.close": "Fermer",
+	"menu.page": "Page",
+	"menu.page.find": "Rechercher",
+	"menu.developer": "Développeur",
+	"menu.developer.devtoolsSite": "DevTools Site",
+	"menu.developer.devtoolsNavbar": "DevTools Navbar",
 }
 
 export const translations: Record<Locale, typeof en> = { en, fr }

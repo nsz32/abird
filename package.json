@@ -1,6 +1,6 @@
 {
 	"name": "bird",
-	"version": "1.0.0",
+	"version": "0.1.0",
 	"description": "Web app wrapper - isolate web applications from the browser",
 	"main": "out/main/index.js",
 	"pnpm": {
