@@ -34,7 +34,7 @@ export function PageHeader({ title, leftInfo, rightInfo, actions, onRename, rena
 				</HStack>
 			</Box>
 
-			<Box flex={1} minH={0} overflowY={noScroll ? "hidden" : "auto"} pt={0} pr={4} pl={4} pb={6}>
+			<Box flex={1} minH={0} overflowY={noScroll ? "hidden" : "auto"} pb={4}>
 				{children}
 			</Box>
 		</Box>

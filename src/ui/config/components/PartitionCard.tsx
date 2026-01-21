@@ -1,7 +1,7 @@
 import { Badge, Box, HStack, IconButton, Spinner, Text } from "@chakra-ui/react"
 import type { PartitionState } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
-import { Trash2 } from "lucide-react"
+import { ChevronRight, Trash2 } from "lucide-react"
 import { useState } from "react"
 import { formatBytes } from "../utils/format"
 
@@ -62,18 +62,22 @@ export function PartitionCard({ partition, isActive, onSelect, onDelete }: Parti
 							{t("partition.orphan")}
 						</Badge>
 					)}
-
+				</HStack>
+				<HStack>
 					{!partition.hasPhysical && (
-						<Badge size="sm" colorPalette="gray">
+						<Badge colorPalette="blue" size="sm">
 							{t("partition.notCreated")}
 						</Badge>
 					)}
+					{partition.diskSize && (
+						<Badge colorPalette="green" size="sm">
+							{formatBytes(partition.diskSize)}
+						</Badge>
+					)}
+					<Text fontSize="xs" color="fg.muted" truncate>
+						{partition.usedByApps.length > 0 && ` ${partition.usedByApps.join(" ")}`}
+					</Text>
 				</HStack>
-
-				<Text fontSize="xs" color="fg.muted" truncate>
-					{partition.diskSize !== undefined ? formatBytes(partition.diskSize) : t("partition.notCreated")}
-					{partition.usedByApps.length > 0 && ` · ${partition.usedByApps.join(", ")}`}
-				</Text>
 			</Box>
 
 			{canDelete && (
@@ -81,6 +85,7 @@ export function PartitionCard({ partition, isActive, onSelect, onDelete }: Parti
 					{deleting ? <Spinner size="xs" /> : <Trash2 size={16} />}
 				</IconButton>
 			)}
+			<ChevronRight size={16} color="#777" />
 		</HStack>
 	)
 }

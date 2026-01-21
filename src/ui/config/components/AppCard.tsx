@@ -1,7 +1,7 @@
 import { Badge, Box, HStack, IconButton, Image, Text } from "@chakra-ui/react"
 import type { AppConfig } from "@shared/config.schema"
 import { useTranslations } from "@ui/shared/hooks"
-import { Check, Trash2 } from "lucide-react"
+import { Check, ChevronRight, Trash2 } from "lucide-react"
 import { useAppIcon } from "../hooks"
 
 const DEFAULT_ICON = "/favicon.png"
@@ -46,6 +46,7 @@ export function AppCard({ name, app, isDeployed, onSelect, onDelete }: AppCardPr
 			<IconButton aria-label={t("app.delete")} variant="ghost" size="sm" colorPalette="red" onClick={handleDelete}>
 				<Trash2 size={16} />
 			</IconButton>
+			<ChevronRight size={16} color="#777" />
 		</HStack>
 	)
 }

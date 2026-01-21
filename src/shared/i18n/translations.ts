@@ -9,6 +9,7 @@ const en = {
 	"settings.apps": "Applications",
 	"settings.noApps": "No applications configured",
 	"settings.configPath": "Configuration",
+	"settings.project": "Project",
 	"settings.partitions": "Partitions",
 
 	// Theme
@@ -153,6 +154,7 @@ const fr: typeof en = {
 	"settings.apps": "Applications",
 	"settings.noApps": "Aucune application configurée",
 	"settings.configPath": "Configuration",
+	"settings.project": "Projet",
 	"settings.partitions": "Partitions",
 
 	// Theme

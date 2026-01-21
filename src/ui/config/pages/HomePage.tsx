@@ -104,8 +104,18 @@ export function HomePage({ config, configPath, partitionsState, deployState, act
 	}
 
 	return (
-		<PageHeader title={t("settings.title")} leftInfo={`${appCount} apps · ${partitionCount} partitions`} rightInfo={<Text>{configPath}</Text>} noScroll>
-			<HStack align="stretch" gap={6} h="100%">
+		<PageHeader
+			title={t("settings.title")}
+			leftInfo={`${appCount} apps · ${partitionCount} partitions`}
+			rightInfo={config.projectName && <Text>{t("settings.project")} : {config.projectName}</Text>}
+			actions={
+				<Text fontSize="sm" color="fg.muted">
+					{configPath}
+				</Text>
+			}
+			noScroll
+		>
+			<HStack align="stretch" gap={4} h="100%">
 				<VStack flex={1} align="stretch" gap={4} {...scrollColumnStyles}>
 					<ConfigSection title={t("settings.appearance")}>
 						<HStack justify="space-between" py={2}>
