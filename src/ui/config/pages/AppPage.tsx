@@ -209,15 +209,16 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 						<HStack gap={3}>
 							<HStack gap={2}>
 								<Box w="32px" h="32px" borderRadius="md" overflow="hidden">
-									<Image
-										src={icon.iconData || DEFAULT_ICON}
-										alt="App icon"
-										title={app.icon}
-										w="32px"
-										h="32px"
-										objectFit="contain"
-										onLoad={icon.onImageLoad}
-									/>
+									{(!app.icon || icon.iconData) && (
+										<Image
+											src={app.icon ? icon.iconData || "" : DEFAULT_ICON}
+											alt="App icon"
+											title={app.icon}
+											w="32px"
+											h="32px"
+											objectFit="contain"
+										/>
+									)}
 								</Box>
 								{app.icon && icon.iconSize && (
 									<Text fontSize="xs" color="fg.muted">

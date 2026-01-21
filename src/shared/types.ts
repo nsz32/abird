@@ -324,7 +324,7 @@ export interface BirdApi {
 		save: (appName: string, base64: string, oldIcon?: string) => Promise<string>
 		importFile: (appName: string, oldIcon?: string) => Promise<string | null>
 		delete: (filename: string) => Promise<void>
-		getData: (filename: string) => Promise<string | null>
+		getData: (filename: string) => Promise<IconData | null>
 	}
 	deploy: {
 		isSupported: () => Promise<boolean>
@@ -344,6 +344,13 @@ export interface BirdApi {
 		isLaunchSupported: () => Promise<boolean>
 		launch: (appName: string) => Promise<void>
 	}
+}
+
+// Icon data (for icon preview with dimensions)
+export interface IconData {
+	data: string // base64 data URL
+	width: number
+	height: number
 }
 
 // Icon fetching

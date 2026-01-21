@@ -3,12 +3,11 @@ import { useEffect, useState } from "react"
 export interface UseAppIconResult {
 	iconData: string | null
 	iconSize: { w: number; h: number } | null
-	onImageLoad: (e: React.SyntheticEvent<HTMLImageElement>) => void
 }
 
 /**
  * Manages icon display for an app.
- * Loads icon data from storage and tracks dimensions.
+ * Loads icon data and dimensions from storage.
  */
 export function useAppIcon(iconFilename?: string): UseAppIconResult {
 	const [iconData, setIconData] = useState<string | null>(null)
@@ -16,17 +15,20 @@ export function useAppIcon(iconFilename?: string): UseAppIconResult {
 
 	useEffect(() => {
 		if (iconFilename) {
-			window.bird.icons.getData(iconFilename).then(setIconData)
+			window.bird.icons.getData(iconFilename).then((result) => {
+				if (result) {
+					setIconData(result.data)
+					setIconSize({ w: result.width, h: result.height })
+				} else {
+					setIconData(null)
+					setIconSize(null)
+				}
+			})
 		} else {
 			setIconData(null)
+			setIconSize(null)
 		}
-		setIconSize(null)
 	}, [iconFilename])
 
-	const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
-		const img = e.currentTarget
-		setIconSize({ w: img.naturalWidth, h: img.naturalHeight })
-	}
-
-	return { iconData, iconSize, onImageLoad }
+	return { iconData, iconSize }
 }

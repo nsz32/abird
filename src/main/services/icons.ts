@@ -1,7 +1,7 @@
 import { randomBytes } from "node:crypto"
 import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
-import type { IconFetchResult, IconResult, IconSource } from "@shared/types"
+import type { IconData, IconFetchResult, IconResult, IconSource } from "@shared/types"
 import { net, WebContentsView, dialog } from "electron"
 import { Jimp } from "jimp"
 import { paths } from "../utils/platform"
@@ -267,12 +267,18 @@ export function getIconPath(filename: string): string | null {
 	return existsSync(path) ? path : null
 }
 
-export function getIconData(filename: string): string | null {
+export async function getIconData(filename: string): Promise<IconData | null> {
 	const path = getIconPath(filename)
 	if (!path) return null
 
 	const buffer = readFileSync(path)
-	return `data:image/png;base64,${buffer.toString("base64")}`
+	const image = await Jimp.fromBuffer(buffer)
+
+	return {
+		data: `data:image/png;base64,${buffer.toString("base64")}`,
+		width: image.width,
+		height: image.height,
+	}
 }
 
 export async function importIconFile(appName: string, oldIcon?: string): Promise<string | null> {
