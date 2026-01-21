@@ -106,8 +106,12 @@ export function HomePage({ config, configPath, partitionsState, deployState, act
 	return (
 		<PageHeader
 			title={t("settings.title")}
-			leftInfo={`${appCount} apps · ${partitionCount} partitions`}
-			rightInfo={config.projectName && <Text>{t("settings.project")} : {config.projectName}</Text>}
+			leftInfo={t("settings.stats", { apps: appCount, partitions: partitionCount })}
+			rightInfo={
+				<Text>
+					{t("settings.project")} : {config.projectName ?? "bird"}
+				</Text>
+			}
 			actions={
 				<Text fontSize="sm" color="fg.muted">
 					{configPath}

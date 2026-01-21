@@ -11,6 +11,7 @@ const en = {
 	"settings.configPath": "Configuration",
 	"settings.project": "Project",
 	"settings.partitions": "Partitions",
+	"settings.stats": '{{apps}} app{{apps>1?"s":""}} · {{partitions}} partition{{partitions>1?"s":""}}',
 
 	// Theme
 	"theme.system": "System",
@@ -156,6 +157,7 @@ const fr: typeof en = {
 	"settings.configPath": "Configuration",
 	"settings.project": "Projet",
 	"settings.partitions": "Partitions",
+	"settings.stats": '{{apps}} app{{apps>1?"s":""}} · {{partitions}} partition{{partitions>1?"s":""}}',
 
 	// Theme
 	"theme.system": "Système",
