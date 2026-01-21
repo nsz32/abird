@@ -9,10 +9,11 @@ interface PageHeaderProps {
 	actions?: ReactNode
 	onRename?: () => void
 	renameLabel?: string
+	noScroll?: boolean
 	children: ReactNode
 }
 
-export function PageHeader({ title, leftInfo, rightInfo, actions, onRename, renameLabel, children }: PageHeaderProps) {
+export function PageHeader({ title, leftInfo, rightInfo, actions, onRename, renameLabel, noScroll, children }: PageHeaderProps) {
 	return (
 		<Box display="flex" flexDirection="column" h="100%">
 			<Box pt={6} pb={4} flexShrink={0}>
@@ -33,7 +34,7 @@ export function PageHeader({ title, leftInfo, rightInfo, actions, onRename, rena
 				</HStack>
 			</Box>
 
-			<Box flex={1} overflowY="auto" pt={0} pr={4} pl={4} pb={6}>
+			<Box flex={1} minH={0} overflowY={noScroll ? "hidden" : "auto"} pt={0} pr={4} pl={4} pb={6}>
 				{children}
 			</Box>
 		</Box>

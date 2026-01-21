@@ -92,10 +92,20 @@ export function HomePage({ config, configPath, partitionsState, activePartition,
 	const appCount = Object.keys(config.apps).length
 	const partitionCount = partitionsState.partitions.length
 
+	const scrollColumnStyles = {
+		overflowY: "auto" as const,
+		minH: 0,
+		pb: 6,
+		pr: 2,
+		css: {
+			"&:not(:hover)": { scrollbarColor: "transparent transparent" },
+		},
+	}
+
 	return (
-		<PageHeader title={t("settings.title")} leftInfo={`${appCount} apps · ${partitionCount} partitions`} rightInfo={<Text>{configPath}</Text>}>
-			<HStack align="start" gap={6}>
-				<VStack flex={1} align="stretch" gap={4}>
+		<PageHeader title={t("settings.title")} leftInfo={`${appCount} apps · ${partitionCount} partitions`} rightInfo={<Text>{configPath}</Text>} noScroll>
+			<HStack align="stretch" gap={6} h="100%">
+				<VStack flex={1} align="stretch" gap={4} {...scrollColumnStyles}>
 					<ConfigSection title={t("settings.appearance")}>
 						<HStack justify="space-between" py={2}>
 							<Text fontSize="sm">{t("settings.theme")}</Text>
@@ -108,7 +118,7 @@ export function HomePage({ config, configPath, partitionsState, activePartition,
 					</ConfigSection>
 				</VStack>
 
-				<VStack flex={1} align="stretch" gap={4}>
+				<VStack flex={1} align="stretch" gap={4} {...scrollColumnStyles}>
 					<ConfigSection title={t("settings.apps")}>
 						<AppList
 							apps={config.apps}
