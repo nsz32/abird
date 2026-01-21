@@ -1,7 +1,10 @@
 import { Button, Dialog, HStack, Input, Text, VStack } from "@chakra-ui/react"
+import type { TranslationKey } from "@shared/i18n/translations"
 import { useTranslations } from "@ui/shared/hooks"
 import { useState } from "react"
 import { validateFolderName } from "../utils/nameValidation"
+
+type NameValidator = (name: string) => TranslationKey | null
 
 interface RenameDialogProps {
 	isOpen: boolean
@@ -10,17 +13,18 @@ interface RenameDialogProps {
 	existingNames: string[]
 	onClose: () => void
 	onRename: (newName: string) => void
+	validateName?: NameValidator
 }
 
-export function RenameDialog({ isOpen, title, currentName, existingNames, onClose, onRename }: RenameDialogProps) {
+export function RenameDialog({ isOpen, title, currentName, existingNames, onClose, onRename, validateName = validateFolderName }: RenameDialogProps) {
 	const { t } = useTranslations()
 	const [name, setName] = useState(currentName)
 
 	const trimmedName = name.trim()
 	const nameExists = trimmedName !== currentName && existingNames.includes(trimmedName)
-	const folderError = trimmedName !== "" ? validateFolderName(trimmedName) : null
-	const isValid = trimmedName !== "" && trimmedName !== currentName && !nameExists && !folderError
-	const hasError = nameExists || folderError !== null
+	const nameError = trimmedName !== "" ? validateName(trimmedName) : null
+	const isValid = trimmedName !== "" && trimmedName !== currentName && !nameExists && !nameError
+	const hasError = nameExists || nameError !== null
 
 	const handleRename = () => {
 		if (!isValid) return
@@ -56,9 +60,9 @@ export function RenameDialog({ isOpen, title, currentName, existingNames, onClos
 									{t("rename.nameExists")}
 								</Text>
 							)}
-							{folderError && (
+							{nameError && (
 								<Text fontSize="xs" color="red.500">
-									{t(folderError)}
+									{t(nameError)}
 								</Text>
 							)}
 						</VStack>

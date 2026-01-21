@@ -47,11 +47,13 @@ function buildExecCommand(appName: string): string {
 	const configPath = getConfigPath()
 	const isCustomConfig = configPath !== paths.config
 
+	const execPath = process.env.APPIMAGE ?? process.execPath
+
 	if (isCustomConfig) {
-		return `${process.execPath} --config "${configPath}" --app "${appName}"`
+		return `${execPath} --config "${configPath}" --app "${appName}"`
 	}
 
-	return `${process.execPath} --app "${appName}"`
+	return `${execPath} --app "${appName}"`
 }
 
 function buildDesktopFileContent(appName: string, appConfig: AppConfig): string {
@@ -139,8 +141,9 @@ export function renameDeploy(oldName: string, newName: string, appConfig: AppCon
 export function launchApp(appName: string): void {
 	const configPath = getConfigPath()
 	const isCustomConfig = configPath !== paths.config
+	const execPath = process.env.APPIMAGE ?? process.execPath
 
 	const args = isCustomConfig ? ["--config", configPath, "--app", appName] : ["--app", appName]
 
-	spawn(process.execPath, args, { detached: true, stdio: "ignore" }).unref()
+	spawn(execPath, args, { detached: true, stdio: "ignore" }).unref()
 }

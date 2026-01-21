@@ -137,6 +137,7 @@ const en = {
 	"partition.cacheCleanup.maxFileSizeMB": "Max file size (MB)",
 	"partition.cacheCleanup.maxAgeDays": "Max age (days)",
 	"partition.cacheCleanup.hint": "Files exceeding these limits will be deleted on exit",
+	"partition.invalidName": "Must start with a letter, use only lowercase, numbers, and underscores",
 
 	// Rename dialog
 	"rename.newName": "New name",
@@ -304,6 +305,7 @@ const fr: typeof en = {
 	"partition.cacheCleanup.maxFileSizeMB": "Taille max fichier (Mo)",
 	"partition.cacheCleanup.maxAgeDays": "Âge max (jours)",
 	"partition.cacheCleanup.hint": "Les fichiers dépassant ces limites seront supprimés à la fermeture",
+	"partition.invalidName": "Doit commencer par une lettre, contenir uniquement minuscules, chiffres et underscores",
 
 	// Rename dialog
 	"rename.newName": "Nouveau nom",

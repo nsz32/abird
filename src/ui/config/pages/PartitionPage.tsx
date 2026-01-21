@@ -1,5 +1,6 @@
 import { Badge, Button, HStack, Spinner, Text, VStack } from "@chakra-ui/react"
 import type { BirdConfig, CacheCleanupConfig, PartitionConfig } from "@shared/config.schema"
+import { validatePartitionName } from "@shared/partition"
 import type { PartitionsState } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
 import { RotateCw, Trash2 } from "lucide-react"
@@ -186,6 +187,7 @@ export function PartitionPage({ name, config, partitionsState, activePartition, 
 				existingNames={existingPartitionNames}
 				onClose={() => setShowRenameDialog(false)}
 				onRename={onRename}
+				validateName={validatePartitionName}
 			/>
 		</PageHeader>
 	)

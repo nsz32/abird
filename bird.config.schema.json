@@ -6,12 +6,15 @@
 			"properties": {
 				"projectName": {
 					"type": "string",
-					"pattern": "^[a-zA-Z0-9_-]+$",
-					"description": "Project name for userData isolation (defaults to 'bird')"
+					"pattern": "^[a-zA-Z0-9_-]+$"
 				},
 				"theme": {
 					"type": "string",
-					"enum": ["system", "light", "dark"],
+					"enum": [
+						"system",
+						"light",
+						"dark"
+					],
 					"default": "system"
 				},
 				"navBar": {
@@ -19,8 +22,11 @@
 					"properties": {
 						"position": {
 							"type": "string",
-							"enum": ["top", "bottom"],
-							"default": "top"
+							"enum": [
+								"top",
+								"bottom"
+							],
+							"default": "bottom"
 						},
 						"visible": {
 							"type": "boolean",
@@ -36,15 +42,19 @@
 						},
 						"showBackButton": {
 							"type": "boolean",
-							"default": false
+							"default": true
 						},
 						"showForwardButton": {
 							"type": "boolean",
-							"default": false
+							"default": true
 						},
 						"showRefreshButton": {
 							"type": "boolean",
-							"default": false
+							"default": true
+						},
+						"showHomeButton": {
+							"type": "boolean",
+							"default": true
 						},
 						"allowSingleTabClose": {
 							"type": "boolean",
@@ -61,7 +71,10 @@
 							"type": "string"
 						},
 						"autoOpenMaxSize": {
-							"type": ["number", "string"]
+							"type": [
+								"number",
+								"string"
+							]
 						},
 						"autoOpenMimeTypes": {
 							"type": "array",
@@ -85,9 +98,13 @@
 						"type": "object",
 						"properties": {
 							"partition": {
-								"type": "string"
+								"type": "string",
+								"pattern": "^[a-z][a-z0-9_]*$"
 							},
 							"startUrl": {
+								"type": "string"
+							},
+							"description": {
 								"type": "string"
 							},
 							"icon": {
@@ -95,7 +112,11 @@
 							},
 							"theme": {
 								"type": "string",
-								"enum": ["system", "light", "dark"]
+								"enum": [
+									"system",
+									"light",
+									"dark"
+								]
 							},
 							"userAgent": {
 								"type": "string"
@@ -108,8 +129,11 @@
 								"properties": {
 									"position": {
 										"type": "string",
-										"enum": ["top", "bottom"],
-										"default": "top"
+										"enum": [
+											"top",
+											"bottom"
+										],
+										"default": "bottom"
 									},
 									"visible": {
 										"type": "boolean",
@@ -125,15 +149,19 @@
 									},
 									"showBackButton": {
 										"type": "boolean",
-										"default": false
+										"default": true
 									},
 									"showForwardButton": {
 										"type": "boolean",
-										"default": false
+										"default": true
 									},
 									"showRefreshButton": {
 										"type": "boolean",
-										"default": false
+										"default": true
+									},
+									"showHomeButton": {
+										"type": "boolean",
+										"default": true
 									},
 									"allowSingleTabClose": {
 										"type": "boolean",
@@ -145,37 +173,27 @@
 							"routing": {
 								"type": "object",
 								"properties": {
-									"internal": {
-										"anyOf": [
-											{
-												"type": "string"
-											},
-											{
-												"type": "array",
-												"items": {
-													"type": "string"
-												}
-											}
-										]
-									},
-									"download": {
-										"anyOf": [
-											{
-												"type": "string"
-											},
-											{
-												"type": "array",
-												"items": {
-													"type": "string"
-												}
-											}
-										]
+									"rules": {
+										"type": "object",
+										"additionalProperties": {
+											"type": "string",
+											"enum": [
+												"internal",
+												"download",
+												"external",
+												"ignore"
+											]
+										},
+										"default": {}
 									}
 								},
 								"additionalProperties": false
 							}
 						},
-						"required": ["partition", "startUrl"],
+						"required": [
+							"partition",
+							"startUrl"
+						],
 						"additionalProperties": false
 					},
 					"default": {}
@@ -184,10 +202,32 @@
 					"type": "object",
 					"additionalProperties": {
 						"type": "object",
-						"properties": {},
+						"properties": {
+							"adBlockEnabled": {
+								"type": "boolean",
+								"default": true
+							},
+							"cacheCleanup": {
+								"type": "object",
+								"properties": {
+									"maxFileSizeMB": {
+										"type": "number",
+										"minimum": 0
+									},
+									"maxAgeDays": {
+										"type": "number",
+										"minimum": 0
+									}
+								},
+								"additionalProperties": false
+							}
+						},
 						"additionalProperties": false
 					},
-					"default": {}
+					"default": {},
+					"propertyNames": {
+						"pattern": "^[a-z][a-z0-9_]*$"
+					}
 				}
 			},
 			"additionalProperties": false

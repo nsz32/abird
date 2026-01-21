@@ -1,5 +1,6 @@
 import { HStack, Text, VStack } from "@chakra-ui/react"
 import type { BirdConfig, NavBarConfig } from "@shared/config.schema"
+import { normalizePartitionName } from "@shared/partition"
 import { deriveInternalPattern } from "@shared/routing"
 import type { DeployState, PartitionsState } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
@@ -44,20 +45,21 @@ export function HomePage({ config, configPath, partitionsState, deployState, act
 
 	const handleCreateApp = async (name: string, startUrl: string) => {
 		const internal = deriveInternalPattern(startUrl)
+		const partitionName = normalizePartitionName(name)
 
 		const newConfig: BirdConfig = {
 			...config,
 			apps: {
 				...config.apps,
-				[name]: { partition: name, startUrl, routing: { rules: { [internal]: "internal" } } },
+				[name]: { partition: partitionName, startUrl, routing: { rules: { [internal]: "internal" } } },
 			},
 		}
 
 		// Assurer la cohérence : la partition doit exister dans le JSON
-		if (!config.partitions?.[name]) {
+		if (!config.partitions?.[partitionName]) {
 			newConfig.partitions = {
 				...config.partitions,
-				[name]: {},
+				[partitionName]: {},
 			}
 		}
 
@@ -68,7 +70,14 @@ export function HomePage({ config, configPath, partitionsState, deployState, act
 		onNavigate(`#app/${name}`)
 	}
 
-	const handleDeleteApp = (name: string) => {
+	const handleDeleteApp = async (name: string) => {
+		const app = config.apps[name]
+
+		await window.bird.deploy.undeploy(name)
+		if (app.icon) {
+			await window.bird.icons.delete(app.icon)
+		}
+
 		const { [name]: _, ...rest } = config.apps
 		onChange({ ...config, apps: rest })
 		reloadPartitions()

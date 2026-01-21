@@ -4,6 +4,7 @@
  * Validation utilisée UNIQUEMENT par le main process
  */
 import { z } from "zod"
+import { isValidPartitionName, PARTITION_NAME_PATTERN } from "./partition"
 
 // Theme mode
 export const ThemeModeSchema = z.enum(["system", "light", "dark"])
@@ -43,9 +44,12 @@ export const DownloadConfigSchema = z.object({
 })
 export type DownloadConfig = z.infer<typeof DownloadConfigSchema>
 
+// Partition name schema (lowercase + numbers + underscore, must start with letter)
+export const PartitionNameSchema = z.string().regex(PARTITION_NAME_PATTERN, "Partition name must start with a letter and contain only lowercase letters, numbers, and underscores")
+
 // Configuration d'une app (site web isolé)
 export const AppConfigSchema = z.object({
-	partition: z.string(),
+	partition: PartitionNameSchema,
 	startUrl: z.string(),
 	description: z.string().optional(),
 	icon: z.string().optional(),
@@ -142,13 +146,32 @@ function collectUnknownKeys(data: unknown, schema: z.ZodObject<z.ZodRawShape>, p
 	return unknownKeys
 }
 
+function validatePartitionNames(data: unknown): string[] {
+	if (typeof data !== "object" || data === null) return []
+
+	const config = data as Record<string, unknown>
+	const errors: string[] = []
+
+	// Validate partition keys in "partitions" object
+	if (config.partitions && typeof config.partitions === "object") {
+		for (const key of Object.keys(config.partitions as object)) {
+			if (!isValidPartitionName(key)) {
+				errors.push(`partitions.${key}: invalid partition name (must start with a letter, use only lowercase, numbers, underscore)`)
+			}
+		}
+	}
+
+	return errors
+}
+
 export function validateConfig(data: unknown): ValidationResult {
 	const unknownKeys = collectUnknownKeys(data, BirdConfigSchema)
+	const partitionErrors = validatePartitionNames(data)
 
 	// Use passthrough to keep unknown keys during parsing (won't fail)
 	const result = BirdConfigSchema.passthrough().safeParse(data)
 
-	if (result.success) {
+	if (result.success && partitionErrors.length === 0) {
 		return {
 			success: true,
 			data: result.data as BirdConfig,
@@ -157,11 +180,13 @@ export function validateConfig(data: unknown): ValidationResult {
 		}
 	}
 
+	const zodErrors = result.success ? [] : result.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`)
+
 	return {
 		success: false,
-		data: BirdConfigSchema.parse({}) as BirdConfig,
+		data: result.success ? (result.data as BirdConfig) : (BirdConfigSchema.parse({}) as BirdConfig),
 		unknownKeys,
-		errors: result.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`),
+		errors: [...zodErrors, ...partitionErrors],
 	}
 }
 

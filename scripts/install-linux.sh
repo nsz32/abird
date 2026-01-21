@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-APPIMAGE=$(find release -name "*.AppImage" -type f | head -1)
+APPIMAGE=$(find release -name "Bird-*.AppImage" -type f | head -1)
 
 if [ -z "$APPIMAGE" ]; then
     echo "Error: No AppImage found in release/"
