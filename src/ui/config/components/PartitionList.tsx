@@ -5,7 +5,7 @@ import { PartitionCard } from "./PartitionCard"
 
 interface PartitionListProps {
 	partitions: PartitionState[]
-	activePartition: string
+	activePartition: string | null
 	onSelect: (name: string) => void
 	onDelete: (name: string) => Promise<void>
 }

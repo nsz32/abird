@@ -249,7 +249,7 @@ export interface ResolvedRoutingConfig {
 // Config effective (computée selon BirdConfig + contexte)
 export interface EffectiveConfig {
 	startUrl: string
-	partition: string
+	partition: string | null
 	theme: ThemeMode
 	userAgent: string
 	navBar: ResolvedNavBarConfig

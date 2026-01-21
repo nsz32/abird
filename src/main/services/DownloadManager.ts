@@ -174,7 +174,7 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 
 		const downloadId = generateDownloadId()
 		const filename = item.getFilename()
-		const partition = config$.get().partition
+		const partition = config$.get().partition ?? ""
 		const { finalPath, tempPath, originalPath } = getDownloadPaths(join(downloadDir, filename))
 		item.setSavePath(tempPath)
 

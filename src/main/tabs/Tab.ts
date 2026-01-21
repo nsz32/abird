@@ -35,14 +35,14 @@ export class Tab {
 	private onValidCallback?: () => void
 	private destroyed = false
 
-	constructor(partition: string, routing: ResolvedRoutingConfig, url: string, userAgent: string, parentId: string | null = null) {
+	constructor(partition: string | null, routing: ResolvedRoutingConfig, url: string, userAgent: string, parentId: string | null = null) {
 		this.id = `tab-${nextId++}`
 		this.initialUrl = url
 		this.parentId = parentId
 
 		const callbacks = this.createCallbacks()
 
-		this.view = url.startsWith("bird://") ? new PanelView(url, callbacks) : new WebView(url, partition, routing, userAgent, callbacks)
+		this.view = url.startsWith("bird://") ? new PanelView(url, callbacks) : new WebView(url, partition ?? "", routing, userAgent, callbacks)
 		console.log("CREATED", url, this.view.constructor.name)
 
 		ViewManager.get().registerContentView(this.id, this.view.webContentsView)

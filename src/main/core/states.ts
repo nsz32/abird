@@ -15,7 +15,7 @@ import { BroadcastEvent, BroadcastObservable, CombinedObservable, StateObservabl
 // Config effective - single source of truth
 const DEFAULT_CONFIG: EffectiveConfig = {
 	startUrl: "about:blank",
-	partition: "default",
+	partition: null,
 	theme: "system",
 	userAgent: "desktop:bird",
 	navBar: {

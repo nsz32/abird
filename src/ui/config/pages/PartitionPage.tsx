@@ -16,7 +16,7 @@ interface PartitionPageProps {
 	name: string
 	config: BirdConfig
 	partitionsState: PartitionsState
-	activePartition: string
+	activePartition: string | null
 	onChange: (config: BirdConfig) => void
 	onNavigate: (hash: string) => void
 	reloadPartitions: () => Promise<void>

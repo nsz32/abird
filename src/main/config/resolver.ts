@@ -75,7 +75,7 @@ function buildEffectiveConfig(app: Partial<AppConfig>, birdConfig: BirdConfig, o
 
 	return {
 		startUrl: app.startUrl || "about:blank",
-		partition: app.partition || "default",
+		partition: app.partition || null,
 		theme: app.theme || birdConfig.theme,
 		userAgent: cli?.userAgent || app.userAgentRaw || app.userAgent || "desktop:bird",
 		navBar: resolveNavBarConfig(mergedNavBar, options?.navBarOverrides),
@@ -91,7 +91,7 @@ export function selectApp(appName: string, cliOverrides?: CliOverrides): boolean
 
 	setCurrentAppName(appName)
 	const effective = buildEffectiveConfig(app, birdConfig, { cliOverrides })
-	acquirePartitionLock(effective.partition)
+	if (effective.partition) acquirePartitionLock(effective.partition)
 	config$.emit(effective)
 	return true
 }
@@ -102,7 +102,6 @@ export function selectConfigMode(): void {
 
 	const configApp: Partial<AppConfig> = {
 		startUrl: "bird://config/",
-		partition: "",
 		userAgent: "Bird",
 		navBar: {
 			visible: true,
@@ -158,7 +157,7 @@ export function selectBrowserMode(startUrl: string, userAgent = "desktop:bird"):
 		allowDuplicateDownloads: true,
 	}
 
-	acquirePartitionLock(effective.partition)
+	if (effective.partition) acquirePartitionLock(effective.partition)
 	config$.emit(effective)
 }
 
