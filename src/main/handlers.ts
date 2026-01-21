@@ -12,6 +12,7 @@ import {
 	downloadHistory$,
 	findBarVisible$,
 	findState$,
+	navBarForceShow$,
 	navState$,
 	notifications$,
 } from "./core/states"
@@ -136,4 +137,12 @@ export function registerHandlers() {
 	// App launch
 	ipcMain.handle(IpcChannels.APP_LAUNCH_SUPPORTED, () => isLaunchSupported())
 	ipcMain.handle(IpcChannels.APP_LAUNCH, (_, appName: string) => launchApp(appName))
+
+	// Navbar auto-hide
+	ipcMain.on(IpcChannels.NAVBAR_URL_EDIT_MODE, (_, active: boolean) => {
+		const current = navBarForceShow$.get()
+		if (active !== current.urlEdit) {
+			navBarForceShow$.emit({ ...current, urlEdit: active })
+		}
+	})
 }

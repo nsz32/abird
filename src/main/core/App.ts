@@ -9,11 +9,13 @@ import {
 	findBarVisible$,
 	findState$,
 	kioskMode$,
+	navBarEffectiveVisible$,
+	navBarForceShow$,
 	navbarSync$,
 	notifications$,
 } from "../core/states"
 import { registerHandlers } from "../handlers"
-import { setupInputListener } from "../input/inputListener"
+import { setMainWindowRef, setupInputListener } from "../input/inputListener"
 import { createAppMenu } from "../input/menu"
 import { createTab, getTabsList } from "../tabs/Tabs"
 import { FindBar } from "../views/FindBar"
@@ -39,6 +41,7 @@ export function startApp() {
 
 	// MainWindow must be created first (initializes ViewManager)
 	mainWindow = new MainWindow()
+	setMainWindowRef(mainWindow.window)
 
 	// Views auto-register with ViewManager on construction
 	watermark = new Watermark()
@@ -51,7 +54,7 @@ export function startApp() {
 	ViewManager.get().registerContentView(DOWNLOADS_VIEW_ID, downloadsPanel.webContentsView)
 
 	// Initial visibility
-	navBar.setVisible(config$.get().navBar.visible)
+	navBar.setVisible(navBarEffectiveVisible$.get())
 	findBar.setVisible(false)
 
 	// Register views for broadcast observables
@@ -116,6 +119,19 @@ function setupSubscriptions() {
 		findBar.setVisible(visible)
 		if (visible) {
 			findBar.sendOpen()
+		}
+	})
+
+	// Navbar auto-hide: update visibility and track downloads
+	navBarEffectiveVisible$.subscribe((visible) => {
+		navBar.setVisible(visible)
+	})
+
+	activeDownloads$.subscribe((downloads) => {
+		const current = navBarForceShow$.get()
+		const hasDownloads = downloads.length > 0
+		if (hasDownloads !== current.downloading) {
+			navBarForceShow$.emit({ ...current, downloading: hasDownloads })
 		}
 	})
 }

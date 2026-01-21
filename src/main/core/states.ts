@@ -45,6 +45,18 @@ export const config$ = new StateObservable<EffectiveConfig>(DEFAULT_CONFIG)
 export const windowBounds$ = new StateObservable<Rectangle>({ x: 0, y: 0, width: 0, height: 0 })
 export const navBarHeight$ = new StateObservable<number>(0)
 
+// Navbar auto-hide state
+export interface NavBarForceShowState {
+	urlEdit: boolean // URL edit mode active
+	mouseHover: boolean // Mouse in trigger zone
+	downloading: boolean // Active downloads
+}
+export const navBarForceShow$ = new StateObservable<NavBarForceShowState>({
+	urlEdit: false,
+	mouseHover: false,
+	downloading: false,
+})
+
 // Tabs
 export const tabs$ = new StateObservable<Tab[]>([])
 
@@ -66,20 +78,51 @@ export const navState$ = new StateObservable<NavigationState>({
 // Bounds dérivés
 const DEFAULT_NAVBAR_HEIGHT = 40
 
-export const navBarBounds$ = new CombinedObservable([windowBounds$, config$, navBarHeight$], (windowBounds, config, navBarHeight) => {
-	const { navBar } = config
-	const height = navBar.visible ? navBarHeight || DEFAULT_NAVBAR_HEIGHT : 0
-	const width = windowBounds.width || 1
-	return navBar.position === "top" ? { x: 0, y: 0, width, height } : { x: 0, y: windowBounds.height - height, width, height }
-})
+// Navbar effective visibility (considering autoHide)
+export const navBarEffectiveVisible$ = new CombinedObservable(
+	[config$, navBarForceShow$],
+	(config, forceShow) => {
+		const { navBar } = config
+		if (!navBar.visible) return false
+		if (!navBar.autoHide) return true
+		return forceShow.urlEdit || forceShow.mouseHover || forceShow.downloading
+	},
+)
 
-export const contentBounds$ = new CombinedObservable([windowBounds$, config$, navBarHeight$], (windowBounds, config, navBarHeight) => {
-	const { navBar } = config
-	const navHeight = navBar.visible ? navBarHeight || DEFAULT_NAVBAR_HEIGHT : 0
-	return navBar.position === "top"
-		? { x: 0, y: navHeight, width: windowBounds.width, height: windowBounds.height - navHeight }
-		: { x: 0, y: 0, width: windowBounds.width, height: windowBounds.height - navHeight }
-})
+export const navBarBounds$ = new CombinedObservable(
+	[windowBounds$, config$, navBarHeight$, navBarEffectiveVisible$],
+	(windowBounds, config, navBarHeight, effectiveVisible) => {
+		const { navBar } = config
+		const width = windowBounds.width || 1
+		const height = navBarHeight || DEFAULT_NAVBAR_HEIGHT
+
+		// Hidden or autoHide collapsed: no bounds (mouse detection via uiohook)
+		if (!navBar.visible || (navBar.autoHide && !effectiveVisible)) {
+			return { x: 0, y: 0, width: 0, height: 0 }
+		}
+
+		return navBar.position === "top"
+			? { x: 0, y: 0, width, height }
+			: { x: 0, y: windowBounds.height - height, width, height }
+	},
+)
+
+export const contentBounds$ = new CombinedObservable(
+	[windowBounds$, config$, navBarHeight$, navBarEffectiveVisible$],
+	(windowBounds, config, navBarHeight, effectiveVisible) => {
+		const { navBar } = config
+
+		// When navbar is hidden or in autoHide collapsed state, content takes full height
+		if (!navBar.visible || (navBar.autoHide && !effectiveVisible)) {
+			return { x: 0, y: 0, width: windowBounds.width, height: windowBounds.height }
+		}
+
+		const navHeight = navBarHeight || DEFAULT_NAVBAR_HEIGHT
+		return navBar.position === "top"
+			? { x: 0, y: navHeight, width: windowBounds.width, height: windowBounds.height - navHeight }
+			: { x: 0, y: 0, width: windowBounds.width, height: windowBounds.height - navHeight }
+	},
+)
 
 // Navbar sync trigger
 export const navbarSync$ = new CombinedObservable([navState$, tabs$, activeContentId$, activeTabId$], () => ({

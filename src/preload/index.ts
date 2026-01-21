@@ -53,6 +53,7 @@ contextBridge.exposeInMainWorld("bird", {
 	},
 	navbar: {
 		resize: (height: number) => ipcRenderer.send(IpcChannels.NAVBAR_RESIZE, height),
+		setUrlEditMode: (active: boolean) => ipcRenderer.send(IpcChannels.NAVBAR_URL_EDIT_MODE, active),
 	},
 	commands: {
 		onFocusUrl: (callback: () => void): (() => void) => {

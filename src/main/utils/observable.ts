@@ -1,8 +1,12 @@
 import type { WebContents } from "electron"
 
 type Listener<T> = (value: T) => void
+
+// Observable sources that can be combined (StateObservable or CombinedObservable)
 // biome-ignore lint/suspicious/noExplicitAny: necessary for type inference
-type Combined<T extends readonly StateObservable<any>[]> = { [K in keyof T]: T[K] extends StateObservable<infer U> ? U : never }
+type ObservableSource<T = any> = { get(): T; subscribe(l: Listener<T>): () => void }
+// biome-ignore lint/suspicious/noExplicitAny: necessary for type inference
+type Combined<T extends readonly ObservableSource<any>[]> = { [K in keyof T]: T[K] extends ObservableSource<infer U> ? U : never }
 
 export class Observable<T> {
 	private listeners = new Set<Listener<T>>()
@@ -79,7 +83,7 @@ export class BroadcastEvent<T> {
 }
 
 // biome-ignore lint/suspicious/noExplicitAny: necessary for type inference
-export class CombinedObservable<const T extends readonly StateObservable<any>[], U> {
+export class CombinedObservable<const T extends readonly ObservableSource<any>[], U> {
 	private listeners = new Set<Listener<U>>()
 	private unsubscribers: Array<() => void> = []
 

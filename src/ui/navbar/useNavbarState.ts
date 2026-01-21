@@ -15,6 +15,7 @@ export function useNavbarState() {
 
 	const enterUrlMode = useCallback(() => {
 		setIsUrlMode(true)
+		window.bird.navbar.setUrlEditMode(true)
 		setTimeout(() => {
 			urlInputRef.current?.focus()
 			urlInputRef.current?.select()
@@ -23,6 +24,7 @@ export function useNavbarState() {
 
 	const exitUrlMode = useCallback(() => {
 		setIsUrlMode(false)
+		window.bird.navbar.setUrlEditMode(false)
 	}, [])
 
 	useEffect(() => {

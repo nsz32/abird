@@ -154,6 +154,7 @@ export const IpcChannels = {
 	NOTIF_RESIZE: "bird:notif:resize",
 	// Navbar
 	NAVBAR_RESIZE: "bird:navbar:resize",
+	NAVBAR_URL_EDIT_MODE: "bird:navbar:url-edit-mode",
 	// Commands
 	COMMAND_FOCUS_URL: "bird:command:focus-url",
 	// Downloads panel
@@ -282,6 +283,7 @@ export interface BirdApi {
 	}
 	navbar: {
 		resize: (height: number) => void
+		setUrlEditMode: (active: boolean) => void
 	}
 	commands: {
 		onFocusUrl: (callback: () => void) => () => void
