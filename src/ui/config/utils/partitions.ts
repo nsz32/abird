@@ -36,8 +36,23 @@ export function getPartitionUsage(config: BirdConfig): Map<string, string[]> {
 }
 
 /**
- * Returns all existing names (apps + partitions) for uniqueness validation.
+ * Returns all existing app names for uniqueness validation.
  */
-export function getExistingNames(config: BirdConfig): string[] {
-	return [...Object.keys(config.apps), ...Object.keys(config.partitions || {})]
+export function getExistingAppNames(config: BirdConfig): string[] {
+	return Object.keys(config.apps)
+}
+
+/**
+ * Returns all existing partition names for uniqueness validation.
+ */
+export function getExistingPartitionNames(config: BirdConfig, partitionsState?: PartitionsState): string[] {
+	const names = new Set(Object.keys(config.partitions || {}))
+
+	if (partitionsState) {
+		for (const p of partitionsState.partitions) {
+			names.add(p.name)
+		}
+	}
+
+	return [...names]
 }

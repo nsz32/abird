@@ -9,7 +9,7 @@ import { PageHeader } from "../components/PageHeader"
 import { RenameDialog } from "../components/RenameDialog"
 import { SwitchField } from "../components/SwitchField"
 import { formatBytes } from "../utils/format"
-import { getExistingNames } from "../utils/partitions"
+import { getExistingPartitionNames } from "../utils/partitions"
 
 interface PartitionPageProps {
 	name: string
@@ -88,7 +88,7 @@ export function PartitionPage({ name, config, partitionsState, activePartition, 
 	}
 
 	const sizeInfo = partition.diskSize !== undefined ? formatBytes(partition.diskSize) : t("partition.notCreated")
-	const existingNames = getExistingNames(config)
+	const existingPartitionNames = getExistingPartitionNames(config, partitionsState)
 
 	const headerActions = (canCleanup || canReset) && (
 		<HStack gap={2}>
@@ -156,7 +156,7 @@ export function PartitionPage({ name, config, partitionsState, activePartition, 
 				isOpen={showRenameDialog}
 				title={t("partition.renameTitle")}
 				currentName={name}
-				existingNames={existingNames}
+				existingNames={existingPartitionNames}
 				onClose={() => setShowRenameDialog(false)}
 				onRename={onRename}
 			/>

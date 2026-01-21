@@ -15,7 +15,7 @@ import { RenameDialog } from "../components/RenameDialog"
 import { RoutingRulesEditor } from "../components/RoutingRulesEditor"
 import { ThemeSelect } from "../components/ThemeSelect"
 import { useAppDeploy, useAppIcon, useAutoRedeploy, useLaunchSupport } from "../hooks"
-import { getAvailablePartitions, getExistingNames, getPartitionUsage } from "../utils/partitions"
+import { getAvailablePartitions, getExistingAppNames, getPartitionUsage } from "../utils/partitions"
 
 const DEFAULT_ICON = "/favicon.png"
 
@@ -142,7 +142,7 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 	// Derived data
 	const availablePartitions = getAvailablePartitions(config, partitionsState)
 	const partitionUsage = getPartitionUsage(config)
-	const existingNames = getExistingNames(config)
+	const existingAppNames = getExistingAppNames(config)
 	const defaultPattern = deriveInternalPattern(app.startUrl)
 
 	// Header elements
@@ -305,7 +305,7 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 				isOpen={showRenameDialog}
 				title={t("app.renameTitle")}
 				currentName={name}
-				existingNames={existingNames}
+				existingNames={existingAppNames}
 				onClose={() => setShowRenameDialog(false)}
 				onRename={onRename}
 			/>
