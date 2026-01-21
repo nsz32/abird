@@ -28,17 +28,7 @@ export function createAppMenu(): Menu {
 	return Menu.buildFromTemplate([
 		{
 			label: t["menu.app"],
-			submenu: [
-				{ label: t["menu.app.about"], click: showAboutDialog },
-				{ type: "separator" },
-				{
-					label: t["menu.app.settings"],
-					accelerator: "CmdOrCtrl+,",
-					click: () => createTab("bird://config/", "user"),
-				},
-				{ type: "separator" },
-				{ label: t["menu.app.quit"], role: "quit", accelerator: "CmdOrCtrl+Q" },
-			],
+			submenu: [{ label: t["menu.app.quit"], role: "quit", accelerator: "CmdOrCtrl+Q" }],
 		},
 		{
 			label: t["menu.tab"],
@@ -97,6 +87,10 @@ export function createAppMenu(): Menu {
 					click: () => getNavBar()?.openDevTools(),
 				},
 			],
+		},
+		{
+			label: t["menu.help"],
+			submenu: [{ label: t["menu.help.about"], click: showAboutDialog }],
 		},
 	])
 }

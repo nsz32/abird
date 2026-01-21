@@ -151,7 +151,6 @@ const en = {
 
 	// Menu
 	"menu.app": "Bird",
-	"menu.app.about": "About Bird",
 	"menu.app.settings": "Settings...",
 	"menu.app.quit": "Quit",
 	"menu.tab": "Tab",
@@ -164,6 +163,8 @@ const en = {
 	"menu.developer": "Developer",
 	"menu.developer.devtoolsSite": "DevTools Site",
 	"menu.developer.devtoolsNavbar": "DevTools Navbar",
+	"menu.help": "Help",
+	"menu.help.about": "About Bird",
 }
 
 const fr: typeof en = {
@@ -317,7 +318,6 @@ const fr: typeof en = {
 
 	// Menu
 	"menu.app": "Bird",
-	"menu.app.about": "À propos de Bird",
 	"menu.app.settings": "Paramètres...",
 	"menu.app.quit": "Quitter",
 	"menu.tab": "Onglet",
@@ -330,6 +330,8 @@ const fr: typeof en = {
 	"menu.developer": "Développeur",
 	"menu.developer.devtoolsSite": "DevTools Site",
 	"menu.developer.devtoolsNavbar": "DevTools Navbar",
+	"menu.help": "Aide",
+	"menu.help.about": "À propos de Bird",
 }
 
 export const translations: Record<Locale, typeof en> = { en, fr }
