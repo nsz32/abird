@@ -17,7 +17,7 @@ import {
 } from "./core/states"
 import { cancelDownload, getDownloadPath, removeFromHistory, retryDownload } from "./services/DownloadManager"
 import { cleanupPartition, deletePartition, getPartitionsState, markPartitionFragile, renamePartition, resetPartition } from "./services/PartitionManager"
-import { deploy, isDeploySupported, isDeployed, isLaunchSupported, launchApp, undeploy } from "./services/deploy"
+import { deploy, getDeployState, isDeploySupported, isDeployed, isLaunchSupported, launchApp, renameDeploy, undeploy } from "./services/deploy"
 import { deleteIcon, fetchIcons, getIconData, importIconFile, saveIcon } from "./services/icons"
 import { dismissNotification } from "./services/notify"
 import { activateTab, closeTab, createTab, getActiveTab, getTabsList } from "./tabs/Tabs"
@@ -105,12 +105,18 @@ export function registerHandlers() {
 	// Deploy
 	ipcMain.handle(IpcChannels.DEPLOY_SUPPORTED, () => isDeploySupported())
 	ipcMain.handle(IpcChannels.DEPLOY_STATUS, (_, appName: string) => isDeployed(appName))
+	ipcMain.handle(IpcChannels.DEPLOY_LIST, (_, appNames: string[]) => getDeployState(appNames))
 	ipcMain.handle(IpcChannels.DEPLOY_APP, (_, appName: string) => {
 		const appConfig = getBirdConfig().apps[appName]
 		if (!appConfig) throw new Error(`App not found: ${appName}`)
 		deploy(appName, appConfig)
 	})
 	ipcMain.handle(IpcChannels.UNDEPLOY_APP, (_, appName: string) => undeploy(appName))
+	ipcMain.handle(IpcChannels.DEPLOY_RENAME, (_, oldName: string, newName: string) => {
+		const appConfig = getBirdConfig().apps[newName]
+		if (!appConfig) throw new Error(`App not found: ${newName}`)
+		renameDeploy(oldName, newName, appConfig)
+	})
 
 	// Partition management
 	ipcMain.handle(IpcChannels.PARTITION_LIST, () => {

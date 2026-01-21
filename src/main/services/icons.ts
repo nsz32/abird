@@ -1,10 +1,12 @@
 import { randomBytes } from "node:crypto"
-import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs"
+import { copyFileSync, existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 import type { IconData, IconFetchResult, IconResult, IconSource } from "@shared/types"
-import { net, WebContentsView, dialog } from "electron"
+import { net, WebContentsView, app, dialog } from "electron"
 import { Jimp } from "jimp"
 import { paths } from "../utils/platform"
+
+const DEFAULT_ICON_FILENAME = "bird-default.png"
 
 const STANDARD_SIZES = [256, 128, 96, 64, 48, 32, 24, 16] as const
 
@@ -88,6 +90,17 @@ async function fetchAsBase64(url: string): Promise<string | null> {
 	}
 }
 
+async function isValidImage(base64: string): Promise<boolean> {
+	try {
+		const data = base64.replace(/^data:image\/\w+;base64,/, "")
+		const buffer = Buffer.from(data, "base64")
+		await Jimp.fromBuffer(buffer)
+		return true
+	} catch {
+		return false
+	}
+}
+
 async function buildIconResults(extracted: ExtractedData): Promise<IconResult[]> {
 	// Définir les sources à fetcher
 	const sources: { url: string | null; source: IconSource; size?: number }[] = [
@@ -108,17 +121,17 @@ async function buildIconResults(extracted: ExtractedData): Promise<IconResult[]>
 		})
 	}
 
-	// Fetch toutes les icônes en parallèle
+	// Fetch et valider toutes les icônes en parallèle
 	const results = await Promise.all(
 		sources.map(async ({ url, source, size }) => {
 			if (!url) return null
 			const base64 = await fetchAsBase64(url)
 			if (!base64) return null
+			if (!(await isValidImage(base64))) return null
 			return { url: base64, source, size } as IconResult
 		}),
 	)
 
-	// Filtrer les nulls
 	return results.filter((r): r is IconResult => r !== null)
 }
 
@@ -295,4 +308,24 @@ export async function importIconFile(appName: string, oldIcon?: string): Promise
 	const base64 = `data:image/png;base64,${buffer.toString("base64")}`
 
 	return saveIcon(appName, base64, oldIcon)
+}
+
+export function getDefaultIconPath(): string | null {
+	const targetPath = join(paths.icons, DEFAULT_ICON_FILENAME)
+
+	if (existsSync(targetPath)) {
+		return targetPath
+	}
+
+	// Copy from app resources on first use
+	const sourcePath = app.isPackaged ? join(process.resourcesPath, "assets", "icons", "256x256.png") : join(app.getAppPath(), "assets", "icons", "256x256.png")
+
+	if (!existsSync(sourcePath)) {
+		return null
+	}
+
+	ensureIconsDir()
+	copyFileSync(sourcePath, targetPath)
+
+	return targetPath
 }

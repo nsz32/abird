@@ -3,10 +3,11 @@ import { createHash } from "node:crypto"
 import { existsSync, mkdirSync, unlinkSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 import type { AppConfig } from "@shared/config.schema"
+import type { DeployState } from "@shared/types"
 import { app } from "electron"
 import { getConfigPath } from "../config"
 import { paths } from "../utils/platform"
-import { getIconPath } from "./icons"
+import { getDefaultIconPath, getIconPath } from "./icons"
 
 export function isDeploySupported(): boolean {
 	return process.platform === "linux"
@@ -54,7 +55,7 @@ function buildExecCommand(appName: string): string {
 }
 
 function buildDesktopFileContent(appName: string, appConfig: AppConfig): string {
-	const iconPath = appConfig.icon ? getIconPath(appConfig.icon) : null
+	const iconPath = appConfig.icon ? getIconPath(appConfig.icon) : getDefaultIconPath()
 
 	const lines = [
 		"[Desktop Entry]",
@@ -66,6 +67,10 @@ function buildDesktopFileContent(appName: string, appConfig: AppConfig): string 
 		"Categories=Network;",
 		`StartupWMClass=bird-${sanitizeAppName(appName)}`,
 	]
+
+	if (appConfig.description) {
+		lines.push(`Comment=${appConfig.description}`)
+	}
 
 	if (iconPath) {
 		lines.push(`Icon=${iconPath}`)
@@ -83,6 +88,19 @@ function ensureDesktopFilesDir(): void {
 export function isDeployed(appName: string): boolean {
 	if (!isDeploySupported()) return false
 	return existsSync(getDesktopFilePath(appName))
+}
+
+export function getDeployState(appNames: string[]): DeployState {
+	const supported = isDeploySupported()
+	const apps: Record<string, boolean> = {}
+
+	if (supported) {
+		for (const name of appNames) {
+			apps[name] = isDeployed(name)
+		}
+	}
+
+	return { supported, apps }
 }
 
 export function deploy(appName: string, appConfig: AppConfig): void {
@@ -106,6 +124,16 @@ export function undeploy(appName: string): void {
 	if (existsSync(filePath)) {
 		unlinkSync(filePath)
 	}
+}
+
+export function renameDeploy(oldName: string, newName: string, appConfig: AppConfig): void {
+	if (!isDeploySupported()) return
+
+	const wasDeployed = isDeployed(oldName)
+	if (!wasDeployed) return
+
+	undeploy(oldName)
+	deploy(newName, appConfig)
 }
 
 export function launchApp(appName: string): void {

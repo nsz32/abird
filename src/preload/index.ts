@@ -1,6 +1,7 @@
 import type { Translations } from "@shared/i18n/translations"
 import {
 	type ActiveDownload,
+	type DeployState,
 	type DownloadEvent,
 	type DownloadHistoryItem,
 	type EffectiveConfig,
@@ -139,8 +140,10 @@ contextBridge.exposeInMainWorld("bird", {
 	deploy: {
 		isSupported: (): Promise<boolean> => ipcRenderer.invoke(IpcChannels.DEPLOY_SUPPORTED),
 		getStatus: (appName: string): Promise<boolean> => ipcRenderer.invoke(IpcChannels.DEPLOY_STATUS, appName),
+		list: (appNames: string[]): Promise<DeployState> => ipcRenderer.invoke(IpcChannels.DEPLOY_LIST, appNames),
 		deploy: (appName: string): Promise<void> => ipcRenderer.invoke(IpcChannels.DEPLOY_APP, appName),
 		undeploy: (appName: string): Promise<void> => ipcRenderer.invoke(IpcChannels.UNDEPLOY_APP, appName),
+		rename: (oldName: string, newName: string): Promise<void> => ipcRenderer.invoke(IpcChannels.DEPLOY_RENAME, oldName, newName),
 	},
 	partition: {
 		list: (): Promise<PartitionsState> => ipcRenderer.invoke(IpcChannels.PARTITION_LIST),

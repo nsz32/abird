@@ -1,6 +1,6 @@
 import type { BirdConfig } from "@shared/config.schema"
-import type { EffectiveConfig, PartitionsState } from "@shared/types"
-import { useEffect, useState } from "react"
+import type { DeployState, EffectiveConfig, PartitionsState } from "@shared/types"
+import { useCallback, useEffect, useState } from "react"
 import { AppPage } from "./pages/AppPage"
 import { HomePage } from "./pages/HomePage"
 import { PartitionPage } from "./pages/PartitionPage"
@@ -12,6 +12,7 @@ interface AppState {
 	configPath: string
 	effectiveConfig: EffectiveConfig
 	partitionsState: PartitionsState
+	deployState: DeployState
 }
 
 export function App() {
@@ -30,11 +31,15 @@ export function App() {
 			window.bird.partition.list(),
 		])
 
+		const appNames = Object.keys((userConfig.content as BirdConfig).apps)
+		const deployState = await window.bird.deploy.list(appNames)
+
 		setState({
 			config: userConfig.content as BirdConfig,
 			configPath: userConfig.path,
 			effectiveConfig,
 			partitionsState,
+			deployState,
 		})
 	}
 
@@ -42,6 +47,13 @@ export function App() {
 		const partitionsState = await window.bird.partition.list()
 		setState((prev) => (prev ? { ...prev, partitionsState } : null))
 	}
+
+	const reloadDeploy = useCallback(async () => {
+		if (!state) return
+		const appNames = Object.keys(state.config.apps)
+		const deployState = await window.bird.deploy.list(appNames)
+		setState((prev) => (prev ? { ...prev, deployState } : null))
+	}, [state?.config.apps])
 
 	const handleChange = async (newConfig: BirdConfig) => {
 		setState((prev) => (prev ? { ...prev, config: newConfig } : null))
@@ -65,6 +77,7 @@ export function App() {
 		}
 
 		await handleChange(newConfig)
+		await window.bird.deploy.rename(oldName, newName)
 		await reloadPartitions()
 		replace(`#app/${newName}`)
 	}
@@ -102,7 +115,7 @@ export function App() {
 		return null
 	}
 
-	const { config, configPath, effectiveConfig, partitionsState } = state
+	const { config, configPath, effectiveConfig, partitionsState, deployState } = state
 
 	const appMatch = route.match(/^#app\/(.+)$/)
 	const appName = appMatch?.[1]
@@ -118,6 +131,7 @@ export function App() {
 					partitionsState={partitionsState}
 					onChange={handleChange}
 					reloadPartitions={reloadPartitions}
+					reloadDeploy={reloadDeploy}
 					onRename={(newName) => handleRenameApp(appName, newName)}
 				/>
 			)
@@ -141,6 +155,7 @@ export function App() {
 				config={config}
 				configPath={configPath}
 				partitionsState={partitionsState}
+				deployState={deployState}
 				activePartition={effectiveConfig.partition}
 				onChange={handleChange}
 				onNavigate={navigate}

@@ -1,4 +1,4 @@
-import { Box, Button, HStack, IconButton, Image, Menu, Portal, Switch, Text, VStack } from "@chakra-ui/react"
+import { Box, Button, HStack, IconButton, Image, Input, Menu, Portal, Switch, Text, VStack } from "@chakra-ui/react"
 import type { AppConfig, BirdConfig, NavBarConfig, RoutingAction } from "@shared/config.schema"
 import { deriveInternalPattern } from "@shared/routing"
 import type { PartitionsState } from "@shared/types"
@@ -13,7 +13,7 @@ import { PageHeader } from "../components/PageHeader"
 import { PartitionSelect } from "../components/PartitionSelect"
 import { RenameDialog } from "../components/RenameDialog"
 import { RoutingRulesEditor } from "../components/RoutingRulesEditor"
-import { ThemeSelect } from "../components/ThemeSelect"
+import { SegmentSelect } from "../components/SegmentSelect"
 import { useAppDeploy, useAppIcon, useAutoRedeploy, useLaunchSupport } from "../hooks"
 import { getAvailablePartitions, getExistingAppNames, getPartitionUsage } from "../utils/partitions"
 
@@ -25,10 +25,11 @@ interface AppPageProps {
 	partitionsState: PartitionsState
 	onChange: (config: BirdConfig) => void
 	reloadPartitions: () => Promise<void>
+	reloadDeploy: () => Promise<void>
 	onRename: (newName: string) => void
 }
 
-export function AppPage({ name, config, partitionsState, onChange, reloadPartitions, onRename }: AppPageProps) {
+export function AppPage({ name, config, partitionsState, onChange, reloadPartitions, reloadDeploy, onRename }: AppPageProps) {
 	const { t } = useTranslations()
 	const app = config.apps[name]
 
@@ -37,7 +38,7 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 	const icon = useAppIcon(app?.icon)
 	const launchSupported = useLaunchSupport()
 
-	useAutoRedeploy(name, app?.icon, deploy.deployed)
+	useAutoRedeploy(name, app?.icon, app?.description, deploy.deployed)
 
 	// Dialog visibility (local UI state)
 	const [showRenameDialog, setShowRenameDialog] = useState(false)
@@ -153,14 +154,18 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 		</Button>
 	)
 
+	const handleDeployChange = async (checked: boolean) => {
+		if (checked) {
+			await deploy.deploy()
+		} else {
+			await deploy.undeploy()
+		}
+		await reloadDeploy()
+	}
+
 	const rightInfo = deploy.supported && (
 		<HStack gap={2}>
-			<Switch.Root
-				colorPalette="blue"
-				checked={deploy.deployed}
-				disabled={deploy.deploying}
-				onCheckedChange={(e) => (e.checked ? deploy.deploy() : deploy.undeploy())}
-			>
+			<Switch.Root colorPalette="blue" checked={deploy.deployed} disabled={deploy.deploying} onCheckedChange={(e) => handleDeployChange(e.checked)}>
 				<Switch.HiddenInput />
 				<Switch.Control>
 					<Switch.Thumb />
@@ -191,6 +196,17 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 								<Pencil size={14} />
 							</IconButton>
 						</HStack>
+					</HStack>
+
+					<HStack justify="space-between" py={2}>
+						<Text fontSize="sm">{t("app.description")}</Text>
+						<Input
+							size="sm"
+							maxW="300px"
+							placeholder={t("app.descriptionPlaceholder")}
+							value={app.description || ""}
+							onChange={(e) => updateApp({ description: e.target.value || undefined })}
+						/>
 					</HStack>
 
 					<HStack justify="space-between" py={2}>
@@ -284,7 +300,15 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 									↺
 								</IconButton>
 							)}
-							<ThemeSelect value={app.theme || config.theme || "system"} onChange={(v) => updateApp({ theme: v })} />
+							<SegmentSelect
+								value={app.theme || config.theme || "system"}
+								options={[
+									{ value: "system", label: t("theme.system") },
+									{ value: "light", label: t("theme.light") },
+									{ value: "dark", label: t("theme.dark") },
+								]}
+								onChange={(v) => updateApp({ theme: v })}
+							/>
 						</HStack>
 					</HStack>
 				</ConfigSection>

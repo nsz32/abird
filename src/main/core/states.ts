@@ -19,7 +19,7 @@ const DEFAULT_CONFIG: EffectiveConfig = {
 	theme: "system",
 	userAgent: "desktop:bird",
 	navBar: {
-		position: "top",
+		position: "bottom",
 		visible: true,
 		autoHide: false,
 		allowUrlEdit: false,

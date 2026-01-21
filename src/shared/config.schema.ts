@@ -11,7 +11,7 @@ export type ThemeMode = z.infer<typeof ThemeModeSchema>
 
 // Configuration de la barre de navigation
 export const NavBarConfigSchema = z.object({
-	position: z.enum(["top", "bottom"]).default("top"),
+	position: z.enum(["top", "bottom"]).default("bottom"),
 	visible: z.boolean().default(true),
 	autoHide: z.boolean().default(false),
 	allowUrlEdit: z.boolean().default(false),
@@ -47,6 +47,7 @@ export type DownloadConfig = z.infer<typeof DownloadConfigSchema>
 export const AppConfigSchema = z.object({
 	partition: z.string(),
 	startUrl: z.string(),
+	description: z.string().optional(),
 	icon: z.string().optional(),
 	theme: ThemeModeSchema.optional(),
 	userAgent: z.string().optional(),

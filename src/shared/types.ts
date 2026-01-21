@@ -121,6 +121,12 @@ export interface PartitionsState {
 	physicalPath: string
 }
 
+// État de déploiement des apps (raccourcis desktop)
+export interface DeployState {
+	supported: boolean
+	apps: Record<string, boolean> // appName -> isDeployed
+}
+
 // Canaux IPC (évite les typos, autocomplétion)
 export const IpcChannels = {
 	// Navigation
@@ -187,8 +193,10 @@ export const IpcChannels = {
 	// Deploy
 	DEPLOY_SUPPORTED: "bird:deploy:supported",
 	DEPLOY_STATUS: "bird:deploy:status",
+	DEPLOY_LIST: "bird:deploy:list",
 	DEPLOY_APP: "bird:deploy:app",
 	UNDEPLOY_APP: "bird:deploy:undeploy",
+	DEPLOY_RENAME: "bird:deploy:rename",
 	// Partition
 	PARTITION_LIST: "bird:partition:list",
 	PARTITION_CLEANUP: "bird:partition:cleanup",
@@ -329,8 +337,10 @@ export interface BirdApi {
 	deploy: {
 		isSupported: () => Promise<boolean>
 		getStatus: (appName: string) => Promise<boolean>
+		list: (appNames: string[]) => Promise<DeployState>
 		deploy: (appName: string) => Promise<void>
 		undeploy: (appName: string) => Promise<void>
+		rename: (oldName: string, newName: string) => Promise<void>
 	}
 	partition: {
 		list: () => Promise<PartitionsState>

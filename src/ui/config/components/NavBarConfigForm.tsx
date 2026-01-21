@@ -1,7 +1,7 @@
 import { HStack, Text } from "@chakra-ui/react"
 import { DEFAULT_NAVBAR, type NavBarConfig } from "@shared/config.schema"
 import { useTranslations } from "@ui/shared/hooks"
-import { PositionSelect } from "./PositionSelect"
+import { SegmentSelect } from "./SegmentSelect"
 import { SwitchField } from "./SwitchField"
 import { TriStateSwitch } from "./TriStateSwitch"
 
@@ -34,7 +34,14 @@ export function NavBarConfigForm(props: NavBarConfigFormProps) {
 			<>
 				<HStack justify="space-between" py={2}>
 					<Text fontSize="sm">{t("navbar.position")}</Text>
-					<PositionSelect value={config.position || props.defaults.position || "top"} onChange={(v) => onChange("position", v)} />
+					<SegmentSelect
+						value={config.position || props.defaults.position || "bottom"}
+						options={[
+							{ value: "bottom", label: t("position.bottom") },
+							{ value: "top", label: t("position.top") },
+						]}
+						onChange={(v) => onChange("position", v)}
+					/>
 				</HStack>
 				<TriStateSwitch
 					label={t("navbar.visible")}
@@ -86,7 +93,14 @@ export function NavBarConfigForm(props: NavBarConfigFormProps) {
 		<>
 			<HStack justify="space-between" py={2}>
 				<Text fontSize="sm">{t("navbar.position")}</Text>
-				<PositionSelect value={config.position || "top"} onChange={(v) => onChange("position", v)} />
+				<SegmentSelect
+					value={config.position || "bottom"}
+					options={[
+						{ value: "bottom", label: t("position.bottom") },
+						{ value: "top", label: t("position.top") },
+					]}
+					onChange={(v) => onChange("position", v)}
+				/>
 			</HStack>
 			<SwitchField label={t("navbar.visible")} checked={config.visible ?? true} onChange={(v) => onChange("visible", v)} />
 			<SwitchField label={t("navbar.autoHide")} checked={config.autoHide ?? false} onChange={(v) => onChange("autoHide", v)} />

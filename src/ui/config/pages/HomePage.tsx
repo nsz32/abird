@@ -1,7 +1,7 @@
 import { HStack, Text, VStack } from "@chakra-ui/react"
 import type { BirdConfig, NavBarConfig } from "@shared/config.schema"
 import { deriveInternalPattern } from "@shared/routing"
-import type { PartitionsState } from "@shared/types"
+import type { DeployState, PartitionsState } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
 import { useEffect, useState } from "react"
 import { AppList } from "../components/AppList"
@@ -10,19 +10,20 @@ import { CreateAppDialog } from "../components/CreateAppDialog"
 import { NavBarConfigForm } from "../components/NavBarConfigForm"
 import { PageHeader } from "../components/PageHeader"
 import { PartitionList } from "../components/PartitionList"
-import { ThemeSelect } from "../components/ThemeSelect"
+import { SegmentSelect } from "../components/SegmentSelect"
 
 interface HomePageProps {
 	config: BirdConfig
 	configPath: string
 	partitionsState: PartitionsState
+	deployState: DeployState
 	activePartition: string
 	onChange: (config: BirdConfig) => void
 	onNavigate: (hash: string) => void
 	reloadPartitions: () => Promise<void>
 }
 
-export function HomePage({ config, configPath, partitionsState, activePartition, onChange, onNavigate, reloadPartitions }: HomePageProps) {
+export function HomePage({ config, configPath, partitionsState, deployState, activePartition, onChange, onNavigate, reloadPartitions }: HomePageProps) {
 	const { t } = useTranslations()
 	const [showCreateDialog, setShowCreateDialog] = useState(false)
 
@@ -109,7 +110,15 @@ export function HomePage({ config, configPath, partitionsState, activePartition,
 					<ConfigSection title={t("settings.appearance")}>
 						<HStack justify="space-between" py={2}>
 							<Text fontSize="sm">{t("settings.theme")}</Text>
-							<ThemeSelect value={config.theme} onChange={updateTheme} />
+							<SegmentSelect
+								value={config.theme}
+								options={[
+									{ value: "system", label: t("theme.system") },
+									{ value: "light", label: t("theme.light") },
+									{ value: "dark", label: t("theme.dark") },
+								]}
+								onChange={updateTheme}
+							/>
 						</HStack>
 					</ConfigSection>
 
@@ -122,6 +131,7 @@ export function HomePage({ config, configPath, partitionsState, activePartition,
 					<ConfigSection title={t("settings.apps")}>
 						<AppList
 							apps={config.apps}
+							deployState={deployState}
 							onSelect={(name) => onNavigate(`#app/${name}`)}
 							onCreate={() => setShowCreateDialog(true)}
 							onDelete={handleDeleteApp}

@@ -168,7 +168,7 @@ export function refreshEffectiveConfig(): void {
 		theme: birdConfig.theme,
 		navBar: {
 			...currentConfig.navBar,
-			position: birdConfig.navBar?.position || "top",
+			position: birdConfig.navBar?.position || "bottom",
 		},
 	})
 }
