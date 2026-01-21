@@ -1,14 +1,15 @@
 import { Badge, Button, HStack, Spinner, Text, VStack } from "@chakra-ui/react"
-import { RotateCw, Trash2 } from "lucide-react"
 import type { BirdConfig, PartitionConfig } from "@shared/config.schema"
 import type { PartitionsState } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
+import { RotateCw, Trash2 } from "lucide-react"
 import { useEffect, useState } from "react"
 import { ConfigSection } from "../components/ConfigSection"
 import { PageHeader } from "../components/PageHeader"
 import { RenameDialog } from "../components/RenameDialog"
 import { SwitchField } from "../components/SwitchField"
 import { formatBytes } from "../utils/format"
+import { getExistingNames } from "../utils/partitions"
 
 interface PartitionPageProps {
 	name: string
@@ -87,7 +88,7 @@ export function PartitionPage({ name, config, partitionsState, activePartition, 
 	}
 
 	const sizeInfo = partition.diskSize !== undefined ? formatBytes(partition.diskSize) : t("partition.notCreated")
-	const existingNames = [...Object.keys(config.apps), ...Object.keys(config.partitions || {})]
+	const existingNames = getExistingNames(config)
 
 	const headerActions = (canCleanup || canReset) && (
 		<HStack gap={2}>

@@ -4,7 +4,7 @@ import { deriveInternalPattern } from "@shared/routing"
 import type { PartitionsState } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
 import { ChevronDown, ExternalLink, Pencil } from "lucide-react"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { ConfigSection } from "../components/ConfigSection"
 import { EditStartUrlDialog } from "../components/EditStartUrlDialog"
 import { IconPickerDialog } from "../components/IconPickerDialog"
@@ -14,6 +14,8 @@ import { PartitionSelect } from "../components/PartitionSelect"
 import { RenameDialog } from "../components/RenameDialog"
 import { RoutingRulesEditor } from "../components/RoutingRulesEditor"
 import { ThemeSelect } from "../components/ThemeSelect"
+import { useAppDeploy, useAppIcon, useAutoRedeploy, useLaunchSupport } from "../hooks"
+import { getAvailablePartitions, getExistingNames, getPartitionUsage } from "../utils/partitions"
 
 const DEFAULT_ICON = "/favicon.png"
 
@@ -28,62 +30,23 @@ interface AppPageProps {
 
 export function AppPage({ name, config, partitionsState, onChange, reloadPartitions, onRename }: AppPageProps) {
 	const { t } = useTranslations()
+	const app = config.apps[name]
+
+	// Capabilities & state
+	const deploy = useAppDeploy(name)
+	const icon = useAppIcon(app?.icon)
+	const launchSupported = useLaunchSupport()
+
+	useAutoRedeploy(name, app?.icon, deploy.deployed)
+
+	// Dialog visibility (local UI state)
 	const [showRenameDialog, setShowRenameDialog] = useState(false)
 	const [showEditUrlDialog, setShowEditUrlDialog] = useState(false)
 	const [showIconPicker, setShowIconPicker] = useState(false)
 
-	const [deploySupported, setDeploySupported] = useState(false)
-	const [deployed, setDeployed] = useState(false)
-	const [deploying, setDeploying] = useState(false)
-	const [launchSupported, setLaunchSupported] = useState(false)
-	const prevIconRef = useRef<string | undefined>(undefined)
-
-	const [iconData, setIconData] = useState<string | null>(null)
-	const [iconSize, setIconSize] = useState<{ w: number; h: number } | null>(null)
-
-	const app = config.apps[name]
-
 	useEffect(() => {
 		document.title = `Bird - ${name}`
-		prevIconRef.current = undefined
-		setIconData(null)
-		setIconSize(null)
 	}, [name])
-
-	useEffect(() => {
-		if (app?.icon) {
-			window.bird.icons.getData(app.icon).then(setIconData)
-		} else {
-			setIconData(null)
-		}
-	}, [app?.icon])
-
-	useEffect(() => {
-		window.bird.deploy.isSupported().then(setDeploySupported)
-		window.bird.app.isLaunchSupported().then(setLaunchSupported)
-	}, [])
-
-	useEffect(() => {
-		if (deploySupported) {
-			window.bird.deploy.getStatus(name).then(setDeployed)
-		}
-	}, [name, deploySupported])
-
-	// Auto-redeploy when icon changes
-	const appIcon = app?.icon
-	useEffect(() => {
-		if (!deployed) return
-
-		const prevIcon = prevIconRef.current
-		prevIconRef.current = appIcon
-
-		if (prevIcon === undefined) return
-		if (prevIcon === appIcon) return
-
-		window.bird.deploy.deploy(name).catch((err) => {
-			console.error("Failed to redeploy after icon change:", err)
-		})
-	}, [appIcon, deployed, name])
 
 	if (!app) {
 		return (
@@ -93,6 +56,7 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 		)
 	}
 
+	// Config updates
 	const updateApp = (updates: Partial<AppConfig>) => {
 		onChange({
 			...config,
@@ -116,18 +80,15 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 		if (isNewPartition) {
 			await window.bird.partition.markFragile(newPartition)
 		}
-
 		updateApp({ partition: newPartition })
 		await reloadPartitions()
 	}
 
 	const updateNavBar = (key: keyof NavBarConfig, value: boolean | string | undefined) => {
 		const newNavBar = { ...app.navBar, [key]: value }
-
 		if (value === undefined) {
 			delete newNavBar[key]
 		}
-
 		const hasValues = Object.keys(newNavBar).length > 0
 		updateApp({ navBar: hasValues ? newNavBar : undefined })
 	}
@@ -137,6 +98,7 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 		updateApp({ routing: hasRules ? { rules } : undefined })
 	}
 
+	// Icon actions
 	const handleSelectIcon = async (base64: string) => {
 		try {
 			const filename = await window.bird.icons.save(name, base64, app.icon)
@@ -164,37 +126,7 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 		updateApp({ icon: undefined })
 	}
 
-	const handleIconLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
-		const img = e.currentTarget
-		setIconSize({ w: img.naturalWidth, h: img.naturalHeight })
-	}
-
-	const handleDeploy = async () => {
-		if (deploying) return
-		setDeploying(true)
-		try {
-			await window.bird.deploy.deploy(name)
-			setDeployed(true)
-		} catch (err) {
-			console.error("Failed to deploy:", err)
-		} finally {
-			setDeploying(false)
-		}
-	}
-
-	const handleUndeploy = async () => {
-		if (deploying) return
-		setDeploying(true)
-		try {
-			await window.bird.deploy.undeploy(name)
-			setDeployed(false)
-		} catch (err) {
-			console.error("Failed to undeploy:", err)
-		} finally {
-			setDeploying(false)
-		}
-	}
-
+	// App launch
 	const handleLaunch = async () => {
 		if (!launchSupported) {
 			alert(t("app.launchNotSupported"))
@@ -207,36 +139,13 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 		}
 	}
 
-	// Partitions disponibles : depuis l'état + depuis la config des apps
-	const getAvailablePartitions = (): string[] => {
-		const partitions = new Set<string>()
+	// Derived data
+	const availablePartitions = getAvailablePartitions(config, partitionsState)
+	const partitionUsage = getPartitionUsage(config)
+	const existingNames = getExistingNames(config)
+	const defaultPattern = deriveInternalPattern(app.startUrl)
 
-		for (const p of partitionsState.partitions) {
-			partitions.add(p.name)
-		}
-
-		for (const appConfig of Object.values(config.apps)) {
-			partitions.add(appConfig.partition)
-		}
-
-		return [...partitions].sort()
-	}
-
-	// Map partition -> apps qui l'utilisent
-	const getPartitionUsage = (): Map<string, string[]> => {
-		const usage = new Map<string, string[]>()
-		for (const [appName, appConfig] of Object.entries(config.apps)) {
-			const partition = appConfig.partition
-			if (!usage.has(partition)) {
-				usage.set(partition, [])
-			}
-			usage.get(partition)?.push(appName)
-		}
-		return usage
-	}
-
-	const existingNames = [...Object.keys(config.apps), ...Object.keys(config.partitions || {})]
-
+	// Header elements
 	const headerActions = (
 		<Button variant="outline" size="sm" onClick={handleLaunch}>
 			<ExternalLink size={16} />
@@ -244,19 +153,22 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 		</Button>
 	)
 
-	const rightInfo = deploySupported && (
+	const rightInfo = deploy.supported && (
 		<HStack gap={2}>
-			<Switch.Root colorPalette="blue" checked={deployed} disabled={deploying} onCheckedChange={(e) => (e.checked ? handleDeploy() : handleUndeploy())}>
+			<Switch.Root
+				colorPalette="blue"
+				checked={deploy.deployed}
+				disabled={deploy.deploying}
+				onCheckedChange={(e) => (e.checked ? deploy.deploy() : deploy.undeploy())}
+			>
 				<Switch.HiddenInput />
 				<Switch.Control>
 					<Switch.Thumb />
 				</Switch.Control>
 			</Switch.Root>
-			<Text>{deployed ? t("app.shortcutCreated") : t("app.shortcutNotCreated")}</Text>
+			<Text>{deploy.deployed ? t("app.shortcutCreated") : t("app.shortcutNotCreated")}</Text>
 		</HStack>
 	)
-
-	const defaultPattern = deriveInternalPattern(app.startUrl)
 
 	return (
 		<PageHeader
@@ -280,26 +192,36 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 							</IconButton>
 						</HStack>
 					</HStack>
+
 					<HStack justify="space-between" py={2}>
 						<Text fontSize="sm">{t("app.partition")}</Text>
 						<PartitionSelect
 							value={app.partition}
-							partitions={getAvailablePartitions()}
-							partitionUsage={getPartitionUsage()}
+							partitions={availablePartitions}
+							partitionUsage={partitionUsage}
 							currentAppName={name}
 							onChange={handlePartitionChange}
 						/>
 					</HStack>
+
 					<HStack justify="space-between" py={2}>
 						<Text fontSize="sm">{t("app.icon")}</Text>
 						<HStack gap={3}>
 							<HStack gap={2}>
 								<Box w="32px" h="32px" borderRadius="md" overflow="hidden">
-									<Image src={iconData || DEFAULT_ICON} alt="App icon" title={app.icon} w="32px" h="32px" objectFit="contain" onLoad={handleIconLoad} />
+									<Image
+										src={icon.iconData || DEFAULT_ICON}
+										alt="App icon"
+										title={app.icon}
+										w="32px"
+										h="32px"
+										objectFit="contain"
+										onLoad={icon.onImageLoad}
+									/>
 								</Box>
-								{app.icon && iconSize && (
+								{app.icon && icon.iconSize && (
 									<Text fontSize="xs" color="fg.muted">
-										{iconSize.w}x{iconSize.h}
+										{icon.iconSize.w}x{icon.iconSize.h}
 									</Text>
 								)}
 							</HStack>
