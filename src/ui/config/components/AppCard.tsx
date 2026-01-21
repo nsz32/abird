@@ -1,7 +1,10 @@
-import { Box, HStack, IconButton, Text } from "@chakra-ui/react"
+import { Box, HStack, IconButton, Image, Text } from "@chakra-ui/react"
 import type { AppConfig } from "@shared/config.schema"
 import { useTranslations } from "@ui/shared/hooks"
 import { Trash2 } from "lucide-react"
+import { useAppIcon } from "../hooks"
+
+const DEFAULT_ICON = "/favicon.png"
 
 interface AppCardProps {
 	name: string
@@ -12,6 +15,7 @@ interface AppCardProps {
 
 export function AppCard({ name, app, onSelect, onDelete }: AppCardProps) {
 	const { t } = useTranslations()
+	const icon = useAppIcon(app.icon)
 
 	const handleDelete = (e: React.MouseEvent) => {
 		e.stopPropagation()
@@ -21,6 +25,7 @@ export function AppCard({ name, app, onSelect, onDelete }: AppCardProps) {
 
 	return (
 		<HStack p={3} borderRadius="md" cursor="pointer" bg="bg.subtle" _hover={{ bg: "bg.muted" }} onClick={onSelect}>
+			<Image src={icon.iconData || DEFAULT_ICON} w="16px" h="16px" flexShrink={0} borderRadius="sm" />
 			<Box flex={1} minW={0}>
 				<Text fontWeight="medium" truncate>
 					{name}

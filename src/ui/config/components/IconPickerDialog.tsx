@@ -3,6 +3,18 @@ import type { IconResult } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
 import { useEffect, useState } from "react"
 
+const CHECKERBOARD_BG = {
+	backgroundImage: `
+		linear-gradient(45deg, #555 25%, transparent 25%),
+		linear-gradient(-45deg, #555 25%, transparent 25%),
+		linear-gradient(45deg, transparent 75%, #555 75%),
+		linear-gradient(-45deg, transparent 75%, #555 75%)
+	`,
+	backgroundSize: "12px 12px",
+	backgroundPosition: "0 0, 0 6px, 6px -6px, -6px 0",
+	backgroundColor: "#999",
+}
+
 interface IconPickerDialogProps {
 	isOpen: boolean
 	startUrl: string
@@ -65,7 +77,7 @@ export function IconPickerDialog({ isOpen, startUrl, partition, onClose, onSelec
 						)}
 
 						{state === "results" && (
-							<Flex wrap="wrap" gap={3} justify="center">
+							<Flex wrap="wrap" gap={3} justify="center" p={3} borderRadius="md" css={CHECKERBOARD_BG}>
 								{icons.map((icon) => {
 									const size = iconSizes[icon.url]
 									return (
@@ -74,14 +86,28 @@ export function IconPickerDialog({ isOpen, startUrl, partition, onClose, onSelec
 											gap={1}
 											p={2}
 											borderRadius="md"
-											border="1px solid"
-											borderColor="border.subtle"
 											cursor="pointer"
-											_hover={{ borderColor: "blue.500" }}
+											_hover={{ backgroundColor: "#aaa" }}
 											onClick={() => handleSelect(icon.url)}
 										>
-											<Image src={icon.url} alt={icon.source} maxH="64px" onLoad={(e) => handleImageLoad(icon.url, e)} />
-											<Text fontSize="xs" color="fg.muted">
+											<Image
+												src={icon.url}
+												alt={icon.source}
+												w="64px"
+												h="64px"
+												objectFit="contain"
+												onLoad={(e) => handleImageLoad(icon.url, e)}
+											/>
+											<Text
+												fontSize="s"
+												fontWeight="bold"
+												color="white"
+												mt="auto"
+												css={{
+													textShadow:
+														"-1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black, 0 -1px 0 black, 0 1px 0 black, -1px 0 0 black, 1px 0 0 black",
+												}}
+											>
 												{size ? `${size.w}x${size.h}` : "..."}
 											</Text>
 										</VStack>
