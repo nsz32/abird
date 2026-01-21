@@ -6,6 +6,7 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from
 import { basename, dirname, join, resolve } from "node:path"
 import { type BirdConfig, validateConfig } from "@shared/config.schema"
 import { app } from "electron"
+import { getOrphanedConfigPartitions } from "../services/PartitionManager"
 import { paths } from "../utils/platform"
 
 const SCHEMA_FILENAME = "bird.config.schema.json"
@@ -153,12 +154,22 @@ export function writeRawConfig(content: unknown): { success: boolean; errors?: s
 		return { success: false, errors: result.errors }
 	}
 
+	birdConfig = result.data
+
+	// Nettoyer les partitions orphelines (en config mais pas sur disque et sans apps)
+	const orphaned = getOrphanedConfigPartitions()
+	if (orphaned.length > 0 && birdConfig.partitions) {
+		for (const name of orphaned) {
+			delete birdConfig.partitions[name]
+		}
+		console.log(`[Partition] cleaned orphaned config entries: ${orphaned.join(", ")}`)
+	}
+
 	ensureConfigDir()
 	copySchemaIfNeeded()
 	try {
-		const contentWithSchema = { $schema: `./${SCHEMA_FILENAME}`, ...(content as object) }
+		const contentWithSchema = { $schema: `./${SCHEMA_FILENAME}`, ...birdConfig }
 		writeFileSync(configPath, JSON.stringify(contentWithSchema, null, "\t"))
-		birdConfig = result.data
 		onConfigChanged?.()
 		return { success: true }
 	} catch (err) {

@@ -17,7 +17,7 @@ import {
 	notifications$,
 } from "./core/states"
 import { cancelDownload, getDownloadPath, removeFromHistory, retryDownload } from "./services/DownloadManager"
-import { cleanupPartition, deletePartition, getPartitionsState, markPartitionFragile, renamePartition, resetPartition } from "./services/PartitionManager"
+import { cleanupPartition, deletePartition, getPartitionsState, renamePartition, resetPartition } from "./services/PartitionManager"
 import { deploy, getDeployState, isDeploySupported, isDeployed, isLaunchSupported, launchApp, renameDeploy, undeploy } from "./services/deploy"
 import { deleteIcon, fetchIcons, getIconData, importIconFile, saveIcon } from "./services/icons"
 import { dismissNotification } from "./services/notify"
@@ -131,7 +131,6 @@ export function registerHandlers() {
 	ipcMain.handle(IpcChannels.PARTITION_CLEANUP, (_, name: string) => cleanupPartition(name))
 	ipcMain.handle(IpcChannels.PARTITION_RESET, (_, name: string) => resetPartition(name))
 	ipcMain.handle(IpcChannels.PARTITION_DELETE, (_, name: string) => deletePartition(name))
-	ipcMain.handle(IpcChannels.PARTITION_MARK_FRAGILE, (_, name: string) => markPartitionFragile(name))
 	ipcMain.handle(IpcChannels.PARTITION_RENAME, (_, oldName: string, newName: string) => renamePartition(oldName, newName))
 
 	// App launch

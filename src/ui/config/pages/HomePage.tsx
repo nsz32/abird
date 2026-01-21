@@ -43,11 +43,6 @@ export function HomePage({ config, configPath, partitionsState, deployState, act
 	}
 
 	const handleCreateApp = async (name: string, startUrl: string) => {
-		const isNewPartition = !partitionsState.partitions.some((p) => p.name === name)
-		if (isNewPartition) {
-			await window.bird.partition.markFragile(name)
-		}
-
 		const internal = deriveInternalPattern(startUrl)
 
 		const newConfig: BirdConfig = {

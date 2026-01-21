@@ -59,8 +59,8 @@ export type AppConfig = z.infer<typeof AppConfigSchema>
 
 // Configuration du nettoyage automatique du cache
 export const CacheCleanupConfigSchema = z.object({
-	maxFileSizeMB: z.number().positive().optional(),
-	maxAgeDays: z.number().positive().optional(),
+	maxFileSizeMB: z.number().nonnegative().optional(),
+	maxAgeDays: z.number().nonnegative().optional(),
 })
 export type CacheCleanupConfig = z.infer<typeof CacheCleanupConfigSchema>
 

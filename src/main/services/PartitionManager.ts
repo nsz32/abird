@@ -10,32 +10,20 @@ import { getBirdConfig } from "../config"
 import { config$ } from "../core/states"
 import { paths } from "../utils/platform"
 
-// Partitions créées automatiquement avec une app (runtime only, pas persisté)
-const fragilePartitions = new Set<string>()
-
-export function markPartitionFragile(name: string): void {
-	fragilePartitions.add(name)
-}
-
-export function isPartitionFragile(name: string): boolean {
-	return fragilePartitions.has(name)
-}
-
 export function getPartitionConfig(name: string): PartitionConfig | null {
 	const birdConfig = getBirdConfig()
 	return (birdConfig.partitions?.[name] as PartitionConfig) ?? null
 }
 
-export function cleanupFragilePartitions(): void {
+/**
+ * Retourne les noms des partitions "fantômes" à supprimer :
+ * partitions en config uniquement (pas sur disque) et sans apps associées.
+ */
+export function getOrphanedConfigPartitions(): string[] {
 	const state = getPartitionsState()
-	for (const partition of state.partitions) {
-		if (fragilePartitions.has(partition.name) && partition.usedByApps.length === 0) {
-			fragilePartitions.delete(partition.name)
-			if (partition.hasPhysical) {
-				deletePartition(partition.name).catch(console.error)
-			}
-		}
-	}
+	return state.partitions
+		.filter((p) => !p.hasPhysical && p.usedByApps.length === 0 && p.hasConfig)
+		.map((p) => p.name)
 }
 
 function getPartitionsDir(): string {
@@ -86,7 +74,6 @@ export function getPartitionsState(): PartitionsState {
 			hasPhysical,
 			usedByApps,
 			isOrphan: hasPhysical && usedByApps.length === 0,
-			isFragile: fragilePartitions.has(name),
 			config: (birdConfig.partitions?.[name] as PartitionConfig) || null,
 			diskSize: hasPhysical ? getPartitionSize(name) : undefined,
 		})
@@ -182,9 +169,4 @@ export function renamePartition(oldName: string, newName: string): void {
 		console.log(`[Partition] renamed: ${oldName} -> ${newName}`)
 	}
 
-	// Mettre à jour le set des partitions fragiles
-	if (fragilePartitions.has(oldName)) {
-		fragilePartitions.delete(oldName)
-		fragilePartitions.add(newName)
-	}
 }

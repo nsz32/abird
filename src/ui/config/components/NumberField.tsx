@@ -8,7 +8,7 @@ interface NumberFieldProps {
 	min?: number
 }
 
-export function NumberField({ label, value, onChange, placeholder, min = 1 }: NumberFieldProps) {
+export function NumberField({ label, value, onChange, placeholder, min = 0 }: NumberFieldProps) {
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const raw = e.target.value
 		if (raw === "") {

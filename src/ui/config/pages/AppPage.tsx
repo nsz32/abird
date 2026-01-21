@@ -77,10 +77,6 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 	}
 
 	const handlePartitionChange = async (newPartition: string) => {
-		const isNewPartition = !partitionsState.partitions.some((p) => p.name === newPartition)
-		if (isNewPartition) {
-			await window.bird.partition.markFragile(newPartition)
-		}
 		updateApp({ partition: newPartition })
 		await reloadPartitions()
 	}

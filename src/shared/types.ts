@@ -110,7 +110,6 @@ export interface PartitionState {
 	hasPhysical: boolean // Existe sur disque
 	usedByApps: string[] // Apps qui l'utilisent
 	isOrphan: boolean // Physique mais non utilisée
-	isFragile: boolean // Créée auto avec app (runtime only)
 	config: _PartitionConfig | null
 	diskSize?: number
 }
@@ -203,7 +202,6 @@ export const IpcChannels = {
 	PARTITION_CLEANUP: "bird:partition:cleanup",
 	PARTITION_RESET: "bird:partition:reset",
 	PARTITION_DELETE: "bird:partition:delete",
-	PARTITION_MARK_FRAGILE: "bird:partition:mark-fragile",
 	PARTITION_RENAME: "bird:partition:rename",
 	// App launch
 	APP_LAUNCH_SUPPORTED: "bird:app:launch-supported",
@@ -349,7 +347,6 @@ export interface BirdApi {
 		cleanup: (name: string) => Promise<void>
 		reset: (name: string) => Promise<void>
 		delete: (name: string) => Promise<void>
-		markFragile: (name: string) => Promise<void>
 		rename: (oldName: string, newName: string) => Promise<void>
 	}
 	app: {

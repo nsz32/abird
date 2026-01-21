@@ -36,7 +36,7 @@ export function PartitionPage({ name, config, partitionsState, activePartition, 
 	const partitionConfig = config.partitions?.[name] as PartitionConfig | undefined
 	const adBlockEnabled = partitionConfig?.adBlockEnabled !== false
 	const cacheCleanup = partitionConfig?.cacheCleanup
-	const cacheCleanupEnabled = cacheCleanup?.maxFileSizeMB !== undefined || cacheCleanup?.maxAgeDays !== undefined
+	const cacheCleanupEnabled = (cacheCleanup?.maxFileSizeMB ?? 0) > 0 || (cacheCleanup?.maxAgeDays ?? 0) > 0
 
 	useEffect(() => {
 		document.title = `Bird - ${name}`
@@ -48,6 +48,7 @@ export function PartitionPage({ name, config, partitionsState, activePartition, 
 		setCleaning(true)
 		try {
 			await window.bird.partition.cleanup(name)
+			reloadPartitions()
 		} catch (err) {
 			console.error("Failed to cleanup partition:", err)
 		} finally {
@@ -98,11 +99,16 @@ export function PartitionPage({ name, config, partitionsState, activePartition, 
 		)
 	}
 
-	const sizeInfo = partition.diskSize !== undefined ? formatBytes(partition.diskSize) : t("partition.notCreated")
 	const existingPartitionNames = getExistingPartitionNames(config, partitionsState)
 
-	const headerActions = (canCleanup || canReset) && (
+	const headerActions = (
 		<HStack gap={2}>
+			{partition.diskSize !== undefined ? (
+				<Badge colorPalette="green">{formatBytes(partition.diskSize)}</Badge>
+			) : (
+				<Badge colorPalette="gray">{t("partition.notCreated")}</Badge>
+			)}
+			{isActive && <Badge colorPalette="blue">{t("partition.active")}</Badge>}
 			{canCleanup && (
 				<Button variant="outline" size="sm" onClick={handleCleanup} disabled={cleaning}>
 					{cleaning ? <Spinner size="sm" /> : <><Trash2 size={16} /> {t("partition.cleanup")}</>}
@@ -116,48 +122,38 @@ export function PartitionPage({ name, config, partitionsState, activePartition, 
 		</HStack>
 	)
 
+	const storagePath = `${partitionsState.physicalPath}/${name}`
+
+	const usageInfo =
+		partition.usedByApps.length === 0 ? (
+			<Badge colorPalette="orange">{t("partition.orphan")}</Badge>
+		) : (
+			<HStack gap={1}>
+				<Text>{t("partition.usedBy")} :</Text>
+				{partition.usedByApps.map((appName, i) => (
+					<Text
+						key={appName}
+						color="blue.500"
+						cursor="pointer"
+						_hover={{ textDecoration: "underline" }}
+						onClick={() => onNavigate(`#app/${appName}`)}
+					>
+						{appName}{i < partition.usedByApps.length - 1 && ","}
+					</Text>
+				))}
+			</HStack>
+		)
+
 	return (
 		<PageHeader
 			title={name}
-			leftInfo={sizeInfo}
+			leftInfo={usageInfo}
+			rightInfo={storagePath}
 			actions={headerActions}
 			onRename={() => setShowRenameDialog(true)}
 			renameLabel={t("partition.rename")}
 		>
 			<VStack align="stretch" gap={4}>
-				<ConfigSection title={t("partition.details")}>
-					<HStack gap={2} py={2}>
-						{isActive && <Badge colorPalette="blue">{t("partition.active")}</Badge>}
-						{partition.usedByApps.length === 0 && <Badge colorPalette="orange">{t("partition.orphan")}</Badge>}
-						{!partition.hasPhysical && <Badge colorPalette="gray">{t("partition.notCreated")}</Badge>}
-						{partition.isFragile && <Badge colorPalette="purple">{t("partition.fragile")}</Badge>}
-					</HStack>
-
-					{partition.usedByApps.length > 0 && (
-						<VStack align="start" py={2} gap={1}>
-							<Text fontSize="sm" fontWeight="medium">
-								{t("partition.usedBy")}
-							</Text>
-							{partition.usedByApps.map((appName) => (
-								<Text
-									key={appName}
-									fontSize="sm"
-									color="blue.500"
-									cursor="pointer"
-									_hover={{ textDecoration: "underline" }}
-									onClick={() => onNavigate(`#app/${appName}`)}
-								>
-									{appName}
-								</Text>
-							))}
-						</VStack>
-					)}
-
-					<Text fontSize="xs" color="fg.muted" pt={2}>
-						{t("partition.storagePath")}: {name}
-					</Text>
-				</ConfigSection>
-
 				<ConfigSection title={t("partition.settings")}>
 					<SwitchField label={t("partition.adBlockEnabled")} checked={adBlockEnabled} onChange={handleAdBlockChange} />
 				</ConfigSection>
@@ -165,15 +161,15 @@ export function PartitionPage({ name, config, partitionsState, activePartition, 
 				<ConfigSection title={t("partition.cacheCleanup.title")} description={t("partition.cacheCleanup.description")}>
 					<NumberField
 						label={t("partition.cacheCleanup.maxFileSizeMB")}
-						value={cacheCleanup?.maxFileSizeMB}
+						value={cacheCleanup?.maxFileSizeMB ?? 0}
 						onChange={(v) => handleCacheCleanupChange({ maxFileSizeMB: v })}
-						placeholder="10"
+						min={0}
 					/>
 					<NumberField
 						label={t("partition.cacheCleanup.maxAgeDays")}
-						value={cacheCleanup?.maxAgeDays}
+						value={cacheCleanup?.maxAgeDays ?? 0}
 						onChange={(v) => handleCacheCleanupChange({ maxAgeDays: v })}
-						placeholder="30"
+						min={0}
 					/>
 					{cacheCleanupEnabled && (
 						<Text fontSize="xs" color="fg.muted" pt={2}>

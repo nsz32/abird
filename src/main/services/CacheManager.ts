@@ -100,8 +100,8 @@ function cleanupPartitionCache(partitionName: string, config: CacheCleanupConfig
 	const cacheDir = join(getPartitionPath(partitionName), "Cache", "Cache_Data")
 	if (!existsSync(cacheDir)) return stats
 
-	const maxSizeBytes = config.maxFileSizeMB !== undefined ? config.maxFileSizeMB * 1024 * 1024 : Number.POSITIVE_INFINITY
-	const maxAgeMs = config.maxAgeDays !== undefined ? config.maxAgeDays * 24 * 60 * 60 * 1000 : Number.POSITIVE_INFINITY
+	const maxSizeBytes = config.maxFileSizeMB ? config.maxFileSizeMB * 1024 * 1024 : Number.POSITIVE_INFINITY
+	const maxAgeMs = config.maxAgeDays ? config.maxAgeDays * 24 * 60 * 60 * 1000 : Number.POSITIVE_INFINITY
 	const now = Date.now()
 
 	const entries = readdirSync(cacheDir, { withFileTypes: true })

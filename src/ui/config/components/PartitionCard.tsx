@@ -75,7 +75,7 @@ export function PartitionCard({ partition, isActive, onSelect, onDelete }: Parti
 						</Badge>
 					)}
 					<Text fontSize="xs" color="fg.muted" truncate>
-						{partition.usedByApps.length > 0 && ` ${partition.usedByApps.join(" ")}`}
+						{partition.usedByApps.length > 0 && `${t("partition.usedBy")} : ${partition.usedByApps.join(" ")}`}
 					</Text>
 				</HStack>
 			</Box>

@@ -7,7 +7,6 @@ import type { AppConfig, BirdConfig, EffectiveConfig, NavBarConfig, ResolvedNavB
 import { config$ } from "../core/states"
 import { acquirePartitionLock } from "../services/CacheManager"
 import { resolveDownloadConfig } from "../services/DownloadManager"
-import { cleanupFragilePartitions } from "../services/PartitionManager"
 import { getBirdConfig, setCurrentAppName, setOnConfigChanged } from "./store"
 
 interface ResolvedNavBarOverrides {
@@ -176,7 +175,4 @@ export function refreshEffectiveConfig(): void {
 }
 
 // Connecter le callback pour rafraîchir la config effective après modification
-setOnConfigChanged(() => {
-	refreshEffectiveConfig()
-	cleanupFragilePartitions()
-})
+setOnConfigChanged(refreshEffectiveConfig)
