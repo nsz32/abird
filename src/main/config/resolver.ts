@@ -5,6 +5,7 @@
 import { DEFAULT_NAVBAR } from "@shared/config.schema"
 import type { AppConfig, BirdConfig, EffectiveConfig, NavBarConfig, ResolvedNavBarConfig, ResolvedRoutingConfig, RoutingConfig } from "@shared/types"
 import { config$ } from "../core/states"
+import { acquirePartitionLock } from "../services/CacheManager"
 import { resolveDownloadConfig } from "../services/DownloadManager"
 import { cleanupFragilePartitions } from "../services/PartitionManager"
 import { getBirdConfig, setCurrentAppName, setOnConfigChanged } from "./store"
@@ -90,6 +91,7 @@ export function selectApp(appName: string, cliOverrides?: CliOverrides): boolean
 
 	setCurrentAppName(appName)
 	const effective = buildEffectiveConfig(app, birdConfig, { cliOverrides })
+	acquirePartitionLock(effective.partition)
 	config$.emit(effective)
 	return true
 }
@@ -156,6 +158,7 @@ export function selectBrowserMode(startUrl: string, userAgent = "desktop:bird"):
 		allowDuplicateDownloads: true,
 	}
 
+	acquirePartitionLock(effective.partition)
 	config$.emit(effective)
 }
 

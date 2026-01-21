@@ -57,9 +57,17 @@ export const AppConfigSchema = z.object({
 })
 export type AppConfig = z.infer<typeof AppConfigSchema>
 
+// Configuration du nettoyage automatique du cache
+export const CacheCleanupConfigSchema = z.object({
+	maxFileSizeMB: z.number().positive().optional(),
+	maxAgeDays: z.number().positive().optional(),
+})
+export type CacheCleanupConfig = z.infer<typeof CacheCleanupConfigSchema>
+
 // Configuration d'une partition
 export const PartitionConfigSchema = z.object({
 	adBlockEnabled: z.boolean().default(true),
+	cacheCleanup: CacheCleanupConfigSchema.optional(),
 })
 export type PartitionConfig = z.infer<typeof PartitionConfigSchema>
 

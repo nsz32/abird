@@ -133,6 +133,11 @@ const en = {
 	"partition.settings": "Settings",
 	"partition.rename": "Rename",
 	"partition.renameTitle": "Rename partition",
+	"partition.cacheCleanup.title": "Auto cache cleanup",
+	"partition.cacheCleanup.description": "Automatically clean cache files when the app closes",
+	"partition.cacheCleanup.maxFileSizeMB": "Max file size (MB)",
+	"partition.cacheCleanup.maxAgeDays": "Max age (days)",
+	"partition.cacheCleanup.hint": "Files exceeding these limits will be deleted on exit",
 
 	// Rename dialog
 	"rename.newName": "New name",
@@ -279,6 +284,11 @@ const fr: typeof en = {
 	"partition.settings": "Paramètres",
 	"partition.rename": "Renommer",
 	"partition.renameTitle": "Renommer la partition",
+	"partition.cacheCleanup.title": "Nettoyage auto du cache",
+	"partition.cacheCleanup.description": "Nettoie automatiquement les fichiers de cache à la fermeture",
+	"partition.cacheCleanup.maxFileSizeMB": "Taille max fichier (Mo)",
+	"partition.cacheCleanup.maxAgeDays": "Âge max (jours)",
+	"partition.cacheCleanup.hint": "Les fichiers dépassant ces limites seront supprimés à la fermeture",
 
 	// Rename dialog
 	"rename.newName": "Nouveau nom",

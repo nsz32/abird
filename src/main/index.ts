@@ -7,7 +7,8 @@ import { initI18n } from "./core/I18n"
 import { registerBirdScheme, setupBirdProtocol } from "./core/Protocol"
 import { findConfigModeConflicts, getConfigPathFromArgs, parseCliArgs, printHelp } from "./core/cli"
 import { parseShortcut, registerKioskExitShortcut } from "./core/kiosk"
-import { kioskMode$ } from "./core/states"
+import { config$, kioskMode$ } from "./core/states"
+import { cleanupAllPartitionCaches, releasePartitionLock } from "./services/CacheManager"
 import { getAvailableUserAgents } from "./utils/userAgents"
 
 // === Bootstrap: resolve userData before app.whenReady ===
@@ -129,4 +130,12 @@ app.whenReady().then(() => {
 
 app.on("window-all-closed", () => {
 	if (process.platform !== "darwin") app.quit()
+})
+
+app.on("will-quit", () => {
+	const partition = config$.get().partition
+	if (partition) {
+		releasePartitionLock(partition)
+	}
+	cleanupAllPartitionCaches()
 })

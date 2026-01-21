@@ -1,10 +1,11 @@
 import { Badge, Button, HStack, Spinner, Text, VStack } from "@chakra-ui/react"
-import type { BirdConfig, PartitionConfig } from "@shared/config.schema"
+import type { BirdConfig, CacheCleanupConfig, PartitionConfig } from "@shared/config.schema"
 import type { PartitionsState } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
 import { RotateCw, Trash2 } from "lucide-react"
 import { useEffect, useState } from "react"
 import { ConfigSection } from "../components/ConfigSection"
+import { NumberField } from "../components/NumberField"
 import { PageHeader } from "../components/PageHeader"
 import { RenameDialog } from "../components/RenameDialog"
 import { SwitchField } from "../components/SwitchField"
@@ -34,6 +35,8 @@ export function PartitionPage({ name, config, partitionsState, activePartition, 
 	const canReset = partition?.hasPhysical && !isActive
 	const partitionConfig = config.partitions?.[name] as PartitionConfig | undefined
 	const adBlockEnabled = partitionConfig?.adBlockEnabled !== false
+	const cacheCleanup = partitionConfig?.cacheCleanup
+	const cacheCleanupEnabled = cacheCleanup?.maxFileSizeMB !== undefined || cacheCleanup?.maxAgeDays !== undefined
 
 	useEffect(() => {
 		document.title = `Bird - ${name}`
@@ -66,17 +69,25 @@ export function PartitionPage({ name, config, partitionsState, activePartition, 
 		}
 	}
 
-	const handleAdBlockChange = (enabled: boolean) => {
+	const updatePartitionConfig = (updates: Partial<PartitionConfig>) => {
 		const currentPartitionConfig = config.partitions?.[name] || {}
-		const newPartitionConfig = { ...currentPartitionConfig, adBlockEnabled: enabled }
-
 		onChange({
 			...config,
 			partitions: {
 				...config.partitions,
-				[name]: newPartitionConfig,
+				[name]: { ...currentPartitionConfig, ...updates },
 			},
 		})
+	}
+
+	const handleAdBlockChange = (enabled: boolean) => {
+		updatePartitionConfig({ adBlockEnabled: enabled })
+	}
+
+	const handleCacheCleanupChange = (updates: Partial<CacheCleanupConfig>) => {
+		const newCacheCleanup = { ...cacheCleanup, ...updates }
+		const isEmpty = newCacheCleanup.maxFileSizeMB === undefined && newCacheCleanup.maxAgeDays === undefined
+		updatePartitionConfig({ cacheCleanup: isEmpty ? undefined : newCacheCleanup })
 	}
 
 	if (!partition) {
@@ -149,6 +160,26 @@ export function PartitionPage({ name, config, partitionsState, activePartition, 
 
 				<ConfigSection title={t("partition.settings")}>
 					<SwitchField label={t("partition.adBlockEnabled")} checked={adBlockEnabled} onChange={handleAdBlockChange} />
+				</ConfigSection>
+
+				<ConfigSection title={t("partition.cacheCleanup.title")} description={t("partition.cacheCleanup.description")}>
+					<NumberField
+						label={t("partition.cacheCleanup.maxFileSizeMB")}
+						value={cacheCleanup?.maxFileSizeMB}
+						onChange={(v) => handleCacheCleanupChange({ maxFileSizeMB: v })}
+						placeholder="10"
+					/>
+					<NumberField
+						label={t("partition.cacheCleanup.maxAgeDays")}
+						value={cacheCleanup?.maxAgeDays}
+						onChange={(v) => handleCacheCleanupChange({ maxAgeDays: v })}
+						placeholder="30"
+					/>
+					{cacheCleanupEnabled && (
+						<Text fontSize="xs" color="fg.muted" pt={2}>
+							{t("partition.cacheCleanup.hint")}
+						</Text>
+					)}
 				</ConfigSection>
 			</VStack>
 
