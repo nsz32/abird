@@ -1,4 +1,5 @@
 import { Menu, nativeTheme } from "electron"
+import { getCurrentAppName } from "../config"
 import {
 	activeDownloads$,
 	config$,
@@ -24,6 +25,7 @@ import { NotificationCenter } from "../views/NotificationCenter"
 import { OverlayPanel } from "../views/OverlayPanel"
 import { Watermark } from "../views/Watermark"
 import { setNavBar } from "../views/views"
+import { getTranslations } from "./I18n"
 import { MainWindow } from "./MainWindow"
 import { ViewManager } from "./ViewManager"
 
@@ -90,6 +92,14 @@ export function startApp() {
 	})
 }
 
+function updateWindowTitle(isDownloadsActive: boolean, pageTitle: string) {
+	const appName = getCurrentAppName() || "Bird"
+	const contextTitle = isDownloadsActive ? getTranslations()["downloads.title"] : pageTitle
+
+	const title = contextTitle ? `${appName} - ${contextTitle}` : appName
+	mainWindow.window.setTitle(title)
+}
+
 function setupSubscriptions() {
 	config$.subscribe((config) => {
 		nativeTheme.themeSource = config.theme
@@ -102,6 +112,8 @@ function setupSubscriptions() {
 		const isDownloadsPanelActive = activeContentId === DOWNLOADS_VIEW_ID
 		navBar.sendNavigationState({ ...navState, isStandalonePanel, isDownloadsPanelActive })
 		navBar.sendTabsList(getTabsList())
+
+		updateWindowTitle(isDownloadsPanelActive, navState.title)
 	})
 
 	externalOpened$.subscribe((tabId) => {
