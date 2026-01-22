@@ -1,6 +1,6 @@
 /**
- * Configuration resolver - calcul de la config effective
- * Responsabilités : fusion des configs, résolution des valeurs, émission
+ * Configuration resolver - effective config computation
+ * Responsibilities: config merging, value resolution, emission
  */
 import { DEFAULT_NAVBAR } from "@shared/config.schema"
 import type { AppConfig, BirdConfig, EffectiveConfig, NavBarConfig, ResolvedNavBarConfig, ResolvedRoutingConfig, RoutingConfig } from "@shared/types"
@@ -177,5 +177,5 @@ export function refreshEffectiveConfig(): void {
 	})
 }
 
-// Connecter le callback pour rafraîchir la config effective après modification
+// Connect the callback to refresh effective config after modification
 setOnConfigChanged(refreshEffectiveConfig)

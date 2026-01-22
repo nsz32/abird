@@ -52,7 +52,7 @@ export class BroadcastObservable<T> extends StateObservable<T> {
 	register(wc: WebContents) {
 		this.webContents.add(wc)
 		wc.once("destroyed", () => this.webContents.delete(wc))
-		// Envoie l'état initial
+		// Send initial state
 		if (!wc.isDestroyed()) wc.send(this.channel, this.get())
 	}
 

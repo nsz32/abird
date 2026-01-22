@@ -91,8 +91,22 @@ function hasOptionWithoutValue(argv: string[], option: string): boolean {
 }
 
 function extractBrowserUrl(argv: string[]): string | null {
-	const firstArg = argv[0]
-	return firstArg?.match(/^https?:\/\//) ? firstArg : null
+	const optionsWithValues = new Set(CLI_OPTIONS.filter((o) => o.hasValue).map((o) => o.name))
+
+	for (let i = 0; i < argv.length; i++) {
+		const arg = argv[i]
+
+		if (optionsWithValues.has(arg)) {
+			i++ // skip option value
+			continue
+		}
+
+		if (arg.match(/^https?:\/\//)) {
+			return arg
+		}
+	}
+
+	return null
 }
 
 function extractKioskShortcut(argv: string[]): string | null {

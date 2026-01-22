@@ -1,22 +1,22 @@
 /**
- * Utilitaires pour le routage des URLs
- * Génération de patterns pour déterminer les URLs internes/externes
+ * URL routing utilities
+ * Pattern generation to determine internal/external URLs
  */
 
 /**
- * Échappe les caractères spéciaux pour une utilisation dans une regex
+ * Escapes special characters for use in a regex
  */
 function escapeRegex(str: string): string {
 	return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
 }
 
 /**
- * Dérive un pattern regex pour les URLs internes à partir d'une URL de départ.
+ * Derives a regex pattern for internal URLs from a start URL.
  *
- * Stratégie : autorise toutes les URLs du même domaine de base (domain.tld)
- * et leurs sous-domaines.
+ * Strategy: allows all URLs from the same base domain (domain.tld)
+ * and their subdomains.
  *
- * Exemples :
+ * Examples:
  * - "https://mail.google.com/inbox" → "^https?://([^/]+\\.)?google\\.com(/|$)"
  * - "https://app.example.org" → "^https?://([^/]+\\.)?example\\.org(/|$)"
  * - "https://localhost:3000" → "^https?://localhost(:\\d+)?(/|$)"
@@ -26,23 +26,23 @@ export function deriveInternalPattern(startUrl: string): string {
 		const url = new URL(startUrl)
 		const hostname = url.hostname
 
-		// Cas spécial : localhost
+		// Special case: localhost
 		if (hostname === "localhost" || hostname === "127.0.0.1") {
 			return `^https?://${escapeRegex(hostname)}(:\\d+)?(/|$)`
 		}
 
-		// Cas spécial : IP address
+		// Special case: IP address
 		if (/^\d{1,3}(\.\d{1,3}){3}$/.test(hostname)) {
 			return `^https?://${escapeRegex(hostname)}(:\\d+)?(/|$)`
 		}
 
-		// Domaine normal : extraire domain.tld (2 derniers segments)
+		// Normal domain: extract domain.tld (last 2 segments)
 		const parts = hostname.split(".")
 		const baseDomain = parts.length >= 2 ? parts.slice(-2).join(".") : hostname
 
 		return `^https?://([^/]+\\.)?${escapeRegex(baseDomain)}(/|$)`
 	} catch {
-		// URL invalide : fallback sur préfixe exact
+		// Invalid URL: fallback to exact prefix
 		return startUrl
 	}
 }

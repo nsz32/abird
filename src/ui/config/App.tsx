@@ -83,12 +83,12 @@ export function App() {
 	}
 
 	const handleRenamePartition = async (oldName: string, newName: string) => {
-		// Renommer le dossier physique d'abord (peut échouer si partition active)
+		// Rename physical folder first (may fail if partition is active)
 		await window.bird.partition.rename(oldName, newName)
 
 		const partitionConfig = config.partitions?.[oldName]
 
-		// Mettre à jour toutes les apps qui utilisent cette partition
+		// Update all apps using this partition
 		const updatedApps = { ...config.apps }
 		for (const [appName, appConfig] of Object.entries(updatedApps)) {
 			if (appConfig.partition === oldName) {
@@ -96,7 +96,7 @@ export function App() {
 			}
 		}
 
-		// Renommer la partition dans config.partitions
+		// Rename partition in config.partitions
 		const { [oldName]: _, ...restPartitions } = config.partitions || {}
 		const newPartitions = partitionConfig ? { ...restPartitions, [newName]: partitionConfig } : { ...restPartitions, [newName]: {} }
 

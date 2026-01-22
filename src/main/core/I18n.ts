@@ -26,3 +26,7 @@ export function getLocale(): Locale {
 export function getTranslations(): Translations {
 	return translations[currentLocale]
 }
+
+export function t(key: keyof Translations): string {
+	return translations[currentLocale][key]
+}

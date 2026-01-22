@@ -1,9 +1,9 @@
 /**
- * Types partagés entre main, preload et renderer
- * Types de config inférés depuis Zod (export type = pas d'exécution du module)
+ * Types shared between main, preload and renderer
+ * Config types inferred from Zod (export type = no module execution)
  */
 
-// Config types (inférés depuis Zod)
+// Config types (inferred from Zod)
 export type {
 	ThemeMode,
 	NavBarConfig,
@@ -15,7 +15,7 @@ export type {
 	PartitionConfig,
 } from "./config.schema"
 
-// Import local pour usage interne dans les interfaces
+// Local import for internal use in interfaces
 import type { PartitionConfig as _PartitionConfig } from "./config.schema"
 
 // I18n types
@@ -27,7 +27,7 @@ export type { Translations } from "./i18n"
 // "blank": Created by _blank/JS → must be checked for content before becoming proper
 export type TabOrigin = "user" | "background" | "blank"
 
-// État de navigation (envoyé aux overlays)
+// Navigation state (sent to overlays)
 export interface NavigationState {
 	url: string
 	title: string
@@ -38,7 +38,7 @@ export interface NavigationState {
 	isDownloadsPanelActive?: boolean
 }
 
-// Info d'un tab (envoyé aux overlays)
+// Tab info (sent to overlays)
 export interface TabInfo {
 	id: string
 	title: string
@@ -62,17 +62,17 @@ export interface Notification {
 	createdAt: number
 }
 
-// Téléchargements actifs
+// Active downloads
 export interface ActiveDownload {
 	id: string
 	filename: string
 	receivedBytes: number
-	totalBytes: number // 0 si inconnu
+	totalBytes: number // 0 if unknown
 	bytesPerSecond: number
 	startedAt: number
 }
 
-// Historique des téléchargements (session uniquement)
+// Download history (session only)
 export type DownloadStatus = "completed" | "cancelled" | "failed" | "blocked" | "duplicate"
 
 export interface DownloadHistoryItem {
@@ -87,46 +87,46 @@ export interface DownloadHistoryItem {
 	completedAt: number
 }
 
-// Events de téléchargement (notifications légères)
+// Download events (lightweight notifications)
 export type DownloadEventType = "started" | "progress" | "completed" | "cancelled" | "failed" | "blocked"
 
 export interface DownloadEvent {
 	type: DownloadEventType
 	id: string
-	progress?: number // 0-100, pour "progress"
+	progress?: number // 0-100, for "progress"
 }
 
-// État de la recherche dans la page
+// Find in page state
 export interface FindState {
 	text: string
-	activeMatch: number // 1-based, 0 si aucun résultat
+	activeMatch: number // 1-based, 0 if no results
 	totalMatches: number
 }
 
-// État d'une partition (config + physique)
+// Partition state (config + physical)
 export interface PartitionState {
 	name: string
-	hasConfig: boolean // Existe dans config.partitions
-	hasPhysical: boolean // Existe sur disque
-	usedByApps: string[] // Apps qui l'utilisent
-	isOrphan: boolean // Physique mais non utilisée
+	hasConfig: boolean // Exists in config.partitions
+	hasPhysical: boolean // Exists on disk
+	usedByApps: string[] // Apps using it
+	isOrphan: boolean // Physical but unused
 	config: _PartitionConfig | null
 	diskSize?: number
 }
 
-// Liste complète des partitions
+// Complete list of partitions
 export interface PartitionsState {
 	partitions: PartitionState[]
 	physicalPath: string
 }
 
-// État de déploiement des apps (raccourcis desktop)
+// App deployment state (desktop shortcuts)
 export interface DeployState {
 	supported: boolean
 	apps: Record<string, boolean> // appName -> isDeployed
 }
 
-// Canaux IPC (évite les typos, autocomplétion)
+// IPC channels (prevents typos, enables autocompletion)
 export const IpcChannels = {
 	// Navigation
 	NAVIGATION_BACK: "bird:navigation:back",
@@ -212,13 +212,13 @@ export const IpcChannels = {
 	SETTINGS_GET_USER_AGENTS: "bird:settings:get-user-agents",
 } as const
 
-// Type utilitaire pour les valeurs de IpcChannels
+// Utility type for IpcChannels values
 export type IpcChannel = (typeof IpcChannels)[keyof typeof IpcChannels]
 
 import type { ThemeMode } from "./config.schema"
 import type { Translations } from "./i18n"
 
-// Config navbar résolue (boutons individuels)
+// Resolved navbar config (individual buttons)
 export interface ResolvedNavBarConfig {
 	position: "top" | "bottom"
 	visible: boolean
@@ -231,7 +231,7 @@ export interface ResolvedNavBarConfig {
 	showHomeButton: boolean
 }
 
-// Config résolue (valeurs parsées pour runtime)
+// Resolved config (parsed values for runtime)
 export interface ResolvedDownloadConfig {
 	directory: string | null
 	autoOpenMaxSize: number
@@ -240,7 +240,7 @@ export interface ResolvedDownloadConfig {
 	allowDuplicateDownloads: boolean
 }
 
-// Config routing résolue (patterns compilés en RegExp)
+// Resolved routing config (patterns compiled to RegExp)
 export interface ResolvedRoutingConfig {
 	internal: RegExp[]
 	download: RegExp[]
@@ -248,7 +248,7 @@ export interface ResolvedRoutingConfig {
 	ignore: RegExp[]
 }
 
-// Config effective (computée selon BirdConfig + contexte)
+// Effective config (computed from BirdConfig + context)
 export interface EffectiveConfig {
 	startUrl: string
 	partition: string | null
@@ -260,7 +260,7 @@ export interface EffectiveConfig {
 	preload?: string
 }
 
-// API Bird exposée aux overlays via contextBridge
+// Bird API exposed to overlays via contextBridge
 export interface BirdApi {
 	navigation: {
 		back: () => Promise<void>
@@ -384,7 +384,7 @@ export interface IconFetchResult {
 	themeColor?: string
 }
 
-// Déclaration globale pour window.bird
+// Global declaration for window.bird
 declare global {
 	interface Window {
 		bird: BirdApi

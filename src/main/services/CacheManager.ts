@@ -1,6 +1,6 @@
 /**
- * Gestion du nettoyage automatique du cache des partitions
- * Responsabilités : lock soft, cleanup basé sur taille/âge
+ * Automatic partition cache cleanup management
+ * Responsibilities: soft lock, size/age-based cleanup
  */
 import { existsSync, readFileSync, readdirSync, statSync, unlinkSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
@@ -46,7 +46,7 @@ function readLockFile(partitionName: string): LockFile {
 	try {
 		const content = readFileSync(lockPath, "utf-8")
 		const lock = JSON.parse(content) as LockFile
-		// Nettoyer les PIDs morts
+		// Clean up dead PIDs
 		lock.holders = lock.holders.filter((h) => isProcessAlive(h.pid))
 		return lock
 	} catch {

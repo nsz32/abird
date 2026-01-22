@@ -3,9 +3,9 @@ import { createLogger } from "./logger"
 
 const log = createLogger("UserAgent")
 
-// User-Agents par plateforme:navigateur:os
+// User-Agents by platform:browser:os
 const USER_AGENTS: Record<string, string> = {
-	// Bird (défaut) - sera remplacé dynamiquement par le UA Electron nettoyé
+	// Bird (default) - will be dynamically replaced by the cleaned Electron UA
 	"desktop:bird": "",
 
 	// Desktop Chrome
@@ -27,7 +27,7 @@ const USER_AGENTS: Record<string, string> = {
 	// Desktop Opera
 	"desktop:opera": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 OPR/114.0.0.0",
 
-	// Internet Explorer (pour rire... et legacy)
+	// Internet Explorer (for laughs... and legacy)
 	"desktop:ie11": "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko",
 	"desktop:ie6": "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)",
 
@@ -35,7 +35,7 @@ const USER_AGENTS: Record<string, string> = {
 	"mobile:chrome:android": "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36",
 	"mobile:chrome:ios":
 		"Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/131.0.0.0 Mobile/15E148 Safari/604.1",
-	"mobile:chrome": "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36", // Alias -> Android par défaut
+	"mobile:chrome": "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36", // Alias -> Android by default
 
 	// Mobile Safari (iPhone)
 	"mobile:safari": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.2 Mobile/15E148 Safari/604.1",
@@ -44,7 +44,7 @@ const USER_AGENTS: Record<string, string> = {
 	"mobile:firefox:android": "Mozilla/5.0 (Android 14; Mobile; rv:133.0) Gecko/133.0 Firefox/133.0",
 	"mobile:firefox:ios":
 		"Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/133.0 Mobile/15E148 Safari/605.1.15",
-	"mobile:firefox": "Mozilla/5.0 (Android 14; Mobile; rv:133.0) Gecko/133.0 Firefox/133.0", // Alias -> Android par défaut
+	"mobile:firefox": "Mozilla/5.0 (Android 14; Mobile; rv:133.0) Gecko/133.0 Firefox/133.0", // Alias -> Android by default
 
 	// Mobile Edge
 	"mobile:edge:android":
@@ -59,7 +59,7 @@ const USER_AGENTS: Record<string, string> = {
 	"tablet:chrome": "Mozilla/5.0 (Linux; Android 14; Pixel Tablet) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
 }
 
-// Mapping process.platform -> OS pour les shortcodes
+// Mapping process.platform -> OS for shortcodes
 function getHostOS(): string {
 	switch (process.platform) {
 		case "win32":
@@ -71,29 +71,29 @@ function getHostOS(): string {
 	}
 }
 
-// Nettoie le UA Electron par défaut (enlève "Electron/X.X.X")
+// Cleans the default Electron UA (removes "Electron/X.X.X")
 function cleanElectronUA(ua: string): string {
 	return ua.replace(/Electron\/[\d.]+ /, "")
 }
 
-// Retourne le UA Electron nettoyé (sans mention d'Electron)
+// Returns the cleaned Electron UA (without Electron mention)
 export function getCleanDefaultUA(): string {
 	return cleanElectronUA(app.userAgentFallback)
 }
 
-// Parse shortcode et retourne le User-Agent
+// Parse shortcode and return the User-Agent
 function parseShortcode(shortcode: string): string | null {
 	const parts = shortcode.split(":")
 	if (parts.length < 2) return null
 
 	const [platform, browser, os] = parts
 
-	// Cas spécial : desktop:bird = UA Electron nettoyé
+	// Special case: desktop:bird = cleaned Electron UA
 	if (platform === "desktop" && browser === "bird") {
 		return getCleanDefaultUA()
 	}
 
-	// Essayer avec OS spécifié, sinon OS hôte, sinon sans OS
+	// Try with specified OS, then host OS, then without OS
 	const keys = [os ? `${platform}:${browser}:${os}` : null, `${platform}:${browser}:${getHostOS()}`, `${platform}:${browser}`].filter(Boolean) as string[]
 
 	for (const key of keys) {
@@ -103,19 +103,19 @@ function parseShortcode(shortcode: string): string | null {
 	return null
 }
 
-// Liste des shortcodes disponibles
+// List of available shortcodes
 export function getAvailableUserAgents(): string[] {
 	return Object.keys(USER_AGENTS)
 }
 
-// Résout le User-Agent (shortcode ou raw) vers la string finale
+// Resolves the User-Agent (shortcode or raw) to the final string
 export function resolveUserAgent(userAgent: string): string {
-	// Si ça ressemble à un UA complet (contient Mozilla ou des espaces), c'est du raw
+	// If it looks like a complete UA (contains Mozilla or spaces), it's raw
 	if (userAgent.includes(" ") || userAgent.startsWith("Mozilla")) {
 		return userAgent
 	}
 
-	// Sinon c'est un shortcode
+	// Otherwise it's a shortcode
 	const parsed = parseShortcode(userAgent)
 	if (parsed) return parsed
 

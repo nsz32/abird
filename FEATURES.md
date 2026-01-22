@@ -31,7 +31,7 @@ Each site runs in an isolated **Electron session partition**:
 | `tempDownloads` | `boolean?` | Temporary downloads (deleted on close) |
 | `autoOpenTypes` | `string[]?` | MIME types to auto-open |
 | `autoOpenExtensions` | `string[]?` | Extensions to auto-open |
-| `autoOpenMaxSize` | `number?` | Max size for auto-open (MB) |
+| `autoOpenMaxSize` | `number?` | Max file size for MIME-based auto-open |
 | `askBehavior` | `'always' \| 'never' \| 'largeOnly'?` | When to ask user |
 
 ### User Interface

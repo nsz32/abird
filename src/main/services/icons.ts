@@ -14,9 +14,9 @@ const PAGE_LOAD_TIMEOUT = 10000
 const FETCH_TIMEOUT = 5000
 
 /**
- * Sélectionne la taille standard optimale pour une image.
- * Retourne la plus grande taille standard <= à la dimension minimale de l'image.
- * Si l'image est plus petite que toutes les tailles standard, retourne la plus petite standard.
+ * Selects the optimal standard size for an image.
+ * Returns the largest standard size <= the minimum image dimension.
+ * If the image is smaller than all standard sizes, returns the smallest standard.
  */
 function selectOptimalSize(width: number, height: number): number {
 	const minDimension = Math.min(width, height)
@@ -30,7 +30,7 @@ function selectOptimalSize(width: number, height: number): number {
 	return STANDARD_SIZES[STANDARD_SIZES.length - 1]
 }
 
-// Script d'extraction des URLs d'icônes (exécuté dans la page)
+// Icon URL extraction script (executed in the page)
 const EXTRACT_SCRIPT = `
 (function() {
 	const get = (sel, attr = 'href') => {
@@ -102,7 +102,7 @@ async function isValidImage(base64: string): Promise<boolean> {
 }
 
 async function buildIconResults(extracted: ExtractedData): Promise<IconResult[]> {
-	// Définir les sources à fetcher
+	// Define sources to fetch
 	const sources: { url: string | null; source: IconSource; size?: number }[] = [
 		{ url: extracted.appleTouchIcon, source: "apple-touch", size: 180 },
 		{ url: extracted.icon192, source: "icon-hd", size: 192 },
@@ -112,7 +112,7 @@ async function buildIconResults(extracted: ExtractedData): Promise<IconResult[]>
 		{ url: extracted.favicon, source: "favicon", size: 32 },
 	]
 
-	// Ajouter Google Favicon API
+	// Add Google Favicon API
 	if (extracted.domain) {
 		sources.push({
 			url: `https://www.google.com/s2/favicons?domain=${extracted.domain}&sz=128`,
@@ -121,7 +121,7 @@ async function buildIconResults(extracted: ExtractedData): Promise<IconResult[]>
 		})
 	}
 
-	// Fetch et valider toutes les icônes en parallèle
+	// Fetch and validate all icons in parallel
 	const results = await Promise.all(
 		sources.map(async ({ url, source, size }) => {
 			if (!url) return null
@@ -146,7 +146,7 @@ export async function fetchIcons(url: string, partition?: string): Promise<IconF
 			},
 		})
 
-		// Vue cachée (pas ajoutée à une fenêtre)
+		// Hidden view (not added to a window)
 		view.setBounds({ x: 0, y: 0, width: 1, height: 1 })
 
 		let resolved = false
@@ -212,7 +212,7 @@ export async function fetchIcons(url: string, partition?: string): Promise<IconF
 }
 
 function sanitizeAppName(name: string): string {
-	// Garde uniquement caractères safe pour filename
+	// Keep only filename-safe characters
 	return name
 		.replace(/[^a-zA-Z0-9_-]/g, "_")
 		.replace(/_+/g, "_")
@@ -234,24 +234,24 @@ function ensureIconsDir(): void {
 export async function saveIcon(appName: string, base64: string, oldIcon?: string): Promise<string> {
 	ensureIconsDir()
 
-	// Décoder base64
+	// Decode base64
 	const base64Data = base64.replace(/^data:image\/\w+;base64,/, "")
 	const buffer = Buffer.from(base64Data, "base64")
 
-	// Convertir en PNG avec jimp
+	// Convert to PNG with jimp
 	const image = await Jimp.fromBuffer(buffer)
 
-	// Redimensionner à la taille standard optimale (crop centré pour images non carrées)
+	// Resize to optimal standard size (centered crop for non-square images)
 	const targetSize = selectOptimalSize(image.width, image.height)
 	image.cover({ w: targetSize, h: targetSize })
 
 	const pngBuffer = await image.getBuffer("image/png")
 
-	// Générer nom et sauvegarder
+	// Generate name and save
 	const filename = generateFilename(appName)
 	writeFileSync(join(paths.icons, filename), pngBuffer)
 
-	// Supprimer ancienne icône si existe
+	// Delete old icon if exists
 	if (oldIcon) {
 		deleteIcon(oldIcon)
 	}
@@ -260,7 +260,7 @@ export async function saveIcon(appName: string, base64: string, oldIcon?: string
 }
 
 export function deleteIcon(filename: string): void {
-	// Sécurité : ne pas permettre de path traversal
+	// Security: prevent path traversal
 	if (filename.includes("/") || filename.includes("\\")) return
 
 	const path = join(paths.icons, filename)

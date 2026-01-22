@@ -119,6 +119,13 @@ const en = {
 	"downloads.mimeStandard": "Standard",
 	"downloads.mimeStandardHint": "Office documents, PDF, images, videos, audio",
 	"downloads.executablesHint": "Executables will be downloaded but never opened automatically",
+	"downloads.notification.inProgress": "Downloading...",
+	"downloads.notification.completed": "Download completed",
+	"downloads.notification.completedWithExe": "Download completed ({name} detected)",
+	"downloads.notification.executableDetected": "Executable detected ({name})",
+	"downloads.notification.executableDeleted": "Executable deleted ({name})",
+	"downloads.notification.interrupted": "Interrupted",
+	"downloads.executableType": "Executable ({name})",
 
 	// Find
 	"find.placeholder": "Search...",

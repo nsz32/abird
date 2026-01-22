@@ -1,45 +1,29 @@
 {
 	"$schema": "./bird.config.schema.json",
-	"theme": "system",
+	"projectName": "devel",
+	"theme": "dark",
 	"downloads": {
-		"autoOpenMaxSize": "1M",
+		"autoOpenMaxSize": "10M",
 		"autoOpenMimeTypes": ["image/*", "application/pdf", "video/*", "audio/*"]
 	},
 	"navBar": {
 		"position": "bottom",
 		"visible": true,
-		"autoHide": true,
+		"autoHide": false,
 		"allowUrlEdit": true,
 		"showBackButton": true,
 		"showForwardButton": true,
 		"showRefreshButton": true
 	},
 	"apps": {
-		"koreus": {
-			"partition": "koreus",
-			"startUrl": "https://www.koreus.com",
-			"routing": {
-				"internal": "https://www.koreus.com"
-			},
-			"navBar": {
-				"position": "top"
-			},
-			"theme": "system",
-			"icon": "koreus-a11bed1f.png"
-		},
-		"gmail": {
-			"partition": "gmail",
-			"startUrl": "https://gmail.google.com",
-			"routing": {
-				"internal": "^https://[^/]*\\.google\\.com"
-			}
-		},
 		"news": {
 			"partition": "google",
 			"startUrl": "https://news.google.com",
 			"userAgent": "desktop:firefox:linux",
 			"routing": {
-				"internal": "^https://[^/]*\\.google\\.com"
+				"rules": {
+					"^https?://([^/]+\\.)?google\\.com(/|$)": "internal"
+				}
 			}
 		},
 		"test1": {
@@ -47,28 +31,36 @@
 			"partition": "test",
 			"startUrl": "https://the-internet.herokuapp.com/",
 			"routing": {
-				"internal": "https://the-internet.herokuapp.com"
+				"rules": {
+					"^https?://([^/]+\\.)?the-internet\\.herokuapp\\.com(/|$)": "internal"
+				}
 			}
 		},
 		"test2": {
 			"partition": "test",
 			"startUrl": "https://testpages.herokuapp.com/styled/index.html",
 			"routing": {
-				"internal": "https://testpages.herokuapp.com"
+				"rules": {
+					"^https?://([^/]+\\.)?testpages\\.herokuapp\\.com(/|$)": "internal"
+				}
 			}
 		},
 		"dark": {
 			"partition": "test",
 			"startUrl": "https://int10h.org/oldschool-pc-fonts/fontlist/font?ibm_vga_8x16#-",
 			"routing": {
-				"internal": "https://int10h.org"
+				"rules": {
+					"^https?://([^/]+\\.)?int10h\\.org(/|$)": "internal"
+				}
 			}
 		},
-		"ovh": {
+		"download": {
 			"partition": "ovh",
 			"startUrl": "https://proof.ovh.net/",
 			"routing": {
-				"internal": "https://proof.ovh.net"
+				"rules": {
+					"^https?://([^/]+\\.)?ovh\\.net(/|$)": "internal"
+				}
 			}
 		}
 	}

@@ -1,6 +1,6 @@
 /**
- * Service de blocage des publicités et traceurs
- * Utilise @ghostery/adblocker-electron pour filtrer les requêtes
+ * Ad and tracker blocking service
+ * Uses @ghostery/adblocker-electron to filter requests
  */
 import { ElectronBlocker } from "@ghostery/adblocker-electron"
 import type { Session } from "electron"

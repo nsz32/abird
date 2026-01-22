@@ -1,6 +1,6 @@
 /**
- * Gestion des partitions Electron
- * Responsabilités : listing, détection orphelins, reset, suppression
+ * Electron partitions management
+ * Responsibilities: listing, orphan detection, reset, deletion
  */
 import { existsSync, readdirSync, renameSync, rmSync, statSync } from "node:fs"
 import { join } from "node:path"
@@ -19,8 +19,8 @@ export function getPartitionConfig(name: string): PartitionConfig | null {
 }
 
 /**
- * Retourne les noms des partitions "fantômes" à supprimer :
- * partitions en config uniquement (pas sur disque) et sans apps associées.
+ * Returns the names of "ghost" partitions to delete:
+ * partitions in config only (not on disk) with no associated apps.
  */
 export function getOrphanedConfigPartitions(): string[] {
 	const state = getPartitionsState()
@@ -61,7 +61,7 @@ export function getPartitionsState(): PartitionsState {
 	const configPartitions = new Set(Object.keys(birdConfig.partitions || {}))
 	const appUsage = getAppPartitionUsage()
 
-	// Fusionner toutes les sources de partitions
+	// Merge all partition sources
 	const allPartitions = new Set([...physicalPartitions, ...configPartitions, ...appUsage.keys()])
 
 	const partitions: PartitionState[] = []
@@ -82,7 +82,7 @@ export function getPartitionsState(): PartitionsState {
 		})
 	}
 
-	// Tri : orphelins d'abord, puis alphabétique
+	// Sort: orphans first, then alphabetically
 	partitions.sort((a, b) => {
 		if (a.isOrphan !== b.isOrphan) return a.isOrphan ? -1 : 1
 		return a.name.localeCompare(b.name)
@@ -163,7 +163,7 @@ export function renamePartition(oldName: string, newName: string): void {
 	const oldPath = join(partitionsDir, oldName)
 	const newPath = join(partitionsDir, newName)
 
-	// Renommer le dossier physique s'il existe
+	// Rename physical folder if it exists
 	if (existsSync(oldPath)) {
 		if (existsSync(newPath)) {
 			throw new Error(`Partition folder already exists: ${newName}`)

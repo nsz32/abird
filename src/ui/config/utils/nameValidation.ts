@@ -1,5 +1,5 @@
-// Caractères interdits sur Windows : < > : " / \ | ? *
-// Noms réservés Windows : CON, PRN, AUX, NUL, COM1-9, LPT1-9
+// Forbidden characters on Windows: < > : " / \ | ? *
+// Windows reserved names: CON, PRN, AUX, NUL, COM1-9, LPT1-9
 
 const INVALID_CHARS = /[<>:"/\\|?*\x00-\x1f]/
 const WINDOWS_RESERVED = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/i

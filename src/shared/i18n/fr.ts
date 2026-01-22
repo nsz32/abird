@@ -121,6 +121,13 @@ export const frTranslations: Translations = {
 	"downloads.mimeStandard": "Standard",
 	"downloads.mimeStandardHint": "Documents Office, PDF, images, vidéos, audio",
 	"downloads.executablesHint": "Les exécutables seront téléchargés mais jamais ouverts automatiquement",
+	"downloads.notification.inProgress": "Téléchargement en cours...",
+	"downloads.notification.completed": "Téléchargement terminé",
+	"downloads.notification.completedWithExe": "Téléchargement terminé ({name} détecté)",
+	"downloads.notification.executableDetected": "Fichier exécutable détecté ({name})",
+	"downloads.notification.executableDeleted": "Fichier exécutable supprimé ({name})",
+	"downloads.notification.interrupted": "Interrompu",
+	"downloads.executableType": "Exécutable ({name})",
 
 	// Find
 	"find.placeholder": "Rechercher...",

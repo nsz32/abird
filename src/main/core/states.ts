@@ -75,7 +75,7 @@ export const navState$ = new StateObservable<NavigationState>({
 	isLoading: false,
 })
 
-// Bounds dérivés
+// Derived bounds
 const DEFAULT_NAVBAR_HEIGHT = 40
 
 // Navbar effective visibility (considering autoHide)

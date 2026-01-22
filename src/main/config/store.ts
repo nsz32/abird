@@ -1,6 +1,6 @@
 /**
- * Configuration store - gestion du fichier JSON utilisateur
- * Responsabilités : lecture, écriture, validation, cache
+ * Configuration store - user JSON file management
+ * Responsibilities: reading, writing, validation, caching
  */
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { basename, dirname, join, resolve } from "node:path"
@@ -159,7 +159,7 @@ export function writeRawConfig(content: unknown): { success: boolean; errors?: s
 
 	birdConfig = result.data
 
-	// Nettoyer les partitions orphelines (en config mais pas sur disque et sans apps)
+	// Clean orphaned partitions (in config but not on disk and without apps)
 	const orphaned = getOrphanedConfigPartitions()
 	if (orphaned.length > 0 && birdConfig.partitions) {
 		for (const name of orphaned) {

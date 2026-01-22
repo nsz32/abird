@@ -1,7 +1,7 @@
 /**
- * Schéma de validation Zod pour la configuration
- * Types inférés depuis Zod (source unique)
- * Validation utilisée UNIQUEMENT par le main process
+ * Zod validation schema for configuration
+ * Types inferred from Zod (single source of truth)
+ * Validation used ONLY by the main process
  */
 import { z } from "zod"
 import { isValidPartitionName, PARTITION_NAME_PATTERN } from "./partition"
@@ -10,7 +10,7 @@ import { isValidPartitionName, PARTITION_NAME_PATTERN } from "./partition"
 export const ThemeModeSchema = z.enum(["system", "light", "dark"])
 export type ThemeMode = z.infer<typeof ThemeModeSchema>
 
-// Configuration de la barre de navigation
+// Navigation bar configuration
 export const NavBarConfigSchema = z.object({
 	position: z.enum(["top", "bottom"]).default("bottom"),
 	visible: z.boolean().default(true),
@@ -24,17 +24,17 @@ export const NavBarConfigSchema = z.object({
 })
 export type NavBarConfig = z.infer<typeof NavBarConfigSchema>
 
-// Actions de routage
+// Routing actions
 export const RoutingActionSchema = z.enum(["internal", "download", "external", "ignore"])
 export type RoutingAction = z.infer<typeof RoutingActionSchema>
 
-// Configuration du routage des URLs (pattern regex → action)
+// URL routing configuration (regex pattern → action)
 export const RoutingConfigSchema = z.object({
 	rules: z.record(z.string(), RoutingActionSchema).default({}),
 })
 export type RoutingConfig = z.infer<typeof RoutingConfigSchema>
 
-// Configuration des téléchargements
+// Downloads configuration
 export const DownloadConfigSchema = z.object({
 	directory: z.string().optional(),
 	autoOpenMaxSize: z.union([z.number(), z.string()]).optional(),
@@ -47,7 +47,7 @@ export type DownloadConfig = z.infer<typeof DownloadConfigSchema>
 // Partition name schema (lowercase + numbers + underscore, must start with letter)
 export const PartitionNameSchema = z.string().regex(PARTITION_NAME_PATTERN, "Partition name must start with a letter and contain only lowercase letters, numbers, and underscores")
 
-// Configuration d'une app (site web isolé)
+// App configuration (isolated website)
 export const AppConfigSchema = z.object({
 	partition: PartitionNameSchema,
 	startUrl: z.string(),
@@ -62,14 +62,14 @@ export const AppConfigSchema = z.object({
 })
 export type AppConfig = z.infer<typeof AppConfigSchema>
 
-// Configuration du nettoyage automatique du cache
+// Automatic cache cleanup configuration
 export const CacheCleanupConfigSchema = z.object({
 	maxFileSizeMB: z.number().nonnegative().optional(),
 	maxAgeDays: z.number().nonnegative().optional(),
 })
 export type CacheCleanupConfig = z.infer<typeof CacheCleanupConfigSchema>
 
-// Configuration d'une partition
+// Partition configuration
 export const PartitionConfigSchema = z.object({
 	adBlockEnabled: z.boolean().default(true),
 	cacheCleanup: CacheCleanupConfigSchema.optional(),
@@ -90,7 +90,7 @@ export const BirdConfigSchema = z.object({
 })
 export type BirdConfig = z.infer<typeof BirdConfigSchema>
 
-// Validation avec gestion des clés inconnues
+// Validation with unknown keys handling
 interface ValidationResult {
 	success: boolean
 	data: BirdConfig
@@ -191,6 +191,6 @@ export function validateConfig(data: unknown): ValidationResult {
 	}
 }
 
-// Valeurs par défaut (générées depuis Zod - source unique de vérité)
+// Default values (generated from Zod - single source of truth)
 export const DEFAULT_NAVBAR: NavBarConfig = NavBarConfigSchema.parse({})
 export const DEFAULT_DOWNLOADS: DownloadConfig = {}

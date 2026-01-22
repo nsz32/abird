@@ -64,7 +64,7 @@ export function HomePage({ config, configPath, partitionsState, deployState, act
 			},
 		}
 
-		// Assurer la cohérence : la partition doit exister dans le JSON
+		// Ensure consistency: partition must exist in JSON
 		if (!config.partitions?.[partitionName]) {
 			newConfig.partitions = {
 				...config.partitions,

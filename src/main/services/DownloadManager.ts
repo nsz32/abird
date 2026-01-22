@@ -3,6 +3,7 @@ import { basename, dirname, extname, join } from "node:path"
 import type { ActiveDownload, DownloadConfig, DownloadHistoryItem, DownloadStatus, ResolvedDownloadConfig } from "@shared/types"
 import type { DownloadItem, Session } from "electron"
 import { app, session, shell } from "electron"
+import { t } from "../core/I18n"
 import { getDownloadAction } from "../core/UrlRouter"
 import { activeDownloads$, config$, downloadEvents$, downloadHistory$ } from "../core/states"
 import { checkOfficeMacroWarning } from "../utils/executableDetection"
@@ -184,7 +185,7 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 		activeItems.set(downloadId, item)
 		addActiveDownload(downloadId, filename, item.getTotalBytes())
 
-		const notifId = addNotification("download", filename, "Téléchargement en cours...", {
+		const notifId = addNotification("download", filename, t("downloads.notification.inProgress"), {
 			dismissable: true,
 		})
 
@@ -208,12 +209,12 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 								unlinkSync(tempPath)
 							} catch {}
 							updateNotification(notifId, {
-								title: `${filename} - Bloqué`,
-								message: `Fichier exécutable détecté (${result.executable.name})`,
+								title: `${filename} - ${t("downloads.status.blocked")}`,
+								message: t("downloads.notification.executableDetected").replace("{name}", result.executable.name),
 								dismissable: true,
 							})
 							removeActiveDownload(downloadId)
-							addToHistory(downloadId, filename, "", url, partition, "blocked", 0, `Exécutable (${result.executable.name})`)
+							addToHistory(downloadId, filename, "", url, partition, "blocked", 0, t("downloads.executableType").replace("{name}", result.executable.name))
 						}
 						return result
 					})
@@ -247,7 +248,7 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 				} catch {}
 				if (!wasBlockedAsExecutable) {
 					updateNotification(notifId, {
-						title: `${filename} - Annulé`,
+						title: `${filename} - ${t("downloads.status.cancelled")}`,
 						dismissable: true,
 					})
 					addToHistory(downloadId, filename, "", url, partition, "cancelled", item.getTotalBytes())
@@ -257,11 +258,11 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 					unlinkSync(tempPath)
 				} catch {}
 				updateNotification(notifId, {
-					title: `${filename} - Échec`,
-					message: "Interrompu",
+					title: `${filename} - ${t("downloads.status.failed")}`,
+					message: t("downloads.notification.interrupted"),
 					dismissable: true,
 				})
-				addToHistory(downloadId, filename, "", url, partition, "failed", item.getTotalBytes(), "Interrompu")
+				addToHistory(downloadId, filename, "", url, partition, "failed", item.getTotalBytes())
 			}
 		})
 	})
@@ -289,20 +290,20 @@ async function handleCompletedDownload(
 			unlinkSync(tempPath)
 		} catch {}
 		if (!config.allowExecutablesDownload) {
-			addNotification("download", filename, `Fichier exécutable supprimé (${result.executable.name})`, {
+			addNotification("download", filename, t("downloads.notification.executableDeleted").replace("{name}", result.executable.name), {
 				dismissable: true,
 				autoDismiss: 5000,
 			})
-			addToHistory(downloadId, filename, "", url, partition, "blocked", size, `Exécutable (${result.executable.name})`)
+			addToHistory(downloadId, filename, "", url, partition, "blocked", size, t("downloads.executableType").replace("{name}", result.executable.name))
 		} else {
 			try {
 				renameSync(tempPath, finalPath)
 			} catch {}
-			addNotification("download", filename, `Téléchargement terminé (${result.executable.name} détecté)`, {
+			addNotification("download", filename, t("downloads.notification.completedWithExe").replace("{name}", result.executable.name), {
 				dismissable: true,
 				autoDismiss: 5000,
 			})
-			addToHistory(downloadId, filename, finalPath, url, partition, "completed", size, `Exécutable (${result.executable.name})`)
+			addToHistory(downloadId, filename, finalPath, url, partition, "completed", size, t("downloads.executableType").replace("{name}", result.executable.name))
 		}
 		return
 	}
@@ -312,7 +313,7 @@ async function handleCompletedDownload(
 		renameSync(tempPath, finalPath)
 	} catch (err) {
 		log.error(`Rename failed: ${filename}`, err)
-		addToHistory(downloadId, filename, "", url, partition, "failed", size, "Erreur de renommage")
+		addToHistory(downloadId, filename, "", url, partition, "failed", size)
 		return
 	}
 
@@ -355,7 +356,7 @@ async function handleCompletedDownload(
 			if (error) log.error(`Open file failed: ${finalPath}`, error)
 		})
 	} else {
-		addNotification("download", filename, "Téléchargement terminé", {
+		addNotification("download", filename, t("downloads.notification.completed"), {
 			dismissable: true,
 			autoDismiss: 5000,
 		})
@@ -363,12 +364,11 @@ async function handleCompletedDownload(
 }
 
 function shouldAutoOpen(result: FileDetectionResult, size: number, config: ResolvedDownloadConfig): boolean {
-	// NEVER auto-open executables, even if MIME matches a wildcard pattern
 	if (result.executable.isExecutable) return false
+	if (!result.mime || !matchesMimePatterns(result.mime, config.autoOpenMimeTypes)) return false
+	if (config.autoOpenMaxSize > 0 && size > config.autoOpenMaxSize) return false
 
-	if (result.mime && matchesMimePatterns(result.mime, config.autoOpenMimeTypes)) return true
-	if (config.autoOpenMaxSize > 0 && size > 0 && size <= config.autoOpenMaxSize) return true
-	return false
+	return true
 }
 
 function matchesMimePatterns(mime: string, patterns: string[]): boolean {

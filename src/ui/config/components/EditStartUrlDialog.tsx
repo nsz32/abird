@@ -56,13 +56,13 @@ export function EditStartUrlDialog({ isOpen, currentUrl, rules, onClose, onSave 
 		let newRules = { ...rules }
 
 		if (updatePattern && newPattern !== currentPattern) {
-			// Supprimer l'ancien pattern s'il existe
+			// Remove old pattern if it exists
 			if (currentPattern in newRules) {
 				const { [currentPattern]: _, ...rest } = newRules
 				newRules = rest
 			}
 
-			// Ajouter le nouveau pattern en premier
+			// Add new pattern first
 			newRules = { [newPattern]: "internal" as RoutingAction, ...newRules }
 		}
 
