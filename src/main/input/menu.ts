@@ -11,7 +11,7 @@ function getAppIconPath(): string {
 }
 
 function showAboutDialog(): void {
-	const detail = ["Desktop, Repackable, Isolated Browser", "", "© 2026 Nicolas Szabo", "<nszabo2@gmail.com>", "", "License: GPL-3.0"].join("\n")
+	const detail = ["Desktop, Repackable, Isolated Browser", "", "© 2026 Nicolas Szabo", "<nszabo2@gmail.com>", "", "License: MIT"].join("\n")
 
 	dialog.showMessageBox({
 		type: "info",

@@ -144,4 +144,4 @@ Quickly test how your site behaves with different user-agents. Check mobile layo
 
 ## License
 
-[GPL-3.0-or-later](LICENSE)
+[MIT](LICENSE)
