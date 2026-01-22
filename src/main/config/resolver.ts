@@ -7,7 +7,10 @@ import type { AppConfig, BirdConfig, EffectiveConfig, NavBarConfig, ResolvedNavB
 import { config$ } from "../core/states"
 import { acquirePartitionLock } from "../services/CacheManager"
 import { resolveDownloadConfig } from "../services/DownloadManager"
+import { createLogger } from "../utils/logger"
 import { getBirdConfig, setCurrentAppName, setOnConfigChanged } from "./store"
+
+const log = createLogger("Routing")
 
 interface ResolvedNavBarOverrides {
 	showBackButton?: boolean
@@ -52,7 +55,7 @@ function resolveRoutingConfig(config: Partial<RoutingConfig> | undefined, startU
 		try {
 			resolved[action].push(new RegExp(pattern))
 		} catch {
-			console.warn(`[Routing] Invalid pattern ignored: ${pattern}`)
+			log.warn(`Invalid pattern ignored: ${pattern}`)
 		}
 	}
 

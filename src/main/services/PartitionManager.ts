@@ -8,7 +8,10 @@ import type { PartitionConfig, PartitionState, PartitionsState } from "@shared/t
 import { session } from "electron"
 import { getBirdConfig } from "../config"
 import { config$ } from "../core/states"
+import { createLogger } from "../utils/logger"
 import { paths } from "../utils/platform"
+
+const log = createLogger("Partition")
 
 export function getPartitionConfig(name: string): PartitionConfig | null {
 	const birdConfig = getBirdConfig()
@@ -119,7 +122,7 @@ export async function cleanupPartition(name: string): Promise<void> {
 
 	const sess = session.fromPartition(`persist:${name}`)
 	await Promise.all([sess.clearCache(), sess.clearHostResolverCache(), sess.clearCodeCaches({})])
-	console.log(`[Partition] cleanup: ${name}`)
+	log.info(`Cleanup: ${name}`)
 }
 
 export async function resetPartition(name: string): Promise<void> {
@@ -131,7 +134,7 @@ export async function resetPartition(name: string): Promise<void> {
 	const partitionPath = join(getPartitionsDir(), name)
 	if (existsSync(partitionPath)) {
 		rmSync(partitionPath, { recursive: true, force: true })
-		console.log(`[Partition] reset: ${partitionPath}`)
+		log.info(`Reset: ${name}`)
 	}
 }
 
@@ -147,7 +150,7 @@ export async function deletePartition(name: string): Promise<void> {
 	}
 
 	await resetPartition(name)
-	console.log(`[Partition] deleted: ${name}`)
+	log.info(`Deleted: ${name}`)
 }
 
 export function renamePartition(oldName: string, newName: string): void {
@@ -166,7 +169,7 @@ export function renamePartition(oldName: string, newName: string): void {
 			throw new Error(`Partition folder already exists: ${newName}`)
 		}
 		renameSync(oldPath, newPath)
-		console.log(`[Partition] renamed: ${oldName} -> ${newName}`)
+		log.info(`Renamed: ${oldName} -> ${newName}`)
 	}
 
 }

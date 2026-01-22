@@ -2,6 +2,9 @@
  * Detection of dangerous executable files by magic bytes.
  * More reliable than MIME type detection for security purposes.
  */
+import { createLogger } from "./logger"
+
+const log = createLogger("ExecutableDetection")
 
 interface ExecutableSignature {
 	name: string
@@ -51,6 +54,6 @@ const OFFICE_MIMES_WITH_POTENTIAL_MACROS = [
 export function checkOfficeMacroWarning(mime: string | undefined): void {
 	if (mime && OFFICE_MIMES_WITH_POTENTIAL_MACROS.includes(mime)) {
 		// TODO: check for macros by opening ZIP and looking for vbaProject.bin
-		console.warn(`[Download] WARNING: Office file detected (${mime}) - macro check not implemented`)
+		log.warn(`Office file detected (${mime}) - macro check not implemented`)
 	}
 }

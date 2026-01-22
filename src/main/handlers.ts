@@ -22,7 +22,10 @@ import { deploy, getDeployState, isDeploySupported, isDeployed, isLaunchSupporte
 import { deleteIcon, fetchIcons, getIconData, importIconFile, saveIcon } from "./services/icons"
 import { dismissNotification } from "./services/notify"
 import { activateTab, closeTab, createTab, getActiveTab, getTabsList } from "./tabs/Tabs"
+import { createLogger } from "./utils/logger"
 import { openFile } from "./utils/platform"
+
+const log = createLogger("IPC")
 
 export function registerHandlers() {
 	ipcMain.handle(IpcChannels.NAVIGATION_GET_STATE, () => navState$.get())
@@ -124,7 +127,7 @@ export function registerHandlers() {
 		try {
 			return getPartitionsState()
 		} catch (err) {
-			console.error("[Partition] Failed to get state:", err)
+			log.error("Failed to get partition state:", err)
 			return { partitions: [], physicalPath: "" }
 		}
 	})

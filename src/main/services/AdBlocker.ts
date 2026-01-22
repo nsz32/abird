@@ -4,6 +4,9 @@
  */
 import { ElectronBlocker } from "@ghostery/adblocker-electron"
 import type { Session } from "electron"
+import { createLogger } from "../utils/logger"
+
+const log = createLogger("AdBlocker")
 
 const blockers = new Map<string, ElectronBlocker>()
 let sharedBlocker: ElectronBlocker | null = null
@@ -21,7 +24,7 @@ export async function enableAdBlock(session: Session, partitionName: string): Pr
 	const blocker = await getBlocker()
 	blocker.enableBlockingInSession(session)
 	blockers.set(partitionName, blocker)
-	console.log(`[AdBlocker] enabled for partition: ${partitionName}`)
+	log.info(`Enabled for partition: ${partitionName}`)
 }
 
 export function disableAdBlock(session: Session, partitionName: string): void {
@@ -30,7 +33,7 @@ export function disableAdBlock(session: Session, partitionName: string): void {
 
 	blocker.disableBlockingInSession(session)
 	blockers.delete(partitionName)
-	console.log(`[AdBlocker] disabled for partition: ${partitionName}`)
+	log.info(`Disabled for partition: ${partitionName}`)
 }
 
 export function isAdBlockEnabled(partitionName: string): boolean {

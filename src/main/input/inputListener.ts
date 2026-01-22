@@ -2,6 +2,9 @@ import { type Rectangle, app } from "electron"
 import { UiohookKey, uIOhook } from "uiohook-napi"
 import { checkKioskExitShortcut } from "../core/kiosk"
 import { config$, ctrlPressed$, kioskMode$, navBarForceShow$, navBarHeight$ } from "../core/states"
+import { createLogger } from "../utils/logger"
+
+const log = createLogger("InputListener")
 
 const pressed = new Set<number>()
 
@@ -71,7 +74,7 @@ export function setupInputListener() {
 	uIOhook.start()
 
 	app.on("will-quit", () => {
-		console.log("stopping uiokook")
+		log.debug("Stopping uIOhook")
 		uIOhook.stop()
 	})
 }

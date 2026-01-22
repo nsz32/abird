@@ -43,11 +43,8 @@ export class Tab {
 		const callbacks = this.createCallbacks()
 
 		this.view = url.startsWith("bird://") ? new PanelView(url, callbacks) : new WebView(url, partition ?? "", routing, userAgent, callbacks)
-		console.log("CREATED", url, this.view.constructor.name)
 
 		ViewManager.get().registerContentView(this.id, this.view.webContentsView)
-
-		console.log("CREATE TAB", this.id)
 	}
 
 	get webView(): WebView {
@@ -62,7 +59,6 @@ export class Tab {
 	}
 
 	destroy() {
-		console.log("DESTROY TAB", this.id)
 		this.destroyed = true
 		ViewManager.get().unregisterContentView(this.id)
 		this.view.destroy()
@@ -112,7 +108,6 @@ export class Tab {
 	}
 
 	private markAsValid() {
-		console.log(`[${this.id}] markAsValid`)
 		this.isValid = true
 		this.onValidCallback?.()
 	}
@@ -142,11 +137,8 @@ export class Tab {
 	private async checkValidity(): Promise<boolean> {
 		const tabCount = tabs$.get().length
 		if (tabCount <= 1) {
-			console.log(`[${this.id}] checkValidity: true (only ${tabCount} tab)`)
 			return true
 		}
-		const hasContent = await this.view.hasVisibleContent()
-		console.log(`[${this.id}] checkValidity: ${hasContent} (hasContent=${hasContent})`)
-		return hasContent
+		return this.view.hasVisibleContent()
 	}
 }

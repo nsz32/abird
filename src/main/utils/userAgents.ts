@@ -1,4 +1,7 @@
 import { app } from "electron"
+import { createLogger } from "./logger"
+
+const log = createLogger("UserAgent")
 
 // User-Agents par plateforme:navigateur:os
 const USER_AGENTS: Record<string, string> = {
@@ -116,6 +119,6 @@ export function resolveUserAgent(userAgent: string): string {
 	const parsed = parseShortcode(userAgent)
 	if (parsed) return parsed
 
-	console.warn(`Unknown userAgent shortcode: ${userAgent}, using desktop:bird`)
+	log.warn(`Unknown shortcode: ${userAgent}, using desktop:bird`)
 	return getCleanDefaultUA()
 }

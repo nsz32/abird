@@ -7,9 +7,12 @@ import { getDownloadAction } from "../core/UrlRouter"
 import { activeDownloads$, config$, downloadEvents$, downloadHistory$ } from "../core/states"
 import { checkOfficeMacroWarning } from "../utils/executableDetection"
 import { type FileDetectionResult, detectFileType, detectFileTypeWithRetry } from "../utils/fileDetection"
+import { createLogger } from "../utils/logger"
 import { parseSize } from "../utils/parseSize"
 import { getFileMd5, openFile } from "../utils/platform"
 import { addNotification, dismissNotification, updateNotification } from "./notify"
+
+const log = createLogger("Download")
 
 const MIN_BYTES_FOR_DETECTION = 4096
 const SPEED_UPDATE_INTERVAL = 1000
@@ -198,10 +201,9 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 				if (!config.allowExecutablesDownload && !earlyDetectionResult && received >= MIN_BYTES_FOR_DETECTION) {
 					earlyDetectionResult = detectFileTypeWithRetry(tempPath, { minSize: MIN_BYTES_FOR_DETECTION }).then((result) => {
 						if (result.executable.isExecutable) {
-							console.log(`[Download] blocking executable: ${result.executable.name}`)
+							log.info(`Blocking executable: ${filename} (${result.executable.name})`)
 							wasBlockedAsExecutable = true
 							item.cancel()
-							console.log(`[Download] aborted: ${filename}`)
 							try {
 								unlinkSync(tempPath)
 							} catch {}
@@ -279,7 +281,7 @@ async function handleCompletedDownload(
 ) {
 	const result = earlyDetectionResult ? await earlyDetectionResult : await detectFileType(tempPath)
 
-	console.log(`[Download] completed: ${filename}, mime: ${result.mime}, executable: ${result.executable.isExecutable}`)
+	log.info(`Completed: ${filename} (mime: ${result.mime || "unknown"})`)
 	checkOfficeMacroWarning(result.mime)
 
 	if (result.executable.isExecutable) {
@@ -309,7 +311,7 @@ async function handleCompletedDownload(
 	try {
 		renameSync(tempPath, finalPath)
 	} catch (err) {
-		console.error(`[Download] rename failed: ${err}`)
+		log.error(`Rename failed: ${filename}`, err)
 		addToHistory(downloadId, filename, "", url, partition, "failed", size, "Erreur de renommage")
 		return
 	}
@@ -317,7 +319,7 @@ async function handleCompletedDownload(
 	// Check for duplicate files (only if file was renamed during save)
 	if (!config.allowDuplicateDownloads && originalPath) {
 		if (await isDuplicateOf(finalPath, originalPath)) {
-			console.log(`[Download] duplicate detected: ${finalPath} = ${originalPath}`)
+			log.info(`Duplicate detected: ${filename}`)
 			try {
 				unlinkSync(finalPath)
 			} catch {}
@@ -339,8 +341,7 @@ async function handleCompletedDownload(
 
 			if (shouldAutoOpen(result, size, config)) {
 				openFile(originalPath).then((error) => {
-					if (error) console.error(`[Download] openFile failed: ${error}`)
-					else console.log(`[Download] opened original: ${originalPath}`)
+					if (error) log.error(`Open file failed: ${originalPath}`, error)
 				})
 			}
 			return
@@ -351,8 +352,7 @@ async function handleCompletedDownload(
 
 	if (shouldAutoOpen(result, size, config)) {
 		openFile(finalPath).then((error) => {
-			if (error) console.error(`[Download] openFile failed: ${error}`)
-			else console.log(`[Download] opened: ${finalPath}`)
+			if (error) log.error(`Open file failed: ${finalPath}`, error)
 		})
 	} else {
 		addNotification("download", filename, "Téléchargement terminé", {

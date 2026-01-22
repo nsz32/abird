@@ -7,6 +7,7 @@ import type { DeployState } from "@shared/types"
 import { app } from "electron"
 import { getConfigPath } from "../config"
 import { paths } from "../utils/platform"
+import { sanitizeAppName } from "../utils/naming"
 import { getDefaultIconPath, getIconPath } from "./icons"
 
 export function isDeploySupported(): boolean {
@@ -15,14 +16,6 @@ export function isDeploySupported(): boolean {
 
 export function isLaunchSupported(): boolean {
 	return app.isPackaged
-}
-
-function sanitizeAppName(name: string): string {
-	return name
-		.toLowerCase()
-		.replace(/[^a-z0-9_-]/g, "-")
-		.replace(/-+/g, "-")
-		.substring(0, 32)
 }
 
 function getDesktopFileName(appName: string): string {

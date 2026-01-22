@@ -7,7 +7,10 @@ import { basename, dirname, join, resolve } from "node:path"
 import { type BirdConfig, validateConfig } from "@shared/config.schema"
 import { app } from "electron"
 import { getOrphanedConfigPartitions } from "../services/PartitionManager"
+import { createLogger } from "../utils/logger"
 import { paths } from "../utils/platform"
+
+const log = createLogger("Config")
 
 const SCHEMA_FILENAME = "bird.config.schema.json"
 const PROJECT_NAME_PATTERN = /^[a-zA-Z0-9_-]+$/
@@ -61,23 +64,23 @@ export function getAvailableApps(): string[] {
 
 function parseConfigFile(): void {
 	try {
-		console.log("Loading config from:", configPath)
+		log.info(`Loading from: ${configPath}`)
 		const content = readFileSync(configPath, "utf-8")
 		const loaded = JSON.parse(content)
 		const result = validateConfig(loaded)
 
 		if (result.unknownKeys.length > 0) {
-			console.warn("Unknown config keys:", result.unknownKeys.join(", "))
+			log.warn(`Unknown keys: ${result.unknownKeys.join(", ")}`)
 		}
 
 		if (!result.success) {
-			console.error("Config validation errors:", result.errors.join("; "))
+			log.error(`Validation errors: ${result.errors.join("; ")}`)
 		}
 
 		birdConfig = result.data
-		console.log("Config loaded, apps:", Object.keys(birdConfig.apps))
+		log.info(`Loaded, apps: ${Object.keys(birdConfig.apps).join(", ") || "(none)"}`)
 	} catch (err) {
-		console.error("Failed to load config:", err)
+		log.error("Failed to load:", err)
 		birdConfig = validateConfig({}).data
 	}
 }
@@ -105,14 +108,14 @@ function copySchemaIfNeeded(): void {
 	const dest = getSchemaDestPath()
 
 	if (!existsSync(source)) {
-		console.warn("Schema file not found:", source)
+		log.warn(`Schema file not found: ${source}`)
 		return
 	}
 
 	try {
 		copyFileSync(source, dest)
 	} catch (err) {
-		console.warn("Failed to copy schema file:", err)
+		log.warn("Failed to copy schema file:", err)
 	}
 }
 
@@ -121,7 +124,7 @@ function writeConfigFile(): void {
 		const configWithSchema = { $schema: `./${SCHEMA_FILENAME}`, ...birdConfig }
 		writeFileSync(configPath, JSON.stringify(configWithSchema, null, "\t"))
 	} catch (err) {
-		console.error("Failed to save config:", err)
+		log.error("Failed to save:", err)
 	}
 }
 
@@ -162,7 +165,7 @@ export function writeRawConfig(content: unknown): { success: boolean; errors?: s
 		for (const name of orphaned) {
 			delete birdConfig.partitions[name]
 		}
-		console.log(`[Partition] cleaned orphaned config entries: ${orphaned.join(", ")}`)
+		log.info(`Cleaned orphaned partition entries: ${orphaned.join(", ")}`)
 	}
 
 	ensureConfigDir()

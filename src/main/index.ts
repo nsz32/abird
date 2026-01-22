@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs"
 import { basename, dirname, join } from "node:path"
 import { app } from "electron"
 import { getAvailableApps, loadConfig, selectApp, selectBrowserMode, selectConfigMode } from "./config"
+import { sanitizeAppName } from "./utils/naming"
 import { startApp } from "./core/App"
 import { initI18n } from "./core/I18n"
 import { registerBirdScheme, setupBirdProtocol } from "./core/Protocol"
@@ -59,7 +60,6 @@ function resolveUserDataPath(): string {
 }
 
 app.setPath("userData", resolveUserDataPath())
-app.setName("Bird")
 
 // Must be called before app.whenReady()
 registerBirdScheme()
@@ -101,6 +101,7 @@ app.whenReady().then(() => {
 	setupBirdProtocol()
 
 	if (args.browserUrl) {
+		app.setName("bird-browser")
 		selectBrowserMode(args.browserUrl, args.userAgent ?? undefined)
 		startApp()
 		return
@@ -113,6 +114,7 @@ app.whenReady().then(() => {
 			app.quit()
 			return
 		}
+		app.setName("bird-config")
 		selectConfigMode()
 		startApp()
 		return
@@ -125,6 +127,7 @@ app.whenReady().then(() => {
 		return
 	}
 
+	app.setName(`bird-${sanitizeAppName(args.appName)}`)
 	startApp()
 })
 

@@ -6,7 +6,10 @@ import { existsSync, readFileSync, readdirSync, statSync, unlinkSync, writeFileS
 import { join } from "node:path"
 import type { CacheCleanupConfig } from "@shared/config.schema"
 import { getBirdConfig } from "../config"
+import { createLogger } from "../utils/logger"
 import { paths } from "../utils/platform"
+
+const log = createLogger("CacheManager")
 
 const LOCK_FILENAME = ".bird-lock"
 
@@ -66,7 +69,7 @@ export function acquirePartitionLock(partitionName: string): void {
 	if (!lock.holders.some((h) => h.pid === pid)) {
 		lock.holders.push({ pid, startedAt: Date.now() })
 		writeLockFile(partitionName, lock)
-		console.log(`[CacheManager] Lock acquired: ${partitionName} (pid: ${pid})`)
+		log.debug(`Lock acquired: ${partitionName} (pid: ${pid})`)
 	}
 }
 
@@ -79,7 +82,7 @@ export function releasePartitionLock(partitionName: string): void {
 	writeLockFile(partitionName, lock)
 
 	if (hadLock) {
-		console.log(`[CacheManager] Lock released: ${partitionName} (pid: ${pid})`)
+		log.debug(`Lock released: ${partitionName} (pid: ${pid})`)
 	}
 }
 
@@ -143,13 +146,13 @@ export function cleanupAllPartitionCaches(): void {
 		if (!cacheCleanup?.maxFileSizeMB && !cacheCleanup?.maxAgeDays) continue
 
 		if (isPartitionLocked(name)) {
-			console.log(`[CacheManager] Skipped ${name}: partition in use`)
+			log.debug(`Skipped ${name}: partition in use`)
 			continue
 		}
 
 		const stats = cleanupPartitionCache(name, cacheCleanup)
 		if (stats.deletedCount > 0) {
-			console.log(`[CacheManager] ${name}: deleted ${stats.deletedCount} files (${formatBytes(stats.deletedBytes)})`)
+			log.info(`${name}: deleted ${stats.deletedCount} files (${formatBytes(stats.deletedBytes)})`)
 		}
 	}
 }

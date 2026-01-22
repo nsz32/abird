@@ -1,5 +1,8 @@
 import { type Locale, type Translations, translations } from "@shared/i18n"
 import { app } from "electron"
+import { createLogger } from "../utils/logger"
+
+const log = createLogger("I18n")
 
 const SUPPORTED_LOCALES: Locale[] = ["en", "fr"]
 const FALLBACK_LOCALE: Locale = "en"
@@ -13,7 +16,7 @@ let currentLocale: Locale = FALLBACK_LOCALE
 
 export function initI18n() {
 	currentLocale = detectLocale()
-	console.log(`[I18n] Detected locale: ${currentLocale}`)
+	log.info(`Detected locale: ${currentLocale}`)
 }
 
 export function getLocale(): Locale {

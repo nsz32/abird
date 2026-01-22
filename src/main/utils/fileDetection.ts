@@ -1,6 +1,9 @@
 import { closeSync, existsSync, openSync, readSync, statSync } from "node:fs"
 import { fileTypeFromFile } from "file-type"
 import { type ExecutableCheckResult, MIN_BYTES_FOR_MAGIC, isExecutableByMagic } from "./executableDetection"
+import { createLogger } from "./logger"
+
+const log = createLogger("FileDetection")
 
 export interface FileDetectionResult {
 	mime?: string
@@ -47,7 +50,7 @@ export async function detectFileTypeWithRetry(filePath: string, options: DetectW
 				return await detectFileType(filePath)
 			}
 		} catch (err) {
-			console.error("[fileDetection] detectWithRetry error:", err)
+			log.error("detectWithRetry error:", err)
 		}
 		await new Promise((r) => setTimeout(r, retryDelay))
 	}
