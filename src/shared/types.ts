@@ -19,7 +19,7 @@ export type {
 import type { PartitionConfig as _PartitionConfig } from "./config.schema"
 
 // I18n types
-export type { Translations } from "./i18n/translations"
+export type { Translations } from "./i18n"
 
 // Tab origin - determines how a tab should behave
 // "user": Created by user action (Home+, first tab) → always proper, activate immediately
@@ -212,7 +212,7 @@ export const IpcChannels = {
 export type IpcChannel = (typeof IpcChannels)[keyof typeof IpcChannels]
 
 import type { ThemeMode } from "./config.schema"
-import type { Translations } from "./i18n/translations"
+import type { Translations } from "./i18n"
 
 // Config navbar résolue (boutons individuels)
 export interface ResolvedNavBarConfig {

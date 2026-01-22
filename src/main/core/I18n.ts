@@ -1,4 +1,4 @@
-import { type Locale, type Translations, translations } from "@shared/i18n/translations"
+import { type Locale, type Translations, translations } from "@shared/i18n"
 import { app } from "electron"
 
 const SUPPORTED_LOCALES: Locale[] = ["en", "fr"]

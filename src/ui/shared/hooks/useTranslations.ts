@@ -1,4 +1,4 @@
-import type { TranslationKey, Translations } from "@shared/i18n/translations"
+import type { TranslationKey, Translations } from "@shared/i18n"
 import { useEffect, useState } from "react"
 
 let cachedTranslations: Translations | null = null

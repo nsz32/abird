@@ -1,4 +1,4 @@
-import type { Translations } from "@shared/i18n/translations"
+import type { Translations } from "@shared/i18n"
 import {
 	type ActiveDownload,
 	type DeployState,

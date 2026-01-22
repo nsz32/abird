@@ -1,5 +1,5 @@
 import { Button, Dialog, HStack, Input, Text, VStack } from "@chakra-ui/react"
-import type { TranslationKey } from "@shared/i18n/translations"
+import type { TranslationKey } from "@shared/i18n"
 import { useTranslations } from "@ui/shared/hooks"
 import { useState } from "react"
 import { validateFolderName } from "../utils/nameValidation"
