@@ -37,7 +37,9 @@ export function PartitionPage({ name, config, partitionsState, activePartition, 
 	const partitionConfig = config.partitions?.[name] as PartitionConfig | undefined
 	const adBlockEnabled = partitionConfig?.adBlockEnabled !== false
 	const cacheCleanup = partitionConfig?.cacheCleanup
-	const cacheCleanupEnabled = (cacheCleanup?.maxFileSizeMB ?? 0) > 0 || (cacheCleanup?.maxAgeDays ?? 0) > 0
+	const maxFileSizeValue = cacheCleanup?.maxFileSizeMB ?? 0
+	const maxAgeValue = cacheCleanup?.maxAgeDays ?? 0
+	const cacheCleanupEnabled = maxFileSizeValue > 0 || maxAgeValue > 0
 
 	useEffect(() => {
 		document.title = `Bird - ${name}`
@@ -162,13 +164,15 @@ export function PartitionPage({ name, config, partitionsState, activePartition, 
 				<ConfigSection title={t("partition.cacheCleanup.title")} description={t("partition.cacheCleanup.description")}>
 					<NumberField
 						label={t("partition.cacheCleanup.maxFileSizeMB")}
-						value={cacheCleanup?.maxFileSizeMB ?? 0}
+						hint={maxFileSizeValue === 0 ? `(${t("partition.cacheCleanup.disabled")})` : undefined}
+						value={maxFileSizeValue}
 						onChange={(v) => handleCacheCleanupChange({ maxFileSizeMB: v })}
 						min={0}
 					/>
 					<NumberField
 						label={t("partition.cacheCleanup.maxAgeDays")}
-						value={cacheCleanup?.maxAgeDays ?? 0}
+						hint={maxAgeValue === 0 ? `(${t("partition.cacheCleanup.disabled")})` : undefined}
+						value={maxAgeValue}
 						onChange={(v) => handleCacheCleanupChange({ maxAgeDays: v })}
 						min={0}
 					/>
