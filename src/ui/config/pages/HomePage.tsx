@@ -1,5 +1,5 @@
 import { HStack, Text, VStack } from "@chakra-ui/react"
-import type { BirdConfig, NavBarConfig } from "@shared/config.schema"
+import type { BirdConfig, DownloadConfig, NavBarConfig } from "@shared/config.schema"
 import { normalizePartitionName } from "@shared/partition"
 import { deriveInternalPattern } from "@shared/routing"
 import type { DeployState, PartitionsState } from "@shared/types"
@@ -8,6 +8,7 @@ import { useEffect, useState } from "react"
 import { AppList } from "../components/AppList"
 import { ConfigSection } from "../components/ConfigSection"
 import { CreateAppDialog } from "../components/CreateAppDialog"
+import { DownloadsConfigForm } from "../components/DownloadsConfigForm"
 import { NavBarConfigForm } from "../components/NavBarConfigForm"
 import { PageHeader } from "../components/PageHeader"
 import { PartitionList } from "../components/PartitionList"
@@ -41,6 +42,14 @@ export function HomePage({ config, configPath, partitionsState, deployState, act
 			...config,
 			navBar: { ...config.navBar, [key]: value },
 		})
+	}
+
+	const updateDownloads = (key: keyof DownloadConfig, value: string | string[] | boolean | undefined) => {
+		const newDownloads = { ...config.downloads, [key]: value }
+		if (value === undefined) {
+			delete newDownloads[key]
+		}
+		onChange({ ...config, downloads: newDownloads })
 	}
 
 	const handleCreateApp = async (name: string, startUrl: string) => {
@@ -143,6 +152,10 @@ export function HomePage({ config, configPath, partitionsState, deployState, act
 					<ConfigSection title={t("settings.navbar")}>
 						<NavBarConfigForm mode="global" config={config.navBar || {}} onChange={updateNavBar} />
 					</ConfigSection>
+
+					<ConfigSection title={t("settings.downloads")}>
+						<DownloadsConfigForm mode="global" config={config.downloads || {}} onChange={updateDownloads} />
+					</ConfigSection>
 				</VStack>
 
 				<VStack flex={1} align="stretch" gap={4} {...scrollColumnStyles}>
@@ -156,7 +169,7 @@ export function HomePage({ config, configPath, partitionsState, deployState, act
 						/>
 					</ConfigSection>
 
-					<ConfigSection title={t("settings.partitions")}>
+					<ConfigSection title={t("settings.partitions")} hint={t("settings.partitionsHint")}>
 						<PartitionList
 							partitions={partitionsState.partitions}
 							activePartition={activePartition}

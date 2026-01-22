@@ -188,6 +188,33 @@
 									}
 								},
 								"additionalProperties": false
+							},
+							"downloads": {
+								"type": "object",
+								"properties": {
+									"directory": {
+										"type": "string"
+									},
+									"autoOpenMaxSize": {
+										"type": [
+											"number",
+											"string"
+										]
+									},
+									"autoOpenMimeTypes": {
+										"type": "array",
+										"items": {
+											"type": "string"
+										}
+									},
+									"allowExecutablesDownload": {
+										"type": "boolean"
+									},
+									"allowDuplicateDownloads": {
+										"type": "boolean"
+									}
+								},
+								"additionalProperties": false
 							}
 						},
 						"required": [

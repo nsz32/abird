@@ -127,6 +127,9 @@ contextBridge.exposeInMainWorld("bird", {
 			read: () => ipcRenderer.invoke(IpcChannels.USERCONFIG_READ),
 			write: (content: unknown) => ipcRenderer.invoke(IpcChannels.USERCONFIG_WRITE, content),
 		},
+		selectDirectory: (defaultPath?: string): Promise<string | null> => ipcRenderer.invoke(IpcChannels.SETTINGS_SELECT_DIRECTORY, defaultPath),
+		getDefaultDownloadsPath: (): Promise<string> => ipcRenderer.invoke(IpcChannels.SETTINGS_GET_DEFAULT_DOWNLOADS_PATH),
+		getUserAgents: (): Promise<string[]> => ipcRenderer.invoke(IpcChannels.SETTINGS_GET_USER_AGENTS),
 	},
 	i18n: {
 		getTranslations: (): Promise<Translations> => ipcRenderer.invoke(IpcChannels.I18N_GET_TRANSLATIONS),

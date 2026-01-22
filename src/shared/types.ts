@@ -206,6 +206,10 @@ export const IpcChannels = {
 	// App launch
 	APP_LAUNCH_SUPPORTED: "bird:app:launch-supported",
 	APP_LAUNCH: "bird:app:launch",
+	// Settings
+	SETTINGS_SELECT_DIRECTORY: "bird:settings:select-directory",
+	SETTINGS_GET_DEFAULT_DOWNLOADS_PATH: "bird:settings:get-default-downloads-path",
+	SETTINGS_GET_USER_AGENTS: "bird:settings:get-user-agents",
 } as const
 
 // Type utilitaire pour les valeurs de IpcChannels
@@ -323,6 +327,9 @@ export interface BirdApi {
 			read: () => Promise<{ path: string; content: unknown }>
 			write: (content: unknown) => Promise<{ success: boolean; errors?: string[] }>
 		}
+		selectDirectory: (defaultPath?: string) => Promise<string | null>
+		getDefaultDownloadsPath: () => Promise<string>
+		getUserAgents: () => Promise<string[]>
 	}
 	i18n: {
 		getTranslations: () => Promise<Translations>

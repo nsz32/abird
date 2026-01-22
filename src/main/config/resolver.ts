@@ -82,7 +82,7 @@ function buildEffectiveConfig(app: Partial<AppConfig>, birdConfig: BirdConfig, o
 		userAgent: cli?.userAgent || app.userAgentRaw || app.userAgent || "desktop:bird",
 		navBar: resolveNavBarConfig(mergedNavBar, options?.navBarOverrides),
 		routing: resolveRoutingConfig(app.routing, app.startUrl),
-		downloads: resolveDownloadConfig({ ...birdConfig.downloads }),
+		downloads: resolveDownloadConfig({ ...birdConfig.downloads, ...app.downloads }),
 	}
 }
 

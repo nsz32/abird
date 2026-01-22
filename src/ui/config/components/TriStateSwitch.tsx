@@ -1,14 +1,16 @@
 import { HStack, IconButton, Switch, Text } from "@chakra-ui/react"
 import { useTranslations } from "@ui/shared/hooks"
+import { CircleHelp } from "lucide-react"
 
 interface TriStateSwitchProps {
 	label: string
 	value: boolean | undefined
 	defaultValue: boolean
 	onChange: (value: boolean | undefined) => void
+	hint?: string
 }
 
-export function TriStateSwitch({ label, value, defaultValue, onChange }: TriStateSwitchProps) {
+export function TriStateSwitch({ label, value, defaultValue, onChange, hint }: TriStateSwitchProps) {
 	const { t } = useTranslations()
 	const isInherited = value === undefined
 	const effectiveValue = isInherited ? defaultValue : value
@@ -29,6 +31,11 @@ export function TriStateSwitch({ label, value, defaultValue, onChange }: TriStat
 		<HStack justify="space-between" py={2}>
 			<HStack gap={1}>
 				<Text fontSize="sm">{label}</Text>
+				{hint && (
+					<span title={hint}>
+						<CircleHelp size={14} color="var(--chakra-colors-fg-muted)" />
+					</span>
+				)}
 				{isInherited && (
 					<Text fontSize="xs" color="fg.muted">
 						{t("inherit.inherited")}

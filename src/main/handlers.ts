@@ -1,5 +1,5 @@
 import { IpcChannels } from "@shared/types"
-import { ipcMain, shell } from "electron"
+import { app, dialog, ipcMain, shell } from "electron"
 import { getBirdConfig, readRawConfig, writeRawConfig } from "./config"
 import { DOWNLOADS_VIEW_ID } from "./core/App"
 import { getTranslations } from "./core/I18n"
@@ -24,6 +24,7 @@ import { dismissNotification } from "./services/notify"
 import { activateTab, closeTab, createTab, getActiveTab, getTabsList } from "./tabs/Tabs"
 import { createLogger } from "./utils/logger"
 import { openFile } from "./utils/platform"
+import { getAvailableUserAgents } from "./utils/userAgents"
 
 const log = createLogger("IPC")
 
@@ -147,4 +148,15 @@ export function registerHandlers() {
 			navBarForceShow$.emit({ ...current, urlEdit: active })
 		}
 	})
+
+	// Settings
+	ipcMain.handle(IpcChannels.SETTINGS_GET_DEFAULT_DOWNLOADS_PATH, () => app.getPath("downloads"))
+	ipcMain.handle(IpcChannels.SETTINGS_SELECT_DIRECTORY, async (_, defaultPath?: string) => {
+		const result = await dialog.showOpenDialog({
+			properties: ["openDirectory"],
+			defaultPath: defaultPath || app.getPath("downloads"),
+		})
+		return result.canceled ? null : result.filePaths[0]
+	})
+	ipcMain.handle(IpcChannels.SETTINGS_GET_USER_AGENTS, () => getAvailableUserAgents())
 }

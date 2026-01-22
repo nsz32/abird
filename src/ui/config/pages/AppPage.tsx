@@ -1,11 +1,12 @@
 import { Box, Button, HStack, IconButton, Image, Input, Menu, Portal, Switch, Text, VStack } from "@chakra-ui/react"
-import type { AppConfig, BirdConfig, NavBarConfig, RoutingAction } from "@shared/config.schema"
+import type { AppConfig, BirdConfig, DownloadConfig, NavBarConfig, RoutingAction } from "@shared/config.schema"
 import { deriveInternalPattern } from "@shared/routing"
 import type { PartitionsState } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
 import { ChevronDown, ExternalLink, Pencil } from "lucide-react"
 import { useEffect, useState } from "react"
 import { ConfigSection } from "../components/ConfigSection"
+import { DownloadsConfigForm } from "../components/DownloadsConfigForm"
 import { EditStartUrlDialog } from "../components/EditStartUrlDialog"
 import { IconPickerDialog } from "../components/IconPickerDialog"
 import { NavBarConfigForm } from "../components/NavBarConfigForm"
@@ -14,6 +15,7 @@ import { PartitionSelect } from "../components/PartitionSelect"
 import { RenameDialog } from "../components/RenameDialog"
 import { RoutingRulesEditor } from "../components/RoutingRulesEditor"
 import { SegmentSelect } from "../components/SegmentSelect"
+import { UserAgentSelect } from "../components/UserAgentSelect"
 import { useAppDeploy, useAppIcon, useAutoRedeploy, useLaunchSupport } from "../hooks"
 import { getAvailablePartitions, getExistingAppNames, getPartitionUsage } from "../utils/partitions"
 
@@ -93,6 +95,15 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 	const updateRoutingRules = (rules: Record<string, RoutingAction>) => {
 		const hasRules = Object.keys(rules).length > 0
 		updateApp({ routing: hasRules ? { rules } : undefined })
+	}
+
+	const updateDownloads = (key: keyof DownloadConfig, value: string | string[] | boolean | undefined) => {
+		const newDownloads = { ...app.downloads, [key]: value }
+		if (value === undefined) {
+			delete newDownloads[key]
+		}
+		const hasValues = Object.keys(newDownloads).length > 0
+		updateApp({ downloads: hasValues ? newDownloads : undefined })
 	}
 
 	// Icon actions
@@ -311,6 +322,17 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 
 				<ConfigSection title={t("app.navbar")}>
 					<NavBarConfigForm mode="app" config={app.navBar || {}} defaults={config.navBar || {}} onChange={updateNavBar} />
+				</ConfigSection>
+
+				<ConfigSection title={t("settings.downloads")}>
+					<DownloadsConfigForm mode="app" config={app.downloads || {}} defaults={config.downloads || {}} onChange={updateDownloads} />
+				</ConfigSection>
+
+				<ConfigSection title={t("app.advanced")}>
+					<HStack justify="space-between" py={2}>
+						<Text fontSize="sm">{t("app.userAgent")}</Text>
+						<UserAgentSelect value={app.userAgent} onChange={(v) => updateApp({ userAgent: v })} />
+					</HStack>
 				</ConfigSection>
 			</VStack>
 

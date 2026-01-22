@@ -58,6 +58,7 @@ export const AppConfigSchema = z.object({
 	userAgentRaw: z.string().optional(),
 	navBar: NavBarConfigSchema.partial().optional(),
 	routing: RoutingConfigSchema.partial().optional(),
+	downloads: DownloadConfigSchema.partial().optional(),
 })
 export type AppConfig = z.infer<typeof AppConfigSchema>
 

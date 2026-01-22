@@ -6,11 +6,13 @@ export const frTranslations: Translations = {
 	"settings.appearance": "Apparence",
 	"settings.theme": "Thème",
 	"settings.navbar": "Barre de navigation (global)",
+	"settings.downloads": "Téléchargements",
 	"settings.apps": "Applications",
 	"settings.noApps": "Aucune application configurée",
 	"settings.configPath": "Configuration",
 	"settings.project": "Projet",
 	"settings.partitions": "Partitions",
+	"settings.partitionsHint": "Une partition isole les données (cookies, cache, stockage). Plusieurs applications peuvent partager la même partition.",
 	"settings.stats": '{{apps}} app{{apps>1?"s":""}} · {{partitions}} partition{{partitions>1?"s":""}}',
 
 	// Theme
@@ -35,6 +37,8 @@ export const frTranslations: Translations = {
 	// App config
 	"app.general": "Général",
 	"app.navbar": "Barre de navigation",
+	"app.advanced": "Avancé",
+	"app.userAgent": "User-Agent",
 	"app.startUrl": "URL de démarrage",
 	"app.partition": "Partition",
 	"app.description": "Description",
@@ -87,6 +91,11 @@ export const frTranslations: Translations = {
 	"inherit.inherited": "(hérité)",
 	"inherit.reset": "Réinitialiser",
 
+	// Common
+	"common.cancel": "Annuler",
+	"common.save": "Enregistrer",
+	"common.edit": "Modifier",
+
 	// Downloads
 	"downloads.title": "Téléchargements",
 	"downloads.empty": "Aucun téléchargement",
@@ -101,6 +110,17 @@ export const frTranslations: Translations = {
 	"downloads.cancel": "Annuler",
 	"downloads.retry": "Relancer",
 	"downloads.remove": "Retirer de la liste",
+	"downloads.directory": "Dossier de téléchargement",
+	"downloads.systemDefault": "Dossier système par défaut",
+	"downloads.autoOpenMimeTypes": "Ouvrir auto (types MIME)",
+	"downloads.mimeTypesPlaceholder": "Un type MIME par ligne\nExemples :\napplication/pdf\nimage/*",
+	"downloads.none": "Aucun",
+	"downloads.allowExecutablesDownload": "Télécharger les exécutables",
+	"downloads.allowDuplicateDownloads": "Gérer les doublons",
+	"downloads.mimeNone": "Rien",
+	"downloads.mimeStandard": "Standard",
+	"downloads.mimeStandardHint": "Documents Office, PDF, images, vidéos, audio",
+	"downloads.executablesHint": "Les exécutables seront téléchargés mais jamais ouverts automatiquement",
 
 	// Find
 	"find.placeholder": "Rechercher...",

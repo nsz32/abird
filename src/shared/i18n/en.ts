@@ -4,11 +4,13 @@ const en = {
 	"settings.appearance": "Appearance",
 	"settings.theme": "Theme",
 	"settings.navbar": "Navigation bar (global)",
+	"settings.downloads": "Downloads",
 	"settings.apps": "Applications",
 	"settings.noApps": "No applications configured",
 	"settings.configPath": "Configuration",
 	"settings.project": "Project",
 	"settings.partitions": "Partitions",
+	"settings.partitionsHint": "A partition isolates data (cookies, cache, storage). Multiple applications can share the same partition.",
 	"settings.stats": '{{apps}} app{{apps>1?"s":""}} · {{partitions}} partition{{partitions>1?"s":""}}',
 
 	// Theme
@@ -33,6 +35,8 @@ const en = {
 	// App config
 	"app.general": "General",
 	"app.navbar": "Navigation bar",
+	"app.advanced": "Advanced",
+	"app.userAgent": "User-Agent",
 	"app.startUrl": "Start URL",
 	"app.partition": "Partition",
 	"app.description": "Description",
@@ -85,6 +89,11 @@ const en = {
 	"inherit.inherited": "(inherited)",
 	"inherit.reset": "Reset",
 
+	// Common
+	"common.cancel": "Cancel",
+	"common.save": "Save",
+	"common.edit": "Edit",
+
 	// Downloads
 	"downloads.title": "Downloads",
 	"downloads.empty": "No downloads",
@@ -99,6 +108,17 @@ const en = {
 	"downloads.cancel": "Cancel",
 	"downloads.retry": "Retry",
 	"downloads.remove": "Remove from list",
+	"downloads.directory": "Download folder",
+	"downloads.systemDefault": "System default folder",
+	"downloads.autoOpenMimeTypes": "Auto-open (MIME types)",
+	"downloads.mimeTypesPlaceholder": "One MIME type per line\nExamples:\napplication/pdf\nimage/*",
+	"downloads.none": "None",
+	"downloads.allowExecutablesDownload": "Download executables",
+	"downloads.allowDuplicateDownloads": "Handle duplicates",
+	"downloads.mimeNone": "None",
+	"downloads.mimeStandard": "Standard",
+	"downloads.mimeStandardHint": "Office documents, PDF, images, videos, audio",
+	"downloads.executablesHint": "Executables will be downloaded but never opened automatically",
 
 	// Find
 	"find.placeholder": "Search...",
