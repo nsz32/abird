@@ -373,10 +373,9 @@ function shouldAutoOpen(result: FileDetectionResult, size: number, config: Resol
 
 function matchesMimePatterns(mime: string, patterns: string[]): boolean {
 	return patterns.some((pattern) => {
-		if (pattern.endsWith("/*")) {
-			return mime.startsWith(pattern.slice(0, -1))
-		}
-		return mime === pattern
+		if (!pattern.includes("*")) return mime === pattern
+		const regex = new RegExp(`^${pattern.replace(/\*/g, ".*")}$`)
+		return regex.test(mime)
 	})
 }
 

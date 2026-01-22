@@ -1,6 +1,6 @@
 import { Button, Dialog, HStack, Portal, Textarea } from "@chakra-ui/react"
 import { useTranslations } from "@ui/shared/hooks"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 interface MimeTypesDialogProps {
 	isOpen: boolean
@@ -11,11 +11,13 @@ interface MimeTypesDialogProps {
 
 export function MimeTypesDialog({ isOpen, value, onClose, onSave }: MimeTypesDialogProps) {
 	const { t } = useTranslations()
-	const [text, setText] = useState(value.join("\n"))
+	const [text, setText] = useState("")
 
-	const handleOpen = () => {
-		setText(value.join("\n"))
-	}
+	useEffect(() => {
+		if (isOpen) {
+			setText(value.join("\n"))
+		}
+	}, [isOpen, value])
 
 	const handleSave = () => {
 		const mimeTypes = text
@@ -27,7 +29,7 @@ export function MimeTypesDialog({ isOpen, value, onClose, onSave }: MimeTypesDia
 	}
 
 	return (
-		<Dialog.Root open={isOpen} onOpenChange={(e) => !e.open && onClose()} onExitComplete={handleOpen}>
+		<Dialog.Root open={isOpen} onOpenChange={(e) => !e.open && onClose()}>
 			<Portal>
 				<Dialog.Backdrop />
 				<Dialog.Positioner>
