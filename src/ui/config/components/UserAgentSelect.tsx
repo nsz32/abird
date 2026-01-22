@@ -1,10 +1,20 @@
-import { HStack, IconButton, Text } from "@chakra-ui/react"
-import { useTranslations } from "@ui/shared/hooks"
-import { RotateCcw } from "lucide-react"
-import { SegmentSelect } from "./SegmentSelect"
+import { Button, Menu, Portal, Text } from "@chakra-ui/react"
 
-const COMMON_PRESETS = ["desktop:bird", "desktop:chrome", "desktop:firefox", "mobile:chrome", "mobile:safari"] as const
-type CommonPreset = (typeof COMMON_PRESETS)[number]
+const USER_AGENT_PRESETS = [
+	"desktop:bird",
+	"desktop:chrome",
+	"desktop:firefox",
+	"desktop:safari",
+	"desktop:edge",
+	"desktop:opera",
+	"mobile:chrome",
+	"mobile:safari",
+	"mobile:firefox",
+	"tablet:chrome",
+	"tablet:safari",
+	"desktop:ie11",
+	"desktop:ie6",
+] as const
 
 interface UserAgentSelectProps {
 	value: string | undefined
@@ -12,53 +22,36 @@ interface UserAgentSelectProps {
 }
 
 export function UserAgentSelect({ value, onChange }: UserAgentSelectProps) {
-	const { t } = useTranslations()
-
-	const isInherited = value === undefined
 	const effectiveValue = value || "desktop:bird"
 
-	const isCommonPreset = (v: string): v is CommonPreset => COMMON_PRESETS.includes(v as CommonPreset)
-	const currentIsCommon = isCommonPreset(effectiveValue)
-
-	const handleChange = (newValue: string) => {
+	const handleSelect = (newValue: string) => {
 		onChange(newValue === "desktop:bird" ? undefined : newValue)
 	}
 
-	const handleReset = () => {
-		onChange(undefined)
-	}
-
-	const options = COMMON_PRESETS.map((preset) => ({
-		value: preset,
-		label: formatPresetLabel(preset),
-	}))
-
 	return (
-		<HStack gap={2}>
-			{!isInherited && (
-				<IconButton aria-label={t("inherit.reset")} variant="ghost" size="xs" onClick={handleReset} title={t("inherit.reset")}>
-					<RotateCcw size={14} />
-				</IconButton>
-			)}
-
-			{isInherited && (
-				<Text fontSize="xs" color="fg.muted">
-					{t("inherit.inherited")}
-				</Text>
-			)}
-
-			<SegmentSelect value={currentIsCommon ? effectiveValue : "desktop:bird"} options={options} onChange={handleChange} />
-		</HStack>
+		<Menu.Root>
+			<Menu.Trigger asChild>
+				<Button size="sm" variant="outline" width="160px" justifyContent="space-between">
+					<Text truncate>{effectiveValue}</Text>
+					<Menu.Indicator>▼</Menu.Indicator>
+				</Button>
+			</Menu.Trigger>
+			<Portal>
+				<Menu.Positioner>
+					<Menu.Content minWidth="160px" maxHeight="300px" overflowY="auto">
+						{USER_AGENT_PRESETS.map((preset) => (
+							<Menu.Item
+								key={preset}
+								value={preset}
+								onSelect={() => handleSelect(preset)}
+								fontWeight={preset === effectiveValue ? "medium" : undefined}
+							>
+								{preset}
+							</Menu.Item>
+						))}
+					</Menu.Content>
+				</Menu.Positioner>
+			</Portal>
+		</Menu.Root>
 	)
-}
-
-function formatPresetLabel(preset: string): string {
-	const parts = preset.split(":")
-	if (parts.length < 2) return preset
-
-	const [platform, browser] = parts
-	const platformIcon = platform === "mobile" ? "M" : "D"
-	const browserName = browser.charAt(0).toUpperCase() + browser.slice(1)
-
-	return `${platformIcon}:${browserName}`
 }
