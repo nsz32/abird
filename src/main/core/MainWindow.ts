@@ -1,4 +1,6 @@
-import { BaseWindow } from "electron"
+import { BaseWindow, nativeImage } from "electron"
+import { getBirdConfig, getCurrentAppName } from "../config"
+import { getDefaultIconPath, getIconPath } from "../services/icons"
 import { ViewManager } from "./ViewManager"
 import { setupKiosk } from "./kiosk"
 import { kioskMode$, windowBounds$ } from "./states"
@@ -16,6 +18,7 @@ export class MainWindow {
 			show: false,
 			autoHideMenuBar: true,
 			kiosk: kioskMode$.get(),
+			icon: this.resolveIcon(),
 		})
 
 		// Initialize ViewManager singleton with this window's contentView
@@ -45,5 +48,16 @@ export class MainWindow {
 		for (const delay of BOUNDS_UPDATE_DELAYS) {
 			setTimeout(() => this.emitBounds(), delay)
 		}
+	}
+
+	private resolveIcon(): Electron.NativeImage | undefined {
+		const appName = getCurrentAppName()
+		const config = getBirdConfig()
+		const iconFilename = appName ? config.apps[appName]?.icon : undefined
+
+		const iconPath = (iconFilename && getIconPath(iconFilename)) || getDefaultIconPath()
+		if (!iconPath) return undefined
+
+		return nativeImage.createFromPath(iconPath)
 	}
 }
