@@ -1,6 +1,9 @@
 import { spawn } from "node:child_process"
 import { join } from "node:path"
 import { app, shell } from "electron"
+import { createLogger } from "./logger"
+
+const log = createLogger("Platform")
 
 /**
  * Centralized paths for the application.
@@ -41,6 +44,14 @@ export function openFile(path: string): Promise<string> {
 		})
 	}
 	return shell.openPath(path)
+}
+
+/**
+ * Open a URL in the system's default browser.
+ */
+export function openExternal(url: string): void {
+	log.info(`Opening external URL: ${url}`)
+	shell.openExternal(url)
 }
 
 /**

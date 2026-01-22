@@ -1,6 +1,6 @@
 import type { FindState, NavigationState, ResolvedRoutingConfig, TabOrigin } from "@shared/types"
-import { shell } from "electron"
 import { ViewManager } from "../core/ViewManager"
+import { openExternal } from "../utils/platform"
 import { externalOpened$, findState$, tabs$ } from "../core/states"
 import { StateObservable } from "../utils/observable"
 import type { BrowserView } from "../views/BrowserView"
@@ -118,7 +118,7 @@ export class Tab {
 	}
 
 	private async handleExternalUrl(url: string) {
-		shell.openExternal(url)
+		openExternal(url)
 
 		const shouldClose = await this.shouldCloseAfterExternal()
 		const targetId = shouldClose && this.parentId ? this.parentId : this.id

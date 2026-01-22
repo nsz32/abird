@@ -1,6 +1,7 @@
 import { join } from "node:path"
-import { Menu, app, dialog, nativeImage, shell } from "electron"
+import { Menu, app, dialog, nativeImage } from "electron"
 import { getTranslations } from "../core/I18n"
+import { openExternal } from "../utils/platform"
 import { findBarVisible$ } from "../core/states"
 import { closeTab, createTab, getActiveTab } from "../tabs/Tabs"
 import { getNavBar } from "../views/views"
@@ -45,7 +46,7 @@ export function createAppMenu(): Menu {
 						const activeTab = getActiveTab()
 						if (activeTab) {
 							const url = activeTab.navState$.get().url || activeTab.initialUrl
-							if (url && url !== "about:blank") shell.openExternal(url)
+							if (url && url !== "about:blank") openExternal(url)
 						}
 					},
 				},

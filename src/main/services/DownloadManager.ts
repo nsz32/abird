@@ -2,7 +2,7 @@ import { existsSync, renameSync, statSync, unlinkSync } from "node:fs"
 import { basename, dirname, extname, join } from "node:path"
 import type { ActiveDownload, DownloadConfig, DownloadHistoryItem, DownloadStatus, ResolvedDownloadConfig } from "@shared/types"
 import type { DownloadItem, Session } from "electron"
-import { app, session, shell } from "electron"
+import { app, session } from "electron"
 import { t } from "../core/I18n"
 import { getDownloadAction } from "../core/UrlRouter"
 import { activeDownloads$, config$, downloadEvents$, downloadHistory$ } from "../core/states"
@@ -10,7 +10,7 @@ import { checkOfficeMacroWarning } from "../utils/executableDetection"
 import { type FileDetectionResult, detectFileType, detectFileTypeWithRetry } from "../utils/fileDetection"
 import { createLogger } from "../utils/logger"
 import { parseSize } from "../utils/parseSize"
-import { getFileMd5, openFile } from "../utils/platform"
+import { getFileMd5, openExternal, openFile } from "../utils/platform"
 import { addNotification, dismissNotification, updateNotification } from "./notify"
 
 const log = createLogger("Download")
@@ -168,7 +168,7 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 
 		if (action === "external") {
 			event.preventDefault()
-			shell.openExternal(url)
+			openExternal(url)
 			return
 		}
 		if (action === "ignore") {
