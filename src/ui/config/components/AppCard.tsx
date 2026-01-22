@@ -28,13 +28,11 @@ export function AppCard({ name, app, isDeployed, onSelect, onDelete }: AppCardPr
 		<HStack p={3} borderRadius="md" cursor="pointer" bg="bg.subtle" _hover={{ bg: "bg.muted" }} onClick={onSelect}>
 			<Image src={icon.iconData || DEFAULT_ICON} w="16px" h="16px" flexShrink={0} borderRadius="sm" />
 			<Box flex={1} minW={0}>
-				<HStack gap={2}>
-					<Text fontWeight="medium" truncate>
-						{name}
-					</Text>
-				</HStack>
-				<Text fontSize="xs" color="fg.muted" truncate>
-					{app.startUrl}
+				<Text fontWeight="medium" truncate>
+					{name}
+				</Text>
+				<Text fontSize="xs" color="fg.muted">
+					{t("app.partition")}: {app.partition}
 				</Text>
 			</Box>
 			{isDeployed && (

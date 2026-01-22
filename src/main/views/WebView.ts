@@ -74,6 +74,8 @@ export class WebView extends BrowserView {
 	}
 
 	private handleNavigation(event: Electron.Event, url: string) {
+		if (url.startsWith("bird://")) return event.preventDefault()
+
 		const action = getNavigationAction(url, this.routing)
 
 		if (action === "internal") return
@@ -87,6 +89,8 @@ export class WebView extends BrowserView {
 	}
 
 	private handleNewWindow(url: string, disposition: string) {
+		if (url.startsWith("bird://")) return
+
 		const action = getNavigationAction(url, this.routing)
 
 		if (action === "internal") {

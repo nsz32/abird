@@ -5,7 +5,7 @@ import { AppPage } from "./pages/AppPage"
 import { HomePage } from "./pages/HomePage"
 import { PartitionPage } from "./pages/PartitionPage"
 import { useHashRouter } from "./useHashRouter"
-import { useTranslations } from "./useTranslations"
+import { useTranslations } from "@ui/shared/hooks"
 
 interface AppState {
 	config: BirdConfig
