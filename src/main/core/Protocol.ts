@@ -13,14 +13,18 @@ export function registerBirdScheme() {
 /**
  * Setup the bird:// protocol handler for production.
  * In dev, Views load directly from Vite server (bypassing this handler).
+ *
+ * URL structure: bird://[view]/[path]
+ * - Assets and public files (favicon.png) are served from renderer root
+ * - View-specific files are served from renderer/[view]/
  */
 export function setupBirdProtocol() {
 	protocol.handle("bird", (request) => {
 		const { host, pathname } = new URL(request.url)
 		const rendererPath = join(__dirname, "../renderer")
-		console.log("PROTOCOL:", request.url, "host:", host, "pathname:", pathname)
 
-		if (pathname.startsWith("/assets/")) {
+		const isRootAsset = pathname.startsWith("/assets/") || pathname === "/favicon.png"
+		if (isRootAsset) {
 			return net.fetch(pathToFileURL(join(rendererPath, pathname)).toString())
 		}
 
