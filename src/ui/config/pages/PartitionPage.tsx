@@ -42,7 +42,7 @@ export function PartitionPage({ name, config, partitionsState, activePartition, 
 	const cacheCleanupEnabled = maxFileSizeValue > 0 || maxAgeValue > 0
 
 	useEffect(() => {
-		document.title = `Bird - ${name}`
+		document.title = `${name}`
 	}, [name])
 
 	const handleCleanup = async () => {
@@ -114,12 +114,24 @@ export function PartitionPage({ name, config, partitionsState, activePartition, 
 			{isActive && <Badge colorPalette="blue">{t("partition.active")}</Badge>}
 			{canCleanup && (
 				<Button variant="outline" size="sm" onClick={handleCleanup} disabled={cleaning}>
-					{cleaning ? <Spinner size="sm" /> : <><Trash2 size={16} /> {t("partition.cleanup")}</>}
+					{cleaning ? (
+						<Spinner size="sm" />
+					) : (
+						<>
+							<Trash2 size={16} /> {t("partition.cleanup")}
+						</>
+					)}
 				</Button>
 			)}
 			{canReset && (
 				<Button variant="ghost" size="sm" colorPalette="red" onClick={handleReset} disabled={resetting}>
-					{resetting ? <Spinner size="sm" /> : <><RotateCw size={16} /> {t("partition.reset")}</>}
+					{resetting ? (
+						<Spinner size="sm" />
+					) : (
+						<>
+							<RotateCw size={16} /> {t("partition.reset")}
+						</>
+					)}
 				</Button>
 			)}
 		</HStack>
@@ -141,7 +153,8 @@ export function PartitionPage({ name, config, partitionsState, activePartition, 
 						_hover={{ textDecoration: "underline" }}
 						onClick={() => onNavigate(`#app/${appName}`)}
 					>
-						{appName}{i < partition.usedByApps.length - 1 && ","}
+						{appName}
+						{i < partition.usedByApps.length - 1 && ","}
 					</Text>
 				))}
 			</HStack>

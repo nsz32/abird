@@ -2,7 +2,7 @@ import type { Translations } from "./en"
 
 export const frTranslations: Translations = {
 	// Settings
-	"settings.title": "Bird - Paramètres",
+	"settings.title": "Paramètres",
 	"settings.appearance": "Apparence",
 	"settings.theme": "Thème",
 	"settings.navbar": "Barre de navigation (global)",

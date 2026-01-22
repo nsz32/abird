@@ -1,6 +1,6 @@
 const en = {
 	// Settings
-	"settings.title": "Bird Settings",
+	"settings.title": "Settings",
 	"settings.appearance": "Appearance",
 	"settings.theme": "Theme",
 	"settings.navbar": "Navigation bar (global)",

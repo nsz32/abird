@@ -100,7 +100,7 @@ export function selectApp(appName: string, cliOverrides?: CliOverrides): boolean
 
 export function selectConfigMode(): void {
 	const birdConfig = getBirdConfig()
-	setCurrentAppName("config")
+	setCurrentAppName("Bird")
 
 	const configApp: Partial<AppConfig> = {
 		startUrl: "bird://config/",
@@ -127,7 +127,7 @@ export function selectConfigMode(): void {
 
 export function selectBrowserMode(startUrl: string, userAgent = "desktop:bird"): void {
 	const birdConfig = getBirdConfig()
-	setCurrentAppName("browser")
+	setCurrentAppName("Bird")
 
 	const browserApp: Partial<AppConfig> = {
 		startUrl,

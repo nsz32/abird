@@ -48,7 +48,7 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 	const [showIconPicker, setShowIconPicker] = useState(false)
 
 	useEffect(() => {
-		document.title = `Bird - ${name}`
+		document.title = `${name}`
 	}, [name])
 
 	if (!app) {
