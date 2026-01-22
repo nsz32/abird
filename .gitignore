@@ -4,3 +4,6 @@ out/
 release/
 *.log
 .DS_Store
+
+# electron-vite temp files
+electron.vite.config.*.mjs
