@@ -51,11 +51,11 @@ export function getDeployState(appNames: string[]): DeployState {
 	return { supported, apps }
 }
 
-export function deploy(appName: string, appConfig: AppConfig): void {
+export async function deploy(appName: string, appConfig: AppConfig): Promise<void> {
 	if (!deployer.supported) {
 		throw new Error(`Deploy is not supported on ${process.platform}`)
 	}
-	deployer.deploy({ name: appName, config: appConfig })
+	await deployer.deploy({ name: appName, config: appConfig })
 }
 
 export function undeploy(appName: string): void {
@@ -63,9 +63,9 @@ export function undeploy(appName: string): void {
 	deployer.undeploy(appName)
 }
 
-export function renameDeploy(oldName: string, newName: string, appConfig: AppConfig): void {
+export async function renameDeploy(oldName: string, newName: string, appConfig: AppConfig): Promise<void> {
 	if (!deployer.supported) return
-	deployer.rename(oldName, newName, appConfig)
+	await deployer.rename(oldName, newName, appConfig)
 }
 
 // === App launching (platform-independent) ===

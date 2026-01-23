@@ -7,9 +7,9 @@ export interface DeployableApp {
 
 export interface Deployer {
 	readonly supported: boolean
-	deploy(app: DeployableApp): void
+	deploy(app: DeployableApp): Promise<void>
 	undeploy(appName: string): void
-	rename(oldName: string, newName: string, config: AppConfig): void
+	rename(oldName: string, newName: string, config: AppConfig): Promise<void>
 	isDeployed(appName: string): boolean
 	getShortcutPath(appName: string): string
 }

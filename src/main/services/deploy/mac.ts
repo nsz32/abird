@@ -17,7 +17,7 @@ export class MacDeployer implements Deployer {
 		return false
 	}
 
-	deploy(_app: DeployableApp): void {
+	async deploy(_app: DeployableApp): Promise<void> {
 		throw new Error("macOS deploy not yet implemented")
 	}
 
@@ -25,7 +25,7 @@ export class MacDeployer implements Deployer {
 		// No-op until implemented
 	}
 
-	rename(_oldName: string, _newName: string, _config: AppConfig): void {
+	async rename(_oldName: string, _newName: string, _config: AppConfig): Promise<void> {
 		// No-op until implemented
 	}
 }

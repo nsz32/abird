@@ -5,7 +5,7 @@ import { shell } from "electron"
 import { getBirdConfig, getProjectName } from "../../config"
 import { getAppUserModelId, sanitizeAppName } from "../../utils/naming"
 import { paths } from "../../utils/platform"
-import { getIconPath } from "../icons"
+import { getIconPathAsIco } from "../icons"
 import { buildExecArgs, getExecInfo } from "./exec"
 import type { DeployableApp, Deployer } from "./types"
 
@@ -41,7 +41,7 @@ export class WindowsDeployer implements Deployer {
 		return existsSync(this.getShortcutPath(appName))
 	}
 
-	deploy({ name, config }: DeployableApp): void {
+	async deploy({ name, config }: DeployableApp): Promise<void> {
 		ensureStartMenuDir()
 
 		const { execPath } = getExecInfo()
@@ -59,8 +59,8 @@ export class WindowsDeployer implements Deployer {
 		}
 
 		if (config.icon) {
-			const iconPath = getIconPath(config.icon)
-			if (iconPath?.endsWith(".ico")) {
+			const iconPath = await getIconPathAsIco(config.icon)
+			if (iconPath) {
 				options.icon = iconPath
 				options.iconIndex = 0
 			}
@@ -80,10 +80,10 @@ export class WindowsDeployer implements Deployer {
 		}
 	}
 
-	rename(oldName: string, newName: string, config: AppConfig): void {
+	async rename(oldName: string, newName: string, config: AppConfig): Promise<void> {
 		if (!this.isDeployed(oldName)) return
 
 		this.undeploy(oldName)
-		this.deploy({ name: newName, config })
+		await this.deploy({ name: newName, config })
 	}
 }

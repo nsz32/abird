@@ -4,6 +4,7 @@ import { join } from "node:path"
 import type { IconData, IconFetchResult, IconResult, IconSource } from "@shared/types"
 import { net, WebContentsView, app, dialog } from "electron"
 import { Jimp } from "jimp"
+import pngToIco from "png-to-ico"
 import { paths } from "../utils/platform"
 
 const DEFAULT_ICON_FILENAME = "bird-default.png"
@@ -263,12 +264,16 @@ export function deleteIcon(filename: string): void {
 	// Security: prevent path traversal
 	if (filename.includes("/") || filename.includes("\\")) return
 
-	const path = join(paths.icons, filename)
-	if (existsSync(path)) {
-		try {
-			unlinkSync(path)
-		} catch {
-			// Ignore errors
+	const pngPath = join(paths.icons, filename)
+	const icoPath = pngPath.replace(/\.png$/, ".ico")
+
+	for (const path of [pngPath, icoPath]) {
+		if (existsSync(path)) {
+			try {
+				unlinkSync(path)
+			} catch {
+				// Ignore errors
+			}
 		}
 	}
 }
@@ -328,4 +333,28 @@ export function getDefaultIconPath(): string | null {
 	copyFileSync(sourcePath, targetPath)
 
 	return targetPath
+}
+
+/**
+ * Gets the ICO version of a PNG icon for Windows shortcuts.
+ * Generates the ICO file on demand if it doesn't exist.
+ */
+export async function getIconPathAsIco(filename: string): Promise<string | null> {
+	const pngPath = getIconPath(filename)
+	if (!pngPath) return null
+
+	const icoFilename = filename.replace(/\.png$/, ".ico")
+	const icoPath = join(paths.icons, icoFilename)
+
+	if (existsSync(icoPath)) {
+		return icoPath
+	}
+
+	try {
+		const icoBuffer = await pngToIco(pngPath)
+		writeFileSync(icoPath, icoBuffer)
+		return icoPath
+	} catch {
+		return null
+	}
 }

@@ -12,11 +12,11 @@
 		"icon": "assets/icons"
 	},
 	"win": {
-		"target": ["nsis", "portable"],
+		"target": ["msi", "portable"],
 		"icon": "assets/icons/icon.ico"
 	},
-	"nsis": {
-		"artifactName": "${productName}-${version}-${arch}-setup.${ext}"
+	"msi": {
+		"artifactName": "${productName}-${version}-${arch}.${ext}"
 	},
 	"portable": {
 		"artifactName": "${productName}-${version}-${arch}-portable.${ext}"

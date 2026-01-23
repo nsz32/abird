@@ -66,7 +66,7 @@ export class LinuxDeployer implements Deployer {
 		return existsSync(this.getShortcutPath(appName))
 	}
 
-	deploy({ name, config }: DeployableApp): void {
+	async deploy({ name, config }: DeployableApp): Promise<void> {
 		ensureDesktopFilesDir()
 
 		const content = buildDesktopFileContent(name, config)
@@ -83,10 +83,10 @@ export class LinuxDeployer implements Deployer {
 		}
 	}
 
-	rename(oldName: string, newName: string, config: AppConfig): void {
+	async rename(oldName: string, newName: string, config: AppConfig): Promise<void> {
 		if (!this.isDeployed(oldName)) return
 
 		this.undeploy(oldName)
-		this.deploy({ name: newName, config })
+		await this.deploy({ name: newName, config })
 	}
 }
