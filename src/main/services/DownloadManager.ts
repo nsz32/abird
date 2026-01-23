@@ -208,13 +208,14 @@ export function setupDownloads(session: Session, config: ResolvedDownloadConfig)
 							try {
 								unlinkSync(tempPath)
 							} catch {}
+							const execName = result.executable.name ?? "unknown"
 							updateNotification(notifId, {
 								title: `${filename} - ${t("downloads.status.blocked")}`,
-								message: t("downloads.notification.executableDetected").replace("{name}", result.executable.name),
+								message: t("downloads.notification.executableDetected").replace("{name}", execName),
 								dismissable: true,
 							})
 							removeActiveDownload(downloadId)
-							addToHistory(downloadId, filename, "", url, partition, "blocked", 0, t("downloads.executableType").replace("{name}", result.executable.name))
+							addToHistory(downloadId, filename, "", url, partition, "blocked", 0, t("downloads.executableType").replace("{name}", execName))
 						}
 						return result
 					})
@@ -286,24 +287,25 @@ async function handleCompletedDownload(
 	checkOfficeMacroWarning(result.mime)
 
 	if (result.executable.isExecutable) {
+		const execName = result.executable.name ?? "unknown"
 		try {
 			unlinkSync(tempPath)
 		} catch {}
 		if (!config.allowExecutablesDownload) {
-			addNotification("download", filename, t("downloads.notification.executableDeleted").replace("{name}", result.executable.name), {
+			addNotification("download", filename, t("downloads.notification.executableDeleted").replace("{name}", execName), {
 				dismissable: true,
 				autoDismiss: 5000,
 			})
-			addToHistory(downloadId, filename, "", url, partition, "blocked", size, t("downloads.executableType").replace("{name}", result.executable.name))
+			addToHistory(downloadId, filename, "", url, partition, "blocked", size, t("downloads.executableType").replace("{name}", execName))
 		} else {
 			try {
 				renameSync(tempPath, finalPath)
 			} catch {}
-			addNotification("download", filename, t("downloads.notification.completedWithExe").replace("{name}", result.executable.name), {
+			addNotification("download", filename, t("downloads.notification.completedWithExe").replace("{name}", execName), {
 				dismissable: true,
 				autoDismiss: 5000,
 			})
-			addToHistory(downloadId, filename, finalPath, url, partition, "completed", size, t("downloads.executableType").replace("{name}", result.executable.name))
+			addToHistory(downloadId, filename, finalPath, url, partition, "completed", size, t("downloads.executableType").replace("{name}", execName))
 		}
 		return
 	}
