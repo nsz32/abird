@@ -109,7 +109,7 @@ export function selectConfigMode(): void {
 			visible: true,
 			autoHide: false,
 			allowUrlEdit: false,
-			allowSingleTabClose: false,
+			allowSingleTabClose: true,
 		},
 		routing: { rules: { "^bird://": "internal" } },
 	}

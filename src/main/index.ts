@@ -18,8 +18,17 @@ import { getAvailableUserAgents } from "./utils/userAgents"
 const DEFAULT_PROJECT_NAME = "bird"
 const PROJECT_NAME_PATTERN = /^[a-zA-Z0-9_-]+$/
 
-function getXdgDataHome(): string {
-	return process.env.XDG_DATA_HOME || join(app.getPath("home"), ".local", "share")
+/**
+ * Get the platform-appropriate data directory.
+ * - Linux: XDG_DATA_HOME or ~/.local/share
+ * - Windows: AppData\Roaming
+ * - macOS: ~/Library/Application Support
+ */
+function getDataHome(): string {
+	if (process.platform === "linux") {
+		return process.env.XDG_DATA_HOME || join(app.getPath("home"), ".local", "share")
+	}
+	return app.getPath("appData")
 }
 
 function inferProjectNameFromPath(configPath: string): string {
@@ -46,18 +55,18 @@ function readProjectName(configPath: string, isCustomPath: boolean): string {
 }
 
 function resolveUserDataPath(): string {
-	const xdgDataHome = getXdgDataHome()
+	const dataHome = getDataHome()
 	const customConfigPath = getConfigPathFromArgs()
 
 	if (customConfigPath) {
 		const projectName = readProjectName(customConfigPath, true)
-		return join(xdgDataHome, projectName)
+		return join(dataHome, projectName)
 	}
 
 	// Default config path: check if it exists and has projectName
-	const defaultConfigPath = join(xdgDataHome, DEFAULT_PROJECT_NAME, "config.json")
+	const defaultConfigPath = join(dataHome, DEFAULT_PROJECT_NAME, "config.json")
 	const projectName = readProjectName(defaultConfigPath, false)
-	return join(xdgDataHome, projectName)
+	return join(dataHome, projectName)
 }
 
 app.setPath("userData", resolveUserDataPath())
