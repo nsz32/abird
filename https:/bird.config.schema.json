@@ -1,0 +1,264 @@
+{
+	"$ref": "#/definitions/BirdConfig",
+	"definitions": {
+		"BirdConfig": {
+			"type": "object",
+			"properties": {
+				"projectName": {
+					"type": "string",
+					"pattern": "^[a-zA-Z0-9_-]+$"
+				},
+				"theme": {
+					"type": "string",
+					"enum": [
+						"system",
+						"light",
+						"dark"
+					],
+					"default": "system"
+				},
+				"navBar": {
+					"type": "object",
+					"properties": {
+						"position": {
+							"type": "string",
+							"enum": [
+								"top",
+								"bottom"
+							],
+							"default": "bottom"
+						},
+						"visible": {
+							"type": "boolean",
+							"default": true
+						},
+						"autoHide": {
+							"type": "boolean",
+							"default": false
+						},
+						"allowUrlEdit": {
+							"type": "boolean",
+							"default": false
+						},
+						"showBackButton": {
+							"type": "boolean",
+							"default": true
+						},
+						"showForwardButton": {
+							"type": "boolean",
+							"default": true
+						},
+						"showRefreshButton": {
+							"type": "boolean",
+							"default": true
+						},
+						"showHomeButton": {
+							"type": "boolean",
+							"default": true
+						},
+						"allowSingleTabClose": {
+							"type": "boolean",
+							"default": false
+						}
+					},
+					"additionalProperties": false,
+					"default": {}
+				},
+				"downloads": {
+					"type": "object",
+					"properties": {
+						"directory": {
+							"type": "string"
+						},
+						"autoOpenMaxSize": {
+							"type": [
+								"number",
+								"string"
+							]
+						},
+						"autoOpenMimeTypes": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						},
+						"allowExecutablesDownload": {
+							"type": "boolean"
+						},
+						"allowDuplicateDownloads": {
+							"type": "boolean"
+						}
+					},
+					"additionalProperties": false,
+					"default": {}
+				},
+				"apps": {
+					"type": "object",
+					"additionalProperties": {
+						"type": "object",
+						"properties": {
+							"partition": {
+								"type": "string",
+								"pattern": "^[a-z][a-z0-9_]*$"
+							},
+							"startUrl": {
+								"type": "string"
+							},
+							"description": {
+								"type": "string"
+							},
+							"icon": {
+								"type": "string"
+							},
+							"theme": {
+								"type": "string",
+								"enum": [
+									"system",
+									"light",
+									"dark"
+								]
+							},
+							"userAgent": {
+								"type": "string"
+							},
+							"userAgentRaw": {
+								"type": "string"
+							},
+							"navBar": {
+								"type": "object",
+								"properties": {
+									"position": {
+										"type": "string",
+										"enum": [
+											"top",
+											"bottom"
+										],
+										"default": "bottom"
+									},
+									"visible": {
+										"type": "boolean",
+										"default": true
+									},
+									"autoHide": {
+										"type": "boolean",
+										"default": false
+									},
+									"allowUrlEdit": {
+										"type": "boolean",
+										"default": false
+									},
+									"showBackButton": {
+										"type": "boolean",
+										"default": true
+									},
+									"showForwardButton": {
+										"type": "boolean",
+										"default": true
+									},
+									"showRefreshButton": {
+										"type": "boolean",
+										"default": true
+									},
+									"showHomeButton": {
+										"type": "boolean",
+										"default": true
+									},
+									"allowSingleTabClose": {
+										"type": "boolean",
+										"default": false
+									}
+								},
+								"additionalProperties": false
+							},
+							"routing": {
+								"type": "object",
+								"properties": {
+									"rules": {
+										"type": "object",
+										"additionalProperties": {
+											"type": "string",
+											"enum": [
+												"internal",
+												"download",
+												"external",
+												"ignore"
+											]
+										},
+										"default": {}
+									}
+								},
+								"additionalProperties": false
+							},
+							"downloads": {
+								"type": "object",
+								"properties": {
+									"directory": {
+										"type": "string"
+									},
+									"autoOpenMaxSize": {
+										"type": [
+											"number",
+											"string"
+										]
+									},
+									"autoOpenMimeTypes": {
+										"type": "array",
+										"items": {
+											"type": "string"
+										}
+									},
+									"allowExecutablesDownload": {
+										"type": "boolean"
+									},
+									"allowDuplicateDownloads": {
+										"type": "boolean"
+									}
+								},
+								"additionalProperties": false
+							}
+						},
+						"required": [
+							"partition",
+							"startUrl"
+						],
+						"additionalProperties": false
+					},
+					"default": {}
+				},
+				"partitions": {
+					"type": "object",
+					"additionalProperties": {
+						"type": "object",
+						"properties": {
+							"adBlockEnabled": {
+								"type": "boolean",
+								"default": true
+							},
+							"cacheCleanup": {
+								"type": "object",
+								"properties": {
+									"maxFileSizeMB": {
+										"type": "number",
+										"minimum": 0
+									},
+									"maxAgeDays": {
+										"type": "number",
+										"minimum": 0
+									}
+								},
+								"additionalProperties": false
+							}
+						},
+						"additionalProperties": false
+					},
+					"default": {},
+					"propertyNames": {
+						"pattern": "^[a-z][a-z0-9_]*$"
+					}
+				}
+			},
+			"additionalProperties": false
+		}
+	},
+	"$schema": "http://json-schema.org/draft-07/schema#"
+}

@@ -36,7 +36,7 @@ export function parseCliArgs(argv: string[] = process.argv.slice(2)): CliArgs | 
 
 	return {
 		appName: getOptionValue(argv, "--app"),
-		configPath: getOptionValue(argv, "--config"),
+		configPath: getConfigPathFromArgs(argv),
 		browserUrl: extractBrowserUrl(argv),
 		userAgent: getOptionValue(argv, "--userAgent"),
 		listUserAgents: hasOptionWithoutValue(argv, "--userAgent"),
@@ -75,11 +75,27 @@ function getOptionValue(argv: string[], option: string): string | null {
 	return value && !value.startsWith("--") ? value : null
 }
 
+function isValidConfigPath(path: string): boolean {
+	const isUrl = /^[a-z][a-z0-9+.-]*:\/\//i.test(path)
+	const endsWithJson = path.toLowerCase().endsWith(".json")
+	return !isUrl && endsWithJson
+}
+
 /**
- * Extract --config path from argv (for early bootstrap before app.whenReady)
+ * Extract and validate --config path from argv (for early bootstrap before app.whenReady)
+ * Exits with error if path is invalid (URL or doesn't end with .json)
  */
 export function getConfigPathFromArgs(argv: string[] = process.argv.slice(2)): string | null {
-	return getOptionValue(argv, "--config")
+	const value = getOptionValue(argv, "--config")
+	if (!value) return null
+
+	if (!isValidConfigPath(value)) {
+		console.error(`Invalid --config path: "${value}"`)
+		console.error("Path must be a valid file path ending with .json")
+		process.exit(1)
+	}
+
+	return value
 }
 
 function hasOptionWithoutValue(argv: string[], option: string): boolean {

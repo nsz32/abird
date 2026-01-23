@@ -1,9 +1,9 @@
 import { join } from "node:path"
 import { Menu, app, dialog, nativeImage } from "electron"
 import { getTranslations } from "../core/I18n"
-import { openExternal } from "../utils/platform"
 import { findBarVisible$ } from "../core/states"
 import { closeTab, createTab, getActiveTab } from "../tabs/Tabs"
+import { openExternal } from "../utils/platform"
 import { getNavBar } from "../views/views"
 
 function getAppIconPath(): string {
@@ -11,7 +11,7 @@ function getAppIconPath(): string {
 }
 
 function showAboutDialog(): void {
-	const detail = ["Desktop, Repackable, Isolated Browser", "", "© 2026 Nicolas Szabo", "<nszabo2@gmail.com>", "", "License: MIT"].join("\n")
+	const detail = ["Desktop Redistribuable Isolated Browser", "", "© 2026 Nicolas Szabo", "<nszabo2@gmail.com>", "", "License: MIT"].join("\n")
 
 	dialog.showMessageBox({
 		type: "info",

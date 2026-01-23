@@ -1,6 +1,6 @@
 {
 	"$schema": "./bird.config.schema.json",
-	"projectName": "devel",
+	"projectName": "bird_devel",
 	"theme": "dark",
 	"downloads": {
 		"autoOpenMaxSize": "10M",
