@@ -7,7 +7,7 @@ Bird turns any website into a standalone desktop application with complete sessi
 ## Why Bird?
 
 - **Session Isolation**: Each app runs in its own partition (cookies, localStorage, cache) — no cross-contamination between apps
-- **Enterprise Packaging**: Web app vendors can distribute their SaaS as a native desktop app, separate from the browser
+- **Ship Your SaaS as a Desktop App** *(coming soon)*: SaaS vendors will be able to package Bird with a locked config to distribute their web app as a native desktop experience — out of the browser, branded, and ready to install
 - **Kiosk Mode**: Lock users to specific URLs with custom escape shortcuts — perfect for public terminals, dashboards, or controlled environments
 - **User-Agent Spoofing**: Test how sites behave with different browsers/devices, or bypass Electron detection
 
@@ -24,7 +24,8 @@ Bird turns any website into a standalone desktop application with complete sessi
 | **Desktop Shortcuts** | Deploy apps as native shortcuts (.desktop on Linux) |
 | **Downloads** | Auto-open by MIME type, configurable directory |
 | **Themes** | System, light, or dark mode |
-| **i18n** | English and French |
+| **i18n** | 10 languages (EN, FR, DE, ES, PT, IT, RU, ZH, AR, HI) |
+| **Distributable** | Package with locked config for SaaS/enterprise distribution *(coming soon)* |
 
 ## Quick Start
 
@@ -41,7 +42,7 @@ pnpm dev
 
 ```bash
 pnpm build                    # Build for production
-pnpm package:linux            # Create AppImage
+pnpm package:appimage         # Create AppImage (Linux)
 ```
 
 ## Usage
@@ -113,9 +114,22 @@ desktop:ie6           # For the brave
 
 Run Gmail, Slack, and Notion as separate apps — each with its own cookies and session. No more "you're signed into another account" issues.
 
-### 2. SaaS Distribution
+### 2. SaaS Distribution *(coming soon)*
 
-Web application vendors can package Bird with their config to distribute a branded desktop app. Your users get a dedicated experience outside the browser — no competing tabs, no distractions.
+Ship your web application as a real desktop app. Package Bird with a preconfigured `config.json` pointing to your SaaS — your customers get a native installer, a dedicated window, and a focused experience outside the browser.
+
+**For SaaS vendors:**
+- Your app lives outside the browser — no tabs, no distractions, no "which tab was it?"
+- Users launch your app from their dock/taskbar like any native software
+- Session isolation means your app never conflicts with their personal accounts
+- Custom branding through icons and window titles
+
+**For enterprises:**
+- Deploy internal tools as standalone apps (CRM, dashboards, ticketing)
+- Control the experience: disable URL bar, lock navigation, enforce routing rules
+- Distribute via standard enterprise deployment (MSI, .deb, AppImage)
+
+> **Status**: Single-app distribution mode is in development. Currently, you can already use `--app <name>` to launch a specific app directly.
 
 ### 3. Kiosk & Digital Signage
 

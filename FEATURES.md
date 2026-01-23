@@ -210,27 +210,40 @@ Manager can create system shortcuts per site:
 
 Shortcuts launch Bird directly with `--site <name>`.
 
-### Bundled Mode
+### Single-App Mode (Enterprise Distribution) — *Work in Progress*
 
-Standalone app with embedded config, built from an exported JSON:
+> **Status**: This mode is planned but not yet implemented. See below for the intended design.
+
+Package Bird as a standalone desktop app for your SaaS. The end user gets a native installer that launches directly into your web application — no configuration UI, no distractions.
+
+**How it will work:**
+1. Create a `config.json` with a single "main" app preconfigured
+2. Build Bird with `BIRD_SINGLE_APP=true`
+3. Distribute as AppImage, MSI, or .dmg
+
+**What gets stripped:**
+- Configuration UI (`bird://config/`)
+- App creation/editing
+- Partition management UI
+- Icon picker, deploy shortcuts
+
+**What remains:**
+- Your preconfigured app
+- Navigation bar (configurable: hide, auto-hide, lock URL)
+- Downloads panel
+- Find in page
+- Notifications
+- Ad blocker
 
 ```bash
-bird bundle --config ./gmail.json --out ./gmail-app/
+# Build a single-app distribution (not yet available)
+BIRD_SINGLE_APP=true pnpm build
+BIRD_SINGLE_APP=true pnpm package:appimage
 ```
 
-Build process:
-```
-src/
-└── config/
-    └── site.ts          # Hardcoded SiteConfig (injected at build)
-```
+The resulting binary reads `config.json` from the same directory (or embedded in resources) and launches the first app directly. Smaller bundle, reduced attack surface, focused UX.
 
-Or via environment variable:
-```bash
-BIRD_SITE_CONFIG=./configs/gmail.json pnpm build
-```
-
-The resulting app is standalone: no `~/.config/bird/`, starts directly on the configured site. No manager UI included.
+**Current workaround**: Use `bird --app <name>` to launch a specific app directly. The config UI is still included in the build but not shown.
 
 ---
 
@@ -374,13 +387,16 @@ interface SiteConfig {
 
 ## Features by Use Case
 
-### 1. Packaged Distribution
+### 1. Enterprise / SaaS Distribution *(partially available)*
 
-Pre-configured single-app builds:
-- Hardcoded `SiteConfig` at build time
-- Minimal/no user configuration
-- Custom app name, icon, window settings
-- Optional kiosk mode
+Ship your web app as a native desktop application:
+
+- **For SaaS vendors**: Package Bird with your preconfigured `config.json`. Your customers install a native app that opens directly into your service — out of the browser, branded, professional.
+- **For enterprises**: Deploy internal tools (CRM, dashboards, ticketing) as standalone apps. Lock navigation, disable URL editing, enforce routing rules.
+- **Single-app mode** *(coming soon)*: Build with `BIRD_SINGLE_APP=true` to strip the configuration UI entirely. Smaller bundle, reduced surface, focused experience.
+- **Kiosk-ready**: Combine with `--kiosk` for public terminals, digital signage, or controlled environments.
+
+> **Available now**: `bird --app <name>` launches directly into a configured app. Full single-app build mode is in development.
 
 ### 2. Multi-site Manager
 

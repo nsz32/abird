@@ -2,10 +2,6 @@
 	"$schema": "./bird.config.schema.json",
 	"projectName": "bird_devel",
 	"theme": "dark",
-	"downloads": {
-		"autoOpenMaxSize": "10M",
-		"autoOpenMimeTypes": ["image/*", "application/pdf", "video/*", "audio/*"]
-	},
 	"navBar": {
 		"position": "bottom",
 		"visible": true,
@@ -15,10 +11,20 @@
 		"showForwardButton": true,
 		"showRefreshButton": true
 	},
+	"downloads": {
+		"autoOpenMaxSize": "10M",
+		"autoOpenMimeTypes": [
+			"image/*",
+			"application/pdf",
+			"video/*",
+			"audio/*"
+		]
+	},
 	"apps": {
 		"news": {
 			"partition": "google",
 			"startUrl": "https://news.google.com",
+			"icon": "news-53a6fe02.png",
 			"userAgent": "desktop:firefox:linux",
 			"routing": {
 				"rules": {
@@ -27,9 +33,9 @@
 			}
 		},
 		"test1": {
-			"theme": "dark",
 			"partition": "test",
 			"startUrl": "https://the-internet.herokuapp.com/",
+			"theme": "dark",
 			"routing": {
 				"rules": {
 					"^https?://([^/]+\\.)?the-internet\\.herokuapp\\.com(/|$)": "internal"
@@ -63,5 +69,6 @@
 				}
 			}
 		}
-	}
+	},
+	"partitions": {}
 }
