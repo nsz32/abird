@@ -1,9 +1,10 @@
-import { readFileSync, writeFileSync } from "node:fs"
+import { copyFileSync, readFileSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 
 const rootDir = join(import.meta.dirname, "..")
-const packageJson = JSON.parse(readFileSync(join(rootDir, "package.json"), "utf-8"))
+const outDir = join(rootDir, "out")
 
+const packageJson = JSON.parse(readFileSync(join(rootDir, "package.json"), "utf-8"))
 const asarPackageJson = {
 	name: packageJson.name,
 	version: packageJson.version,
@@ -11,7 +12,7 @@ const asarPackageJson = {
 	main: "main/index.js",
 }
 
-const outputPath = join(rootDir, "out", "package.json")
-writeFileSync(outputPath, JSON.stringify(asarPackageJson, null, "\t"))
+writeFileSync(join(outDir, "package.json"), JSON.stringify(asarPackageJson, null, "\t"))
+copyFileSync(join(rootDir, "bird.config.schema.json"), join(outDir, "bird.config.schema.json"))
 
-console.log(`Asar package.json generated: ${outputPath}`)
+console.log("Asar prepared: package.json + schema")

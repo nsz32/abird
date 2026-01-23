@@ -97,9 +97,6 @@ function ensureConfigDir(): void {
 }
 
 function getSchemaSourcePath(): string {
-	if (app.isPackaged) {
-		return join(process.resourcesPath, SCHEMA_FILENAME)
-	}
 	return join(app.getAppPath(), SCHEMA_FILENAME)
 }
 

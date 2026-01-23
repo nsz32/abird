@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "node:fs"
 import { basename, dirname, join } from "node:path"
 import { app } from "electron"
+import { createLogger } from "./utils/logger"
 import { getAvailableApps, getProjectName, loadConfig, selectApp, selectBrowserMode, selectConfigMode } from "./config"
 import { sanitizeAppName } from "./utils/naming"
 import { startApp } from "./core/App"
@@ -65,6 +66,9 @@ app.setPath("userData", resolveUserDataPath())
 registerBirdScheme()
 
 app.whenReady().then(() => {
+	const log = createLogger("Main")
+	log.info(`Paths - appPath: ${app.getAppPath()}, resourcesPath: ${process.resourcesPath}, isPackaged: ${app.isPackaged}`)
+
 	const args = parseCliArgs()
 	if (!args) {
 		app.quit()

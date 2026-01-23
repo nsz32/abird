@@ -24,6 +24,7 @@
 		"news": {
 			"partition": "google",
 			"startUrl": "https://news.google.com",
+			"description": "pour avoir des newss",
 			"icon": "news-53a6fe02.png",
 			"userAgent": "desktop:firefox:linux",
 			"routing": {

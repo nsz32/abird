@@ -4,8 +4,8 @@
 	"directories": {
 		"output": "release"
 	},
-	"files": ["out/**/*", "package.json"],
-	"extraResources": ["bird.config.schema.json", "assets/icons/256x256.png"],
+	"files": ["out/**/*", "package.json", "bird.config.schema.json"],
+	"extraResources": ["assets/icons/256x256.png"],
 	"linux": {
 		"target": ["AppImage", "deb"],
 		"category": "Network",
