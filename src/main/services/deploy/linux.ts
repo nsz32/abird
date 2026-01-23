@@ -1,67 +1,27 @@
-import { createHash } from "node:crypto"
 import { existsSync, mkdirSync, unlinkSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 import type { AppConfig } from "@shared/config.schema"
-import { app } from "electron"
-import { getConfigPath, getProjectName } from "../../config"
+import { getProjectName } from "../../config"
 import { sanitizeAppName } from "../../utils/naming"
+import { paths } from "../../utils/platform"
 import { getDefaultIconPath, getIconPath } from "../icons"
+import { buildExecArgs, getExecInfo } from "./exec"
 import type { DeployableApp, Deployer } from "./types"
 
-const DESKTOP_FILES_DIR = join(app.getPath("home"), ".local", "share", "applications")
-
-interface ExecInfo {
-	execPath: string
-	asarPath: string | null
-}
-
-/**
- * Returns execution info for launching Bird.
- * Handles 3 modes:
- * - AppImage: uses APPIMAGE env variable
- * - Standalone asar: electron + asar path
- * - Standard packaged: just execPath
- */
-function getExecInfo(): ExecInfo {
-	if (process.env.APPIMAGE) {
-		return { execPath: process.env.APPIMAGE, asarPath: null }
-	}
-
-	const appPath = app.getAppPath()
-	const isStandaloneAsar = appPath.endsWith(".asar") && !appPath.includes("/resources/")
-	if (isStandaloneAsar) {
-		return { execPath: process.execPath, asarPath: appPath }
-	}
-
-	return { execPath: process.execPath, asarPath: null }
-}
+const DESKTOP_FILES_DIR = paths.desktopFiles
 
 function getDesktopFileName(appName: string): string {
-	const configPath = getConfigPath()
-	const isCustomConfig = configPath !== join(app.getPath("userData"), "config.json")
-
 	const safeName = sanitizeAppName(appName)
 	const prefix = getProjectName()
-
-	if (isCustomConfig) {
-		const configHash = createHash("md5").update(configPath).digest("hex").slice(0, 8)
-		return `${prefix}-${safeName}-${configHash}.desktop`
-	}
 
 	return `${prefix}-${safeName}.desktop`
 }
 
 function buildExecCommand(appName: string): string {
-	const configPath = getConfigPath()
-	const isCustomConfig = configPath !== join(app.getPath("userData"), "config.json")
-	const { execPath, asarPath } = getExecInfo()
+	const { execPath } = getExecInfo()
+	const args = buildExecArgs(appName)
 
-	const parts = [execPath]
-	if (asarPath) parts.push(`"${asarPath}"`)
-	if (isCustomConfig) parts.push(`--config "${configPath}"`)
-	parts.push(`--app "${appName}"`)
-
-	return parts.join(" ")
+	return args ? `${execPath} ${args}` : execPath
 }
 
 function buildDesktopFileContent(appName: string, appConfig: AppConfig): string {

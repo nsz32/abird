@@ -25,6 +25,9 @@ export const paths = {
 	get desktopFiles() {
 		return join(app.getPath("home"), ".local", "share", "applications")
 	},
+	get startMenu() {
+		return join(app.getPath("appData"), "Microsoft", "Windows", "Start Menu", "Programs")
+	},
 }
 
 /**

@@ -2,8 +2,7 @@ import { spawn } from "node:child_process"
 import type { AppConfig } from "@shared/config.schema"
 import type { DeployState } from "@shared/types"
 import { app } from "electron"
-import { getConfigPath } from "../../config"
-import { paths } from "../../utils/platform"
+import { buildExecArgsArray, getExecInfo } from "./exec"
 import { LinuxDeployer } from "./linux"
 import { MacDeployer } from "./mac"
 import type { Deployer } from "./types"
@@ -69,36 +68,11 @@ export function renameDeploy(oldName: string, newName: string, appConfig: AppCon
 	deployer.rename(oldName, newName, appConfig)
 }
 
-// === App launching (platform-independent for now) ===
-
-interface ExecInfo {
-	execPath: string
-	asarPath: string | null
-}
-
-function getExecInfo(): ExecInfo {
-	if (process.env.APPIMAGE) {
-		return { execPath: process.env.APPIMAGE, asarPath: null }
-	}
-
-	const appPath = app.getAppPath()
-	const isStandaloneAsar = appPath.endsWith(".asar") && !appPath.includes("/resources/")
-	if (isStandaloneAsar) {
-		return { execPath: process.execPath, asarPath: appPath }
-	}
-
-	return { execPath: process.execPath, asarPath: null }
-}
+// === App launching (platform-independent) ===
 
 export function launchApp(appName: string): void {
-	const configPath = getConfigPath()
-	const isCustomConfig = configPath !== paths.config
-	const { execPath, asarPath } = getExecInfo()
-
-	const args: string[] = []
-	if (asarPath) args.push(asarPath)
-	if (isCustomConfig) args.push("--config", configPath)
-	args.push("--app", appName)
+	const { execPath } = getExecInfo()
+	const args = buildExecArgsArray(appName)
 
 	spawn(execPath, args, { detached: true, stdio: "ignore" }).unref()
 }

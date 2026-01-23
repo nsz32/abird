@@ -16,3 +16,24 @@ export function sanitizeAppName(name: string): string {
 		.replace(/-+/g, "-")
 		.substring(0, 32)
 }
+
+/**
+ * Convert a string to PascalCase.
+ */
+function toPascalCase(str: string): string {
+	return str
+		.split(/[-_]/)
+		.map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+		.join("")
+}
+
+/**
+ * Generate AppUserModelId for Windows taskbar grouping.
+ * Format: ProjectName.AppName (PascalCase, max 128 chars, no spaces)
+ */
+export function getAppUserModelId(projectName: string, appName: string): string {
+	const pascalProject = toPascalCase(projectName)
+	const pascalApp = toPascalCase(sanitizeAppName(appName))
+
+	return `${pascalProject}.${pascalApp}`
+}

@@ -1,31 +1,89 @@
+import { existsSync, mkdirSync, unlinkSync } from "node:fs"
+import { join } from "node:path"
 import type { AppConfig } from "@shared/config.schema"
+import { shell } from "electron"
+import { getBirdConfig, getProjectName } from "../../config"
+import { getAppUserModelId, sanitizeAppName } from "../../utils/naming"
+import { paths } from "../../utils/platform"
+import { getIconPath } from "../icons"
+import { buildExecArgs, getExecInfo } from "./exec"
 import type { DeployableApp, Deployer } from "./types"
+
+const START_MENU_DIR = paths.startMenu
+
+function getShortcutFileName(appName: string): string {
+	const safeName = sanitizeAppName(appName)
+	const projectName = getBirdConfig().projectName
+
+	const displayName = projectName ? `${projectName} ${safeName}` : safeName
+
+	return `${displayName}.lnk`
+}
+
+function ensureStartMenuDir(): void {
+	if (!existsSync(START_MENU_DIR)) {
+		mkdirSync(START_MENU_DIR, { recursive: true })
+	}
+}
 
 /**
  * Windows deployer - creates .lnk shortcuts in Start Menu.
- * TODO: Implement using shell.writeShortcutLink() or windows-shortcuts lib.
+ * Uses shell.writeShortcutLink() with AppUserModelId for taskbar grouping.
  */
 export class WindowsDeployer implements Deployer {
-	readonly supported = false
+	readonly supported = true
 
-	getShortcutPath(_appName: string): string {
-		// Future: join(app.getPath('appData'), 'Microsoft', 'Windows', 'Start Menu', 'Programs', `${appName}.lnk`)
-		return ""
+	getShortcutPath(appName: string): string {
+		return join(START_MENU_DIR, getShortcutFileName(appName))
 	}
 
-	isDeployed(_appName: string): boolean {
-		return false
+	isDeployed(appName: string): boolean {
+		return existsSync(this.getShortcutPath(appName))
 	}
 
-	deploy(_app: DeployableApp): void {
-		throw new Error("Windows deploy not yet implemented")
+	deploy({ name, config }: DeployableApp): void {
+		ensureStartMenuDir()
+
+		const { execPath } = getExecInfo()
+		const shortcutPath = this.getShortcutPath(name)
+		const appUserModelId = getAppUserModelId(getProjectName(), name)
+
+		const options: Electron.ShortcutDetails = {
+			target: execPath,
+			args: buildExecArgs(name),
+			appUserModelId,
+		}
+
+		if (config.description) {
+			options.description = config.description
+		}
+
+		if (config.icon) {
+			const iconPath = getIconPath(config.icon)
+			if (iconPath?.endsWith(".ico")) {
+				options.icon = iconPath
+				options.iconIndex = 0
+			}
+		}
+
+		const success = shell.writeShortcutLink(shortcutPath, "create", options)
+		if (!success) {
+			throw new Error(`Failed to create shortcut: ${shortcutPath}`)
+		}
 	}
 
-	undeploy(_appName: string): void {
-		// No-op until implemented
+	undeploy(appName: string): void {
+		const filePath = this.getShortcutPath(appName)
+
+		if (existsSync(filePath)) {
+			unlinkSync(filePath)
+		}
 	}
 
-	rename(_oldName: string, _newName: string, _config: AppConfig): void {
-		// No-op until implemented
+	rename(oldName: string, newName: string, config: AppConfig): void {
+		if (!this.isDeployed(oldName)) return
+
+		this.undeploy(oldName)
+		this.deploy({ name: newName, config })
 	}
 }

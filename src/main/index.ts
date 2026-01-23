@@ -1,9 +1,7 @@
 import { existsSync, readFileSync } from "node:fs"
 import { basename, dirname, join } from "node:path"
 import { app } from "electron"
-import { createLogger } from "./utils/logger"
 import { getAvailableApps, getProjectName, loadConfig, selectApp, selectBrowserMode, selectConfigMode } from "./config"
-import { sanitizeAppName } from "./utils/naming"
 import { startApp } from "./core/App"
 import { initI18n } from "./core/I18n"
 import { registerBirdScheme, setupBirdProtocol } from "./core/Protocol"
@@ -11,6 +9,8 @@ import { findConfigModeConflicts, getConfigPathFromArgs, parseCliArgs, printHelp
 import { parseShortcut, registerKioskExitShortcut } from "./core/kiosk"
 import { config$, kioskMode$ } from "./core/states"
 import { cleanupAllPartitionCaches, releasePartitionLock } from "./services/CacheManager"
+import { createLogger } from "./utils/logger"
+import { getAppUserModelId, sanitizeAppName } from "./utils/naming"
 import { getAvailableUserAgents } from "./utils/userAgents"
 
 // === Bootstrap: resolve userData before app.whenReady ===
@@ -62,6 +62,18 @@ function resolveUserDataPath(): string {
 
 app.setPath("userData", resolveUserDataPath())
 
+/**
+ * Set app name and Windows AppUserModelId for taskbar grouping.
+ * Must be called before creating windows.
+ */
+function setAppIdentity(projectName: string, appName: string): void {
+	app.setName(`${projectName}-${sanitizeAppName(appName)}`)
+
+	if (process.platform === "win32") {
+		app.setAppUserModelId(getAppUserModelId(projectName, appName))
+	}
+}
+
 // Must be called before app.whenReady()
 registerBirdScheme()
 
@@ -107,7 +119,7 @@ app.whenReady().then(() => {
 	const projectName = getProjectName()
 
 	if (args.browserUrl) {
-		app.setName(`${projectName}-browser`)
+		setAppIdentity(projectName, "browser")
 		selectBrowserMode(args.browserUrl, args.userAgent ?? undefined)
 		startApp()
 		return
@@ -120,7 +132,7 @@ app.whenReady().then(() => {
 			app.quit()
 			return
 		}
-		app.setName(`${projectName}-config`)
+		setAppIdentity(projectName, "config")
 		selectConfigMode()
 		startApp()
 		return
@@ -133,7 +145,7 @@ app.whenReady().then(() => {
 		return
 	}
 
-	app.setName(`${projectName}-${sanitizeAppName(args.appName)}`)
+	setAppIdentity(projectName, args.appName)
 	startApp()
 })
 

@@ -15,6 +15,12 @@
 		"target": ["nsis", "portable"],
 		"icon": "assets/icons/icon.ico"
 	},
+	"nsis": {
+		"artifactName": "${productName}-${version}-${arch}-setup.${ext}"
+	},
+	"portable": {
+		"artifactName": "${productName}-${version}-${arch}-portable.${ext}"
+	},
 	"mac": {
 		"target": ["dmg"],
 		"icon": "assets/icons/icon.icns"
