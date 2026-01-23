@@ -4,32 +4,31 @@
 	"description": "Web app wrapper - isolate web applications from the browser",
 	"main": "out/main/index.js",
 	"pnpm": {
-		"onlyBuiltDependencies": [
-			"@biomejs/biome",
-			"electron",
-			"esbuild"
-		]
+		"onlyBuiltDependencies": ["@biomejs/biome", "electron", "esbuild"]
 	},
 	"scripts": {
-		"dev": "electron-vite dev",
-		"dev:local": "electron-vite dev -- --config bird.config.json",
+		"gen:schema": "tsx scripts/generate-schema.ts",
+
+		"build": "pnpm gen:schema && electron-vite build",
 		"start": "electron .",
+		"clean": "rm -rf out release",
+
+		"dev": "electron-vite dev -- --config bird.config.json",
+		"dev:bare": "electron-vite dev",
+
 		"lint": "biome check .",
 		"lint:fix": "biome check --write .",
 		"format": "biome format --write .",
 		"typecheck": "tsc --noEmit",
-		"test": "vitest",
-		"test:run": "vitest run",
-		"generate:schema": "tsx scripts/generate-schema.ts",
-		"build": "pnpm generate:schema && electron-vite build",
-		"package:linux": "rm -rf release && pnpm build && electron-builder --linux AppImage",
-		"install:linux": "bash scripts/install-linux.sh"
+		"check": "pnpm lint && pnpm typecheck",
+		"knip": "knip",
+
+		"package:asar": "pnpm clean && pnpm build && pnpm dlx @electron/asar pack out release/bird.asar",
+		"package:appimage": "pnpm clean && pnpm build && electron-builder --linux AppImage",
+		"package:win": "echo 'WIP: Windows packaging not yet implemented'",
+		"package:mac": "echo 'WIP: macOS packaging not yet implemented'"
 	},
-	"keywords": [
-		"electron",
-		"webapp",
-		"wrapper"
-	],
+	"keywords": ["electron", "webapp", "wrapper"],
 	"author": "Nicolas Szabo <nszabo2@gmail.com>",
 	"license": "MIT",
 	"type": "module",
@@ -48,8 +47,7 @@
 		"knip": "^5.76.1",
 		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",
-		"vite": "^6.0.0",
-		"vitest": "^2.1.0"
+		"vite": "^6.0.0"
 	},
 	"dependencies": {
 		"@chakra-ui/react": "^3.31.0",
