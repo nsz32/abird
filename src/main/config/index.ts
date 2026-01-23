@@ -9,6 +9,7 @@ export {
 	getCurrentAppName,
 	getConfigPath,
 	getBirdConfig,
+	getProjectName,
 	readRawConfig,
 	writeRawConfig,
 	type RawUserConfig,

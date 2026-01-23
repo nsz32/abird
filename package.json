@@ -23,7 +23,7 @@
 		"check": "pnpm lint && pnpm typecheck",
 		"knip": "knip",
 
-		"package:asar": "pnpm clean && pnpm build && pnpm dlx @electron/asar pack out release/bird.asar",
+		"package:asar": "pnpm clean && pnpm build && tsx scripts/prepare-asar.ts && pnpm dlx @electron/asar pack out release/bird.asar",
 		"package:appimage": "pnpm clean && pnpm build && electron-builder --linux AppImage",
 		"package:win": "echo 'WIP: Windows packaging not yet implemented'",
 		"package:mac": "echo 'WIP: macOS packaging not yet implemented'"

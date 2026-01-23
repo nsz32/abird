@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs"
 import { basename, dirname, join } from "node:path"
 import { app } from "electron"
-import { getAvailableApps, loadConfig, selectApp, selectBrowserMode, selectConfigMode } from "./config"
+import { getAvailableApps, getProjectName, loadConfig, selectApp, selectBrowserMode, selectConfigMode } from "./config"
 import { sanitizeAppName } from "./utils/naming"
 import { startApp } from "./core/App"
 import { initI18n } from "./core/I18n"
@@ -100,8 +100,10 @@ app.whenReady().then(() => {
 	initI18n()
 	setupBirdProtocol()
 
+	const projectName = getProjectName()
+
 	if (args.browserUrl) {
-		app.setName("bird-browser")
+		app.setName(`${projectName}-browser`)
 		selectBrowserMode(args.browserUrl, args.userAgent ?? undefined)
 		startApp()
 		return
@@ -114,7 +116,7 @@ app.whenReady().then(() => {
 			app.quit()
 			return
 		}
-		app.setName("bird-config")
+		app.setName(`${projectName}-config`)
 		selectConfigMode()
 		startApp()
 		return
@@ -127,7 +129,7 @@ app.whenReady().then(() => {
 		return
 	}
 
-	app.setName(`bird-${sanitizeAppName(args.appName)}`)
+	app.setName(`${projectName}-${sanitizeAppName(args.appName)}`)
 	startApp()
 })
 

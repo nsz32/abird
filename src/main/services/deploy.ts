@@ -5,7 +5,7 @@ import { join } from "node:path"
 import type { AppConfig } from "@shared/config.schema"
 import type { DeployState } from "@shared/types"
 import { app } from "electron"
-import { getConfigPath } from "../config"
+import { getConfigPath, getProjectName } from "../config"
 import { paths } from "../utils/platform"
 import { sanitizeAppName } from "../utils/naming"
 import { getDefaultIconPath, getIconPath } from "./icons"
@@ -18,18 +18,46 @@ export function isLaunchSupported(): boolean {
 	return app.isPackaged
 }
 
+interface ExecInfo {
+	execPath: string
+	asarPath: string | null
+}
+
+/**
+ * Returns execution info for launching Bird.
+ * Handles 3 modes:
+ * - AppImage: uses APPIMAGE env variable
+ * - Standalone asar: electron + asar path
+ * - Standard packaged: just execPath
+ */
+function getExecInfo(): ExecInfo {
+	if (process.env.APPIMAGE) {
+		return { execPath: process.env.APPIMAGE, asarPath: null }
+	}
+
+	const appPath = app.getAppPath()
+	const isStandaloneAsar = appPath.endsWith(".asar") && !appPath.includes("/resources/")
+	if (isStandaloneAsar) {
+		return { execPath: process.execPath, asarPath: appPath }
+	}
+
+	return { execPath: process.execPath, asarPath: null }
+}
+
 function getDesktopFileName(appName: string): string {
 	const configPath = getConfigPath()
 	const isCustomConfig = configPath !== paths.config
 
 	const safeName = sanitizeAppName(appName)
 
+	const prefix = getProjectName()
+
 	if (isCustomConfig) {
 		const configHash = createHash("md5").update(configPath).digest("hex").slice(0, 8)
-		return `bird-${safeName}-${configHash}.desktop`
+		return `${prefix}-${safeName}-${configHash}.desktop`
 	}
 
-	return `bird-${safeName}.desktop`
+	return `${prefix}-${safeName}.desktop`
 }
 
 function getDesktopFilePath(appName: string): string {
@@ -39,14 +67,14 @@ function getDesktopFilePath(appName: string): string {
 function buildExecCommand(appName: string): string {
 	const configPath = getConfigPath()
 	const isCustomConfig = configPath !== paths.config
+	const { execPath, asarPath } = getExecInfo()
 
-	const execPath = process.env.APPIMAGE ?? process.execPath
+	const parts = [execPath]
+	if (asarPath) parts.push(`"${asarPath}"`)
+	if (isCustomConfig) parts.push(`--config "${configPath}"`)
+	parts.push(`--app "${appName}"`)
 
-	if (isCustomConfig) {
-		return `${execPath} --config "${configPath}" --app "${appName}"`
-	}
-
-	return `${execPath} --app "${appName}"`
+	return parts.join(" ")
 }
 
 function buildDesktopFileContent(appName: string, appConfig: AppConfig): string {
@@ -60,7 +88,7 @@ function buildDesktopFileContent(appName: string, appConfig: AppConfig): string 
 		"Terminal=false",
 		"Type=Application",
 		"Categories=Network;",
-		`StartupWMClass=bird-${sanitizeAppName(appName)}`,
+		`StartupWMClass=${getProjectName()}-${sanitizeAppName(appName)}`,
 	]
 
 	if (appConfig.description) {
@@ -134,9 +162,12 @@ export function renameDeploy(oldName: string, newName: string, appConfig: AppCon
 export function launchApp(appName: string): void {
 	const configPath = getConfigPath()
 	const isCustomConfig = configPath !== paths.config
-	const execPath = process.env.APPIMAGE ?? process.execPath
+	const { execPath, asarPath } = getExecInfo()
 
-	const args = isCustomConfig ? ["--config", configPath, "--app", appName] : ["--app", appName]
+	const args: string[] = []
+	if (asarPath) args.push(asarPath)
+	if (isCustomConfig) args.push("--config", configPath)
+	args.push("--app", appName)
 
 	spawn(execPath, args, { detached: true, stdio: "ignore" }).unref()
 }

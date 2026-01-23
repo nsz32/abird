@@ -35,6 +35,10 @@ export function setCurrentAppName(name: string | null): void {
 	currentAppName = name
 }
 
+export function getProjectName(): string {
+	return birdConfig.projectName ?? "bird"
+}
+
 export function loadConfig(customPath?: string | null): void {
 	if (customPath) configPath = resolve(customPath)
 
