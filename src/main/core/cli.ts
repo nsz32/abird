@@ -1,7 +1,16 @@
+import { app } from "electron"
+
 interface CliOption {
 	name: string
 	hasValue: boolean
 	description: string
+}
+
+/** Get CLI arguments, accounting for packaged vs dev mode */
+function getArgv(): string[] {
+	// In dev: argv = [electron, script.js, ...args] → slice(2)
+	// In packaged: argv = [executable, ...args] → slice(1)
+	return process.argv.slice(app.isPackaged ? 1 : 2)
 }
 
 const CLI_OPTIONS: CliOption[] = [
@@ -24,7 +33,7 @@ export interface CliArgs {
 	showHelp: boolean
 }
 
-export function parseCliArgs(argv: string[] = process.argv.slice(2)): CliArgs | null {
+export function parseCliArgs(argv: string[] = getArgv()): CliArgs | null {
 	const unknownOptions = findUnknownOptions(argv)
 	if (unknownOptions.length > 0) {
 		for (const opt of unknownOptions) {
@@ -85,7 +94,7 @@ function isValidConfigPath(path: string): boolean {
  * Extract and validate --config path from argv (for early bootstrap before app.whenReady)
  * Exits with error if path is invalid (URL or doesn't end with .json)
  */
-export function getConfigPathFromArgs(argv: string[] = process.argv.slice(2)): string | null {
+export function getConfigPathFromArgs(argv: string[] = getArgv()): string | null {
 	const value = getOptionValue(argv, "--config")
 	if (!value) return null
 
