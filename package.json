@@ -1,7 +1,7 @@
 {
 	"name": "bird",
 	"version": "0.1.0",
-	"description": "Web app wrapper - isolate web applications from the browser",
+	"description": "Bird - Desktop Redistribuable Isolated Browser",
 	"main": "out/main/index.js",
 	"pnpm": {
 		"onlyBuiltDependencies": ["@biomejs/biome", "electron", "esbuild"]

@@ -5,6 +5,8 @@
 	"directories": {
 		"output": "release"
 	},
+	"afterPack": "./scripts/afterPack.cjs",
+	"electronLanguages": ["ar", "de", "en-US", "es", "fr", "hi", "it", "pt-BR", "pt-PT", "ru", "zh-CN", "zh-TW"],
 	"files": [
 		"out/**/*",
 		"package.json",
@@ -13,8 +15,7 @@
 		"!**/node_modules/**",
 		"node_modules/@ghostery/adblocker-electron-preload/**",
 		"node_modules/uiohook-napi/**",
-		"node_modules/node-gyp-build/**",
-		"!**/locales/!(ar|de|en-US|es|fr|hi|it|pt-BR|pt-PT|ru|zh-CN|zh-TW).pak"
+		"node_modules/node-gyp-build/**"
 	],
 	"asarUnpack": ["**/*.node"],
 	"extraResources": ["assets/icons/256x256.png"],
