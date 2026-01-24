@@ -24,9 +24,7 @@ export function getPartitionConfig(name: string): PartitionConfig | null {
  */
 export function getOrphanedConfigPartitions(): string[] {
 	const state = getPartitionsState()
-	return state.partitions
-		.filter((p) => !p.hasPhysical && p.usedByApps.length === 0 && p.hasConfig)
-		.map((p) => p.name)
+	return state.partitions.filter((p) => !p.hasPhysical && p.usedByApps.length === 0 && p.hasConfig).map((p) => p.name)
 }
 
 function getPartitionsDir(): string {
@@ -171,5 +169,4 @@ export function renamePartition(oldName: string, newName: string): void {
 		renameSync(oldPath, newPath)
 		log.info(`Renamed: ${oldName} -> ${newName}`)
 	}
-
 }

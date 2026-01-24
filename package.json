@@ -4,15 +4,12 @@
 	"description": "Web app wrapper - isolate web applications from the browser",
 	"main": "out/main/index.js",
 	"pnpm": {
-		"onlyBuiltDependencies": [
-			"@biomejs/biome",
-			"electron",
-			"esbuild"
-		]
+		"onlyBuiltDependencies": ["@biomejs/biome", "electron", "esbuild"]
 	},
 	"scripts": {
 		"gen:schema": "tsx scripts/generate-schema.ts",
 		"build": "pnpm gen:schema && electron-vite build",
+		"build:fresh": "pnpm clean && pnpm build",
 		"start": "electron .",
 		"clean": "rm -rf out release",
 		"dev": "electron-vite dev -- --config bird.config.json",
@@ -23,17 +20,13 @@
 		"typecheck": "tsc --noEmit",
 		"check": "pnpm lint && pnpm typecheck",
 		"knip": "knip",
-		"package:asar": "pnpm clean && pnpm build && tsx scripts/prepare-asar.ts && pnpm dlx @electron/asar pack out release/bird.asar",
-		"package:appimage": "pnpm clean && pnpm build && electron-builder --linux AppImage",
-		"package:win": "pnpm clean && pnpm build && electron-builder --win",
+		"package:asar": "tsx scripts/prepare-asar.ts",
+		"package:appimage": "electron-builder --linux AppImage",
+		"package:win": "electron-builder --win",
 		"package:mac": "echo 'WIP: macOS packaging not yet implemented'"
 	},
-	"keywords": [
-		"electron",
-		"webapp",
-		"wrapper"
-	],
-	"author": "Nicolas Szabo <nszabo2@gmail.com>",
+	"keywords": ["electron", "webapp", "wrapper"],
+	"author": "Bird Team",
 	"license": "MIT",
 	"type": "module",
 	"engines": {
@@ -41,6 +34,8 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",
+		"@chakra-ui/react": "^3.31.0",
+		"@emotion/react": "^11.14.0",
 		"@types/node": "^22.10.0",
 		"@types/react": "^19.2.7",
 		"@types/react-dom": "^19.2.3",
@@ -49,25 +44,23 @@
 		"electron-builder": "^26.0.12",
 		"electron-vite": "^3.0.0",
 		"knip": "^5.76.1",
+		"lucide-react": "^0.562.0",
+		"next-themes": "^0.4.6",
+		"react": "^19.2.3",
+		"react-dom": "^19.2.3",
 		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",
-		"vite": "^6.0.0"
+		"vite": "^6.0.0",
+		"zod-to-json-schema": "^3.25.1"
 	},
 	"dependencies": {
-		"@chakra-ui/react": "^3.31.0",
-		"@emotion/react": "^11.14.0",
 		"@ghostery/adblocker-electron": "^2.13.4",
+		"@ghostery/adblocker-electron-preload": "^2.13.4",
 		"electron-context-menu": "^4.1.1",
 		"file-type": "^21.3.0",
 		"jimp": "^1.6.0",
-		"lucide-react": "^0.562.0",
-		"next-themes": "^0.4.6",
 		"png-to-ico": "^3.0.1",
-		"react": "^19.2.3",
-		"react-dom": "^19.2.3",
-		"react-icons": "^5.5.0",
 		"uiohook-napi": "^1.5.4",
-		"zod": "^3.25.76",
-		"zod-to-json-schema": "^3.25.1"
+		"zod": "^3.25.76"
 	}
 }

@@ -13,7 +13,7 @@ export const hiTranslations: Translations = {
 	"settings.project": "प्रोजेक्ट",
 	"settings.partitions": "पार्टीशन",
 	"settings.partitionsHint": "पार्टीशन डेटा को अलग करता है (कुकीज़, कैश, स्टोरेज)। कई एप्लिकेशन एक ही पार्टीशन साझा कर सकते हैं।",
-	"settings.stats": '{{apps}} ऐप · {{partitions}} पार्टीशन',
+	"settings.stats": "{{apps}} ऐप · {{partitions}} पार्टीशन",
 
 	// Theme
 	"theme.system": "सिस्टम",

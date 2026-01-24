@@ -13,12 +13,18 @@ const rendererAlias = {
 
 export default defineConfig({
 	main: {
-		plugins: [externalizeDepsPlugin()],
+		plugins: [],
 		resolve: { alias: sharedAlias },
 		build: {
+			minify: true,
+			sourcemap: false,
 			rollupOptions: {
 				input: {
 					index: resolve(__dirname, "src/main/index.ts"),
+				},
+				external: ["electron", "uiohook-napi", "@ghostery/adblocker-electron-preload"],
+				treeshake: {
+					moduleSideEffects: false,
 				},
 			},
 		},
@@ -27,6 +33,8 @@ export default defineConfig({
 		plugins: [externalizeDepsPlugin()],
 		resolve: { alias: sharedAlias },
 		build: {
+			minify: true,
+			sourcemap: false,
 			lib: {
 				entry: resolve(__dirname, "src/preload/index.ts"),
 				formats: ["cjs"],
@@ -45,6 +53,8 @@ export default defineConfig({
 		plugins: [react()],
 		resolve: { alias: rendererAlias },
 		build: {
+			minify: true,
+			sourcemap: false,
 			rollupOptions: {
 				input: {
 					navbar: resolve(__dirname, "src/ui/navbar/index.html"),

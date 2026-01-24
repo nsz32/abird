@@ -1,4 +1,4 @@
-import { Box, Heading, HStack, Text, VStack } from "@chakra-ui/react"
+import { Box, HStack, Heading, Text, VStack } from "@chakra-ui/react"
 import { CircleHelp } from "lucide-react"
 import type { ReactNode } from "react"
 

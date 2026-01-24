@@ -4,7 +4,7 @@
  * Validation used ONLY by the main process
  */
 import { z } from "zod"
-import { isValidPartitionName, PARTITION_NAME_PATTERN } from "./partition"
+import { PARTITION_NAME_PATTERN, isValidPartitionName } from "./partition"
 
 // Theme mode
 export const ThemeModeSchema = z.enum(["system", "light", "dark"])
@@ -45,7 +45,9 @@ export const DownloadConfigSchema = z.object({
 export type DownloadConfig = z.infer<typeof DownloadConfigSchema>
 
 // Partition name schema (lowercase + numbers + underscore, must start with letter)
-export const PartitionNameSchema = z.string().regex(PARTITION_NAME_PATTERN, "Partition name must start with a letter and contain only lowercase letters, numbers, and underscores")
+export const PartitionNameSchema = z
+	.string()
+	.regex(PARTITION_NAME_PATTERN, "Partition name must start with a letter and contain only lowercase letters, numbers, and underscores")
 
 // App configuration (isolated website)
 export const AppConfigSchema = z.object({

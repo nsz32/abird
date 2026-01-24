@@ -13,7 +13,7 @@ export const ruTranslations: Translations = {
 	"settings.project": "Проект",
 	"settings.partitions": "Разделы",
 	"settings.partitionsHint": "Раздел изолирует данные (куки, кэш, хранилище). Несколько приложений могут использовать один раздел.",
-	"settings.stats": '{{apps}} прил. · {{partitions}} разд.',
+	"settings.stats": "{{apps}} прил. · {{partitions}} разд.",
 
 	// Theme
 	"theme.system": "Системная",

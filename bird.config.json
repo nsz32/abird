@@ -39,7 +39,8 @@
 			"theme": "dark",
 			"routing": {
 				"rules": {
-					"^https?://([^/]+\\.)?the-internet\\.herokuapp\\.com(/|$)": "internal"
+					"^https?://([^/]+\\.)?the-internet\\.herokuapp\\.com(/|$)": "internal",
+					"^https?://([^/]+\\.)?herokuapp\\.com(/|$)": "internal"
 				}
 			}
 		},

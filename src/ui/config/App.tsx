@@ -1,11 +1,11 @@
 import type { BirdConfig } from "@shared/config.schema"
 import type { DeployState, EffectiveConfig, PartitionsState } from "@shared/types"
+import { useTranslations } from "@ui/shared/hooks"
 import { useCallback, useEffect, useState } from "react"
 import { AppPage } from "./pages/AppPage"
 import { HomePage } from "./pages/HomePage"
 import { PartitionPage } from "./pages/PartitionPage"
 import { useHashRouter } from "./useHashRouter"
-import { useTranslations } from "@ui/shared/hooks"
 
 interface AppState {
 	config: BirdConfig

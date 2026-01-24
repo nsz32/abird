@@ -1,10 +1,22 @@
 {
 	"appId": "com.bird.app",
 	"productName": "Bird",
+	"publish": null,
 	"directories": {
 		"output": "release"
 	},
-	"files": ["out/**/*", "package.json", "bird.config.schema.json"],
+	"files": [
+		"out/**/*",
+		"package.json",
+		"bird.config.schema.json",
+		"!**/*.map",
+		"!**/node_modules/**",
+		"node_modules/@ghostery/adblocker-electron-preload/**",
+		"node_modules/uiohook-napi/**",
+		"node_modules/node-gyp-build/**",
+		"!**/locales/!(ar|de|en-US|es|fr|hi|it|pt-BR|pt-PT|ru|zh-CN|zh-TW).pak"
+	],
+	"asarUnpack": ["**/*.node"],
 	"extraResources": ["assets/icons/256x256.png"],
 	"linux": {
 		"target": ["AppImage", "deb"],
@@ -12,12 +24,13 @@
 		"icon": "assets/icons"
 	},
 	"win": {
-		"target": ["nsis", "portable"],
+		"target": [{ "target": "nsis", "arch": ["x64"] }, { "target": "portable", "arch": ["x64"] }],
 		"icon": "assets/icons/icon.ico"
 	},
 	"nsis": {
 		"oneClick": false,
 		"allowToChangeInstallationDirectory": true,
+		"packElevateHelper": false,
 		"artifactName": "${productName}-${version}-${arch}-setup.${ext}"
 	},
 	"portable": {

@@ -13,7 +13,7 @@ export const zhTranslations: Translations = {
 	"settings.project": "项目",
 	"settings.partitions": "分区",
 	"settings.partitionsHint": "分区隔离数据（cookies、缓存、存储）。多个应用程序可以共享同一分区。",
-	"settings.stats": '{{apps}} 个应用 · {{partitions}} 个分区',
+	"settings.stats": "{{apps}} 个应用 · {{partitions}} 个分区",
 
 	// Theme
 	"theme.system": "系统",

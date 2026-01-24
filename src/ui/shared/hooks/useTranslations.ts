@@ -24,16 +24,12 @@ export function useTranslations() {
 			}
 
 			// Resolve conditionals: {{param>1?"s":""}}
-			text = text.replace(
-				/\{\{(\w+)(<=?|>=?|!=|==?)(-?\d+)\?"([^"]*)":"([^"]*)"\}\}/g,
-				(_, name, op, val, ifTrue, ifFalse) => {
-					const n = Number(params[name] ?? 0)
-					const v = Number(val)
-					const match =
-						op === ">" ? n > v : op === "<" ? n < v : op === ">=" ? n >= v : op === "<=" ? n <= v : op === "!=" ? n !== v : n === v
-					return match ? ifTrue : ifFalse
-				},
-			)
+			text = text.replace(/\{\{(\w+)(<=?|>=?|!=|==?)(-?\d+)\?"([^"]*)":"([^"]*)"\}\}/g, (_, name, op, val, ifTrue, ifFalse) => {
+				const n = Number(params[name] ?? 0)
+				const v = Number(val)
+				const match = op === ">" ? n > v : op === "<" ? n < v : op === ">=" ? n >= v : op === "<=" ? n <= v : op === "!=" ? n !== v : n === v
+				return match ? ifTrue : ifFalse
+			})
 		}
 
 		return text

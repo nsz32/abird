@@ -21,7 +21,7 @@ export function registerBirdScheme() {
 export function setupBirdProtocol() {
 	protocol.handle("bird", (request) => {
 		const { host, pathname } = new URL(request.url)
-		const rendererPath = join(__dirname, "../renderer")
+		const rendererPath = join(import.meta.dirname, "../renderer")
 
 		const isRootAsset = pathname.startsWith("/assets/") || pathname === "/favicon.png"
 		if (isRootAsset) {

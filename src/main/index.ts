@@ -9,6 +9,7 @@ import { findConfigModeConflicts, getConfigPathFromArgs, parseCliArgs, printHelp
 import { parseShortcut, registerKioskExitShortcut } from "./core/kiosk"
 import { config$, kioskMode$ } from "./core/states"
 import { cleanupAllPartitionCaches, releasePartitionLock } from "./services/CacheManager"
+import { cleanupInstallerCache } from "./utils/cleanup"
 import { createLogger } from "./utils/logger"
 import { getAppUserModelId, sanitizeAppName } from "./utils/naming"
 import { getAvailableUserAgents } from "./utils/userAgents"
@@ -87,6 +88,8 @@ function setAppIdentity(projectName: string, appName: string): void {
 registerBirdScheme()
 
 app.whenReady().then(() => {
+	cleanupInstallerCache()
+
 	const log = createLogger("Main")
 	log.info(`Paths - appPath: ${app.getAppPath()}, resourcesPath: ${process.resourcesPath}, isPackaged: ${app.isPackaged}`)
 

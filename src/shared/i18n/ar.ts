@@ -13,7 +13,7 @@ export const arTranslations: Translations = {
 	"settings.project": "المشروع",
 	"settings.partitions": "الأقسام",
 	"settings.partitionsHint": "القسم يعزل البيانات (ملفات تعريف الارتباط، ذاكرة التخزين المؤقت، التخزين). يمكن لتطبيقات متعددة مشاركة نفس القسم.",
-	"settings.stats": '{{apps}} تطبيق · {{partitions}} قسم',
+	"settings.stats": "{{apps}} تطبيق · {{partitions}} قسم",
 
 	// Theme
 	"theme.system": "النظام",

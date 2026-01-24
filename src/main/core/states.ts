@@ -79,15 +79,12 @@ export const navState$ = new StateObservable<NavigationState>({
 const DEFAULT_NAVBAR_HEIGHT = 40
 
 // Navbar effective visibility (considering autoHide)
-export const navBarEffectiveVisible$ = new CombinedObservable(
-	[config$, navBarForceShow$],
-	(config, forceShow) => {
-		const { navBar } = config
-		if (!navBar.visible) return false
-		if (!navBar.autoHide) return true
-		return forceShow.urlEdit || forceShow.mouseHover || forceShow.downloading
-	},
-)
+export const navBarEffectiveVisible$ = new CombinedObservable([config$, navBarForceShow$], (config, forceShow) => {
+	const { navBar } = config
+	if (!navBar.visible) return false
+	if (!navBar.autoHide) return true
+	return forceShow.urlEdit || forceShow.mouseHover || forceShow.downloading
+})
 
 export const navBarBounds$ = new CombinedObservable(
 	[windowBounds$, config$, navBarHeight$, navBarEffectiveVisible$],
@@ -101,9 +98,7 @@ export const navBarBounds$ = new CombinedObservable(
 			return { x: 0, y: 0, width: 0, height: 0 }
 		}
 
-		return navBar.position === "top"
-			? { x: 0, y: 0, width, height }
-			: { x: 0, y: windowBounds.height - height, width, height }
+		return navBar.position === "top" ? { x: 0, y: 0, width, height } : { x: 0, y: windowBounds.height - height, width, height }
 	},
 )
 

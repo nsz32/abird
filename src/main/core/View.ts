@@ -86,7 +86,7 @@ export abstract class View {
 
 	private resolvePreload(preload?: boolean | string): string | undefined {
 		if (!preload) return undefined
-		if (typeof preload === "string") return join(__dirname, preload)
-		return join(__dirname, "../preload/index.js")
+		if (typeof preload === "string") return join(import.meta.dirname, preload)
+		return join(import.meta.dirname, "../preload/index.js")
 	}
 }

@@ -92,7 +92,12 @@ export function DownloadsConfigForm(props: DownloadsConfigFormProps) {
 							<Button size="xs" variant="ghost" onClick={() => onChange("autoOpenMimeTypes", [])}>
 								{t("downloads.mimeNone")}
 							</Button>
-							<Button size="xs" variant="ghost" title={t("downloads.mimeStandardHint")} onClick={() => onChange("autoOpenMimeTypes", STANDARD_MIME_TYPES)}>
+							<Button
+								size="xs"
+								variant="ghost"
+								title={t("downloads.mimeStandardHint")}
+								onClick={() => onChange("autoOpenMimeTypes", STANDARD_MIME_TYPES)}
+							>
 								{t("downloads.mimeStandard")}
 							</Button>
 							<IconButton aria-label={t("common.edit")} variant="ghost" size="xs" onClick={() => setShowMimeDialog(true)}>
@@ -144,7 +149,12 @@ export function DownloadsConfigForm(props: DownloadsConfigFormProps) {
 						<Button size="xs" variant="ghost" onClick={() => onChange("autoOpenMimeTypes", undefined)}>
 							{t("downloads.mimeNone")}
 						</Button>
-						<Button size="xs" variant="ghost" title={t("downloads.mimeStandardHint")} onClick={() => onChange("autoOpenMimeTypes", STANDARD_MIME_TYPES)}>
+						<Button
+							size="xs"
+							variant="ghost"
+							title={t("downloads.mimeStandardHint")}
+							onClick={() => onChange("autoOpenMimeTypes", STANDARD_MIME_TYPES)}
+						>
 							{t("downloads.mimeStandard")}
 						</Button>
 						<IconButton aria-label={t("common.edit")} variant="ghost" size="xs" onClick={() => setShowMimeDialog(true)}>
