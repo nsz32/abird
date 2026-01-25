@@ -1,8 +1,10 @@
+<img src="icon.svg" align="right" width="96" />
+
 # Bird
 
-**Isolated web app wrapper for desktop.**
+**Desktop redistribuable isolated browser.**
 
-Bird turns any website into a standalone desktop application with complete session isolation, advanced kiosk mode, and enterprise-ready packaging.
+Bird turns any website into a standalone desktop application with complete session isolation, advanced kiosk mode, and (WIP) enterprise-ready packaging.
 
 ## Why Bird?
 
