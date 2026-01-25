@@ -1,5 +1,5 @@
 import { IpcChannels } from "@shared/types"
-import { app, dialog, ipcMain, shell } from "electron"
+import { app, BrowserWindow, dialog, ipcMain, shell } from "electron"
 import { getBirdConfig, readRawConfig, writeRawConfig } from "./config"
 import { DOWNLOADS_VIEW_ID } from "./core/App"
 import { getTranslations } from "./core/I18n"
@@ -16,11 +16,13 @@ import {
 	navState$,
 	notifications$,
 } from "./core/states"
+import { setCleanAllInProgress } from "./index"
 import { cancelDownload, getDownloadPath, removeFromHistory, retryDownload } from "./services/DownloadManager"
 import { cleanupPartition, deletePartition, getPartitionsState, renamePartition, resetPartition } from "./services/PartitionManager"
 import { deploy, getDeployState, isDeploySupported, isDeployed, isLaunchSupported, launchApp, renameDeploy, undeploy } from "./services/deploy"
 import { deleteIcon, fetchIcons, getIconData, importIconFile, saveIcon } from "./services/icons"
 import { dismissNotification } from "./services/notify"
+import { performCleanAll } from "./utils/cleanup"
 import { activateTab, closeTab, createTab, getActiveTab, getTabsList } from "./tabs/Tabs"
 import { createLogger } from "./utils/logger"
 import { openFile } from "./utils/platform"
@@ -140,6 +142,23 @@ export function registerHandlers() {
 	// App launch
 	ipcMain.handle(IpcChannels.APP_LAUNCH_SUPPORTED, () => isLaunchSupported())
 	ipcMain.handle(IpcChannels.APP_LAUNCH, (_, appName: string) => launchApp(appName))
+	ipcMain.handle(IpcChannels.APP_CLEAN_ALL, async () => {
+		setCleanAllInProgress(true)
+
+		const windows = BrowserWindow.getAllWindows()
+		await Promise.all(
+			windows.map(
+				(win) =>
+					new Promise<void>((resolve) => {
+						win.once("closed", resolve)
+						win.close()
+					}),
+			),
+		)
+
+		performCleanAll()
+		app.quit()
+	})
 
 	// Navbar auto-hide
 	ipcMain.on(IpcChannels.NAVBAR_URL_EDIT_MODE, (_, active: boolean) => {
