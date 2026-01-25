@@ -9,7 +9,6 @@
 
 ```bash
 pnpm install
-pnpm gen:icons   # Required before first run (icons are gitignored)
 ```
 
 ## Commands

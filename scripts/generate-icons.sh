@@ -53,6 +53,7 @@ png2icns "$OUTPUT_DIR/icon.icns" "${icns_inputs[@]}"
 echo "    -> $OUTPUT_DIR/icon.icns"
 
 echo "==> Copying favicon for config UI..."
+mkdir -p "$PROJECT_ROOT/src/ui/public"
 cp "$OUTPUT_DIR/32x32.png" "$PROJECT_ROOT/src/ui/public/favicon.png"
 echo "    -> $PROJECT_ROOT/src/ui/public/favicon.png"
 
