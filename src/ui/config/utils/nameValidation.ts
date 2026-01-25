@@ -1,6 +1,7 @@
 // Forbidden characters on Windows: < > : " / \ | ? *
 // Windows reserved names: CON, PRN, AUX, NUL, COM1-9, LPT1-9
 
+// biome-ignore lint/suspicious/noControlCharactersInRegex: intentional - Windows forbids control chars in filenames
 const INVALID_CHARS = /[<>:"/\\|?*\x00-\x1f]/
 const WINDOWS_RESERVED = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/i
 

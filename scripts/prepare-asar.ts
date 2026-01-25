@@ -2,11 +2,7 @@ import { execSync } from "node:child_process"
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 
-const EXTERNAL_MODULES = [
-	"@ghostery/adblocker-electron-preload",
-	"uiohook-napi",
-	"node-gyp-build",
-]
+const EXTERNAL_MODULES = ["@ghostery/adblocker-electron-preload", "uiohook-napi", "node-gyp-build"]
 
 type Platform = "linux" | "darwin" | "win32"
 type Arch = "x64" | "arm64"
@@ -47,11 +43,7 @@ async function main() {
 	const packageJson = JSON.parse(readFileSync(join(rootDir, "package.json"), "utf-8"))
 	writeFileSync(
 		join(stagingDir, "package.json"),
-		JSON.stringify(
-			{ name: packageJson.name, version: packageJson.version, type: "module", main: "main/index.js" },
-			null,
-			"\t",
-		),
+		JSON.stringify({ name: packageJson.name, version: packageJson.version, type: "module", main: "main/index.js" }, null, "\t"),
 	)
 
 	// Copy schema

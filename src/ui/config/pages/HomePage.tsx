@@ -133,7 +133,14 @@ export function HomePage({ config, configPath, partitionsState, deployState, act
 							{t("settings.project")} : {config.projectName}
 						</Text>
 					)}
-					<IconButton aria-label={t("settings.cleanAll")} variant="ghost" size="xs" colorPalette="red" onClick={handleCleanAll} title={t("settings.cleanAll")}>
+					<IconButton
+						aria-label={t("settings.cleanAll")}
+						variant="ghost"
+						size="xs"
+						colorPalette="red"
+						onClick={handleCleanAll}
+						title={t("settings.cleanAll")}
+					>
 						<BrushCleaning size={14} />
 					</IconButton>
 				</HStack>

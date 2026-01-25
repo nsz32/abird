@@ -1,7 +1,7 @@
 import type { BirdConfig } from "@shared/config.schema"
 import type { DeployState, EffectiveConfig, PartitionsState } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { AppPage } from "./pages/AppPage"
 import { HomePage } from "./pages/HomePage"
 import { PartitionPage } from "./pages/PartitionPage"
@@ -48,12 +48,14 @@ export function App() {
 		setState((prev) => (prev ? { ...prev, partitionsState } : null))
 	}
 
+	const apps = state?.config.apps
+	const appNames = useMemo(() => (apps ? Object.keys(apps) : []), [apps])
+
 	const reloadDeploy = useCallback(async () => {
-		if (!state) return
-		const appNames = Object.keys(state.config.apps)
+		if (appNames.length === 0) return
 		const deployState = await window.bird.deploy.list(appNames)
 		setState((prev) => (prev ? { ...prev, deployState } : null))
-	}, [state?.config.apps])
+	}, [appNames])
 
 	const handleChange = async (newConfig: BirdConfig) => {
 		setState((prev) => (prev ? { ...prev, config: newConfig } : null))

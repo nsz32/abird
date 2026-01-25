@@ -13,12 +13,7 @@
 	},
 	"downloads": {
 		"autoOpenMaxSize": "10M",
-		"autoOpenMimeTypes": [
-			"image/*",
-			"application/pdf",
-			"video/*",
-			"audio/*"
-		]
+		"autoOpenMimeTypes": ["image/*", "application/pdf", "video/*", "audio/*"]
 	},
 	"apps": {
 		"news": {
