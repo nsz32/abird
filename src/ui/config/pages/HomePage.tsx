@@ -1,9 +1,10 @@
-import { HStack, Text, VStack } from "@chakra-ui/react"
+import { HStack, IconButton, Text, VStack } from "@chakra-ui/react"
 import type { BirdConfig, DownloadConfig, NavBarConfig } from "@shared/config.schema"
 import { normalizePartitionName } from "@shared/partition"
 import { deriveInternalPattern } from "@shared/routing"
 import type { DeployState, PartitionsState } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
+import { BrushCleaning } from "lucide-react"
 import { useEffect, useState } from "react"
 import { AppList } from "../components/AppList"
 import { ConfigSection } from "../components/ConfigSection"
@@ -103,6 +104,11 @@ export function HomePage({ config, configPath, partitionsState, deployState, act
 		reloadPartitions()
 	}
 
+	const handleCleanAll = () => {
+		if (!confirm(t("settings.cleanAllConfirm"))) return
+		window.bird.app.cleanAll()
+	}
+
 	const appCount = Object.keys(config.apps).length
 	const partitionCount = partitionsState.partitions.length
 
@@ -121,11 +127,16 @@ export function HomePage({ config, configPath, partitionsState, deployState, act
 			title={t("settings.title")}
 			leftInfo={t("settings.stats", { apps: appCount, partitions: partitionCount })}
 			rightInfo={
-				config.projectName && (
-					<Text>
-						{t("settings.project")} : {config.projectName}
-					</Text>
-				)
+				<HStack>
+					{config.projectName && (
+						<Text>
+							{t("settings.project")} : {config.projectName}
+						</Text>
+					)}
+					<IconButton aria-label={t("settings.cleanAll")} variant="ghost" size="xs" colorPalette="red" onClick={handleCleanAll} title={t("settings.cleanAll")}>
+						<BrushCleaning size={14} />
+					</IconButton>
+				</HStack>
 			}
 			actions={
 				<Text fontSize="sm" color="fg.muted">

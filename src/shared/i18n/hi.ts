@@ -14,6 +14,8 @@ export const hiTranslations: Translations = {
 	"settings.partitions": "पार्टीशन",
 	"settings.partitionsHint": "पार्टीशन डेटा को अलग करता है (कुकीज़, कैश, स्टोरेज)। कई एप्लिकेशन एक ही पार्टीशन साझा कर सकते हैं।",
 	"settings.stats": "{{apps}} ऐप · {{partitions}} पार्टीशन",
+	"settings.cleanAll": "सभी डेटा हटाएं",
+	"settings.cleanAllConfirm": "इससे सभी Bird डेटा और शॉर्टकट हटा दिए जाएंगे। आपकी पूरी कॉन्फ़िगरेशन खो जाएगी। जारी रखें?",
 
 	// Theme
 	"theme.system": "सिस्टम",

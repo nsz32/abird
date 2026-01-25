@@ -5,16 +5,22 @@ import { getAvailableApps, getProjectName, loadConfig, selectApp, selectBrowserM
 import { startApp } from "./core/App"
 import { initI18n } from "./core/I18n"
 import { registerBirdScheme, setupBirdProtocol } from "./core/Protocol"
-import { findConfigModeConflicts, getConfigPathFromArgs, parseCliArgs, printHelp } from "./core/cli"
+import { findConfigModeConflicts, getConfigPathFromArgs, parseCliArgs, printHelp, promptConfirmation } from "./core/cli"
 import { parseShortcut, registerKioskExitShortcut } from "./core/kiosk"
 import { config$, kioskMode$ } from "./core/states"
 import { cleanupAllPartitionCaches, releasePartitionLock } from "./services/CacheManager"
-import { cleanupInstallerCache } from "./utils/cleanup"
+import { cleanupInstallerCache, performCleanAll } from "./utils/cleanup"
 import { createLogger } from "./utils/logger"
 import { getAppUserModelId, sanitizeAppName } from "./utils/naming"
 import { getAvailableUserAgents } from "./utils/userAgents"
 
 // === Bootstrap: resolve userData before app.whenReady ===
+
+let cleanAllInProgress = false
+
+export function setCleanAllInProgress(value: boolean): void {
+	cleanAllInProgress = value
+}
 
 const DEFAULT_PROJECT_NAME = "bird"
 const PROJECT_NAME_PATTERN = /^[a-zA-Z0-9_-]+$/
@@ -84,6 +90,21 @@ function setAppIdentity(projectName: string, appName: string): void {
 	}
 }
 
+async function handleCleanAll(force: boolean): Promise<void> {
+	if (!force) {
+		const confirmed = await promptConfirmation("This will remove all Bird data and shortcuts. Continue?")
+		if (!confirmed) {
+			console.log("Aborted.")
+			app.quit()
+			return
+		}
+	}
+
+	performCleanAll()
+	console.log("All Bird data has been removed.")
+	app.quit()
+}
+
 // Must be called before app.whenReady()
 registerBirdScheme()
 
@@ -125,6 +146,12 @@ app.whenReady().then(() => {
 	}
 
 	loadConfig(args.configPath)
+
+	if (args.cleanAll) {
+		handleCleanAll(args.force)
+		return
+	}
+
 	initI18n()
 	setupBirdProtocol()
 
@@ -162,6 +189,7 @@ app.whenReady().then(() => {
 })
 
 app.on("window-all-closed", () => {
+	if (cleanAllInProgress) return
 	if (process.platform !== "darwin") app.quit()
 })
 

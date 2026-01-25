@@ -8,7 +8,8 @@
 	},
 	"scripts": {
 		"gen:schema": "tsx scripts/generate-schema.ts",
-		"build": "pnpm gen:schema && electron-vite build",
+		"gen:icons": "bash scripts/generate-icons.sh icon.svg",
+		"build": "pnpm gen:icons && pnpm gen:schema && electron-vite build",
 		"build:fresh": "pnpm clean && pnpm build",
 		"start": "electron .",
 		"clean": "rm -rf out release",
@@ -41,7 +42,7 @@
 		"@types/react-dom": "^19.2.3",
 		"@vitejs/plugin-react": "^5.1.2",
 		"electron": "^39.2.7",
-		"electron-builder": "^26.0.12",
+		"electron-builder": "^26.4.0",
 		"electron-vite": "^3.0.0",
 		"knip": "^5.76.1",
 		"lucide-react": "^0.562.0",

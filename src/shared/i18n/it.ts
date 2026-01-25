@@ -14,6 +14,8 @@ export const itTranslations: Translations = {
 	"settings.partitions": "Partizioni",
 	"settings.partitionsHint": "Una partizione isola i dati (cookie, cache, archiviazione). Più applicazioni possono condividere la stessa partizione.",
 	"settings.stats": '{{apps}} app · {{partitions}} partizion{{partitions>1?"i":"e"}}',
+	"settings.cleanAll": "Elimina tutti i dati",
+	"settings.cleanAllConfirm": "Verranno eliminati TUTTI i dati e collegamenti di Bird. L'intera configurazione andrà persa. Continuare?",
 
 	// Theme
 	"theme.system": "Sistema",

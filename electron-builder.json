@@ -32,7 +32,10 @@
 		"oneClick": false,
 		"allowToChangeInstallationDirectory": true,
 		"packElevateHelper": false,
-		"artifactName": "${productName}-${version}-${arch}-setup.${ext}"
+		"artifactName": "${productName}-${version}-${arch}-setup.${ext}",
+		"include": "scripts/installer.nsh",
+		"installerLanguages": ["en-US", "fr", "de", "es", "it", "pt-BR", "ru", "zh-CN"],
+		"warningsAsErrors": false
 	},
 	"portable": {
 		"artifactName": "${productName}-${version}-${arch}-portable.${ext}"

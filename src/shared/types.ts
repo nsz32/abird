@@ -203,9 +203,10 @@ export const IpcChannels = {
 	PARTITION_RESET: "bird:partition:reset",
 	PARTITION_DELETE: "bird:partition:delete",
 	PARTITION_RENAME: "bird:partition:rename",
-	// App launch
+	// App launch & cleanup
 	APP_LAUNCH_SUPPORTED: "bird:app:launch-supported",
 	APP_LAUNCH: "bird:app:launch",
+	APP_CLEAN_ALL: "bird:app:clean-all",
 	// Settings
 	SETTINGS_SELECT_DIRECTORY: "bird:settings:select-directory",
 	SETTINGS_GET_DEFAULT_DOWNLOADS_PATH: "bird:settings:get-default-downloads-path",
@@ -359,6 +360,7 @@ export interface BirdApi {
 	app: {
 		isLaunchSupported: () => Promise<boolean>
 		launch: (appName: string) => Promise<void>
+		cleanAll: () => Promise<void>
 	}
 }
 

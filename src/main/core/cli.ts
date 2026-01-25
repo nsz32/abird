@@ -1,3 +1,4 @@
+import { createInterface } from "node:readline"
 import { app } from "electron"
 
 interface CliOption {
@@ -18,6 +19,8 @@ const CLI_OPTIONS: CliOption[] = [
 	{ name: "--config", hasValue: true, description: "Path to config file" },
 	{ name: "--userAgent", hasValue: true, description: "User agent preset (omit value to list)" },
 	{ name: "--kiosk", hasValue: true, description: "Enable kiosk mode with exit shortcut" },
+	{ name: "--cleanall", hasValue: false, description: "Remove all Bird data and shortcuts" },
+	{ name: "--force", hasValue: false, description: "Skip confirmation prompts" },
 	{ name: "--help", hasValue: false, description: "Show this help message" },
 ]
 
@@ -30,6 +33,8 @@ export interface CliArgs {
 	userAgent: string | null
 	listUserAgents: boolean
 	kioskShortcut: string | null
+	cleanAll: boolean
+	force: boolean
 	showHelp: boolean
 }
 
@@ -50,6 +55,8 @@ export function parseCliArgs(argv: string[] = getArgv()): CliArgs | null {
 		userAgent: getOptionValue(argv, "--userAgent"),
 		listUserAgents: hasOptionWithoutValue(argv, "--userAgent"),
 		kioskShortcut: extractKioskShortcut(argv),
+		cleanAll: argv.includes("--cleanall"),
+		force: argv.includes("--force"),
 		showHelp: argv.includes("--help"),
 	}
 }
@@ -140,4 +147,15 @@ function extractKioskShortcut(argv: string[]): string | null {
 
 	const nextArg = argv[index + 1]
 	return nextArg && !nextArg.startsWith("--") ? nextArg : ""
+}
+
+export function promptConfirmation(message: string): Promise<boolean> {
+	const rl = createInterface({ input: process.stdin, output: process.stdout })
+
+	return new Promise((resolve) => {
+		rl.question(`${message} [y/N] `, (answer) => {
+			rl.close()
+			resolve(answer.toLowerCase() === "y")
+		})
+	})
 }

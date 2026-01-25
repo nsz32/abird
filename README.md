@@ -21,18 +21,19 @@ Bird turns any website into a standalone desktop application with complete sessi
 | **Ad Blocking** | Built-in ad blocker powered by Ghostery |
 | **User-Agent Presets** | Chrome, Firefox, Safari, Edge, mobile devices, even IE6 |
 | **Kiosk Mode** | Fullscreen lock with custom exit shortcut |
-| **Desktop Shortcuts** | Deploy apps as native shortcuts (.desktop on Linux) |
-| **Downloads** | Auto-open by MIME type, configurable directory |
+| **Desktop Shortcuts** | Deploy apps as native shortcuts (.desktop on Linux, Start Menu on Windows) |
+| **Downloads** | Auto-open by MIME type, configurable directory, dangerous file detection |
 | **Themes** | System, light, or dark mode |
 | **i18n** | 10 languages (EN, FR, DE, ES, PT, IT, RU, ZH, AR, HI) |
-| **Distributable** | Package with locked config for SaaS/enterprise distribution *(coming soon)* |
+| **Find in Page** | Built-in find with match highlighting |
+| **Tab Management** | Multi-tab support with smart validation |
 
 ## Quick Start
 
 ### Run from source
 
 ```bash
-# Prerequisites: Node.js >= 20, pnpm >= 9
+# Prerequisites: Node.js >= 20, pnpm
 
 pnpm install
 pnpm dev
@@ -43,6 +44,7 @@ pnpm dev
 ```bash
 pnpm build                    # Build for production
 pnpm package:appimage         # Create AppImage (Linux)
+pnpm package:win              # Create installer (Windows)
 ```
 
 ## Usage
@@ -62,6 +64,9 @@ bird --app dashboard --kiosk Ctrl+Alt+K
 
 # Test with different user-agent
 bird --app myapp --userAgent mobile:chrome
+
+# Complete uninstall (remove shortcuts, data, config)
+bird --cleanall
 ```
 
 ## Configuration
@@ -108,6 +113,22 @@ tablet:chrome         # Chrome on tablet
 desktop:ie6           # For the brave
 ```
 
+### Configuration Layers
+
+Bird supports layered configuration with inheritance:
+
+```
+Zod Schema Defaults
+       ↓
+BirdConfig.defaults (global defaults)
+       ↓
+BirdConfig.global (global user prefs)
+       ↓
+BirdConfig.apps[appId] (per-app overrides)
+       ↓
+EffectiveConfig (computed at runtime)
+```
+
 ## Use Cases
 
 ### 1. Isolated Web Apps
@@ -127,7 +148,7 @@ Ship your web application as a real desktop app. Package Bird with a preconfigur
 **For enterprises:**
 - Deploy internal tools as standalone apps (CRM, dashboards, ticketing)
 - Control the experience: disable URL bar, lock navigation, enforce routing rules
-- Distribute via standard enterprise deployment (MSI, .deb, AppImage)
+- Distribute via standard enterprise deployment (deb, AppImage, NSIS installer)
 
 > **Status**: Single-app distribution mode is in development. Currently, you can already use `--app <name>` to launch a specific app directly.
 
@@ -148,13 +169,14 @@ Quickly test how your site behaves with different user-agents. Check mobile layo
 
 ## Tech Stack
 
-- **Electron** — Desktop runtime
-- **TypeScript** — Type safety
-- **React** — UI components
+- **Electron 39** — Desktop runtime
+- **TypeScript 5.9** — Type safety
+- **React 19** — UI components
 - **Chakra UI** — Component library
-- **Zod** — Schema validation
+- **Zod** — Schema validation (types = validation)
 - **Biome** — Linting & formatting
 - **electron-vite** — Build tooling
+- **Ghostery** — Ad blocking
 
 ## License
 

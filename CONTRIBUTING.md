@@ -46,14 +46,59 @@ function createTab(url: string): Tab {
 }
 ```
 
+## Architecture
+
+### Key Patterns
+
+- **Observable suffix `$`** — All observables end with `$` (e.g., `config$`, `tabs$`, `navState$`)
+- **Handler prefix `handle`** — Functions handling events (e.g., `handleNavigation`)
+- **Callback prefix `on`** — Event callbacks (e.g., `onNavStateChanged`)
+- **Zod = Types** — All config types are inferred from Zod schemas (`z.infer<typeof schema>`)
+
+### State Management
+
+Bird uses custom observables without external dependencies:
+
+```typescript
+// StateObservable — Simple state with subscribers
+const tabs$ = new StateObservable<Tab[]>([])
+
+// BroadcastObservable — Auto-sends to registered WebContents
+const config$ = new BroadcastObservable<EffectiveConfig>(defaultConfig)
+
+// CombinedObservable — Derives from multiple sources
+const navBarVisible$ = new CombinedObservable(
+    [config$, forceShow$],
+    ([config, force]) => config.navBar.visible || force
+)
+```
+
+### Process Separation
+
+- **Main process** (`src/main/`) — Source of truth for config, state, navigation
+- **Preload** (`src/preload/`) — Context bridge exposing `window.bird.*` API
+- **Renderer** (`src/ui/`) — React overlays, display-only, communicates via IPC
+
 ## Commits
 
 - Concise, factual messages
 - One logical change per commit
 - Format: `<type>: <description>` (e.g., `fix: tab close selection`)
 
+Types: `feat`, `fix`, `refactor`, `docs`, `build`, `chore`
+
 ## Pull Requests
 
 - Small, focused changes
-- Run `pnpm lint` and `pnpm typecheck` before submitting
-- No PR for formatting-only changes (use `pnpm lint --write`)
+- Run `pnpm check` before submitting (lint + typecheck)
+- No PR for formatting-only changes (use `pnpm lint:fix`)
+
+## Development Setup
+
+```bash
+pnpm install
+pnpm dev              # Development with hot reload
+pnpm check            # Lint + typecheck
+```
+
+See [DEVELOPMENT.md](DEVELOPMENT.md) for full setup instructions.

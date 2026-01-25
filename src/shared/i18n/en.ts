@@ -12,6 +12,8 @@ const en = {
 	"settings.partitions": "Partitions",
 	"settings.partitionsHint": "A partition isolates data (cookies, cache, storage). Multiple applications can share the same partition.",
 	"settings.stats": '{{apps}} app{{apps>1?"s":""}} · {{partitions}} partition{{partitions>1?"s":""}}',
+	"settings.cleanAll": "Remove all data",
+	"settings.cleanAllConfirm": "This will remove ALL Bird data and shortcuts for this project. Your entire configuration will be lost. Continue?",
 
 	// Theme
 	"theme.system": "System",

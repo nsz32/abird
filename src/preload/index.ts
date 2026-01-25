@@ -159,5 +159,6 @@ contextBridge.exposeInMainWorld("bird", {
 	app: {
 		isLaunchSupported: (): Promise<boolean> => ipcRenderer.invoke(IpcChannels.APP_LAUNCH_SUPPORTED),
 		launch: (appName: string): Promise<void> => ipcRenderer.invoke(IpcChannels.APP_LAUNCH, appName),
+		cleanAll: (): Promise<void> => ipcRenderer.invoke(IpcChannels.APP_CLEAN_ALL),
 	},
 })

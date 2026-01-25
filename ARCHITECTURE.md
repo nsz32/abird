@@ -8,7 +8,7 @@ Bird is an Electron app that wraps web applications as isolated desktop apps. Ea
 
 ```
 src/
-├── main/                          # Electron main process (40 files)
+├── main/                          # Electron main process (≈50 files)
 │   ├── config/                    # Configuration management (3 files)
 │   │   ├── store.ts               # JSON file I/O, validation (Zod), memory cache
 │   │   ├── resolver.ts            # Config merging: defaults → global → app → EffectiveConfig
@@ -38,61 +38,83 @@ src/
 │   │   ├── Watermark.ts           # Background watermark
 │   │   ├── OverlayPanel.ts        # Generic panel (used for downloads)
 │   │   └── views.ts               # Global view registry (singleton pattern)
-│   ├── services/                  # Business services (7 files)
+│   ├── services/                  # Business services (≈10 files)
 │   │   ├── DownloadManager.ts     # Downloads tracking, history, retry, auto-open
 │   │   ├── PartitionManager.ts    # Partition CRUD, cache cleanup, locks
 │   │   ├── CacheManager.ts        # Automatic cache cleanup (by size/age)
 │   │   ├── AdBlocker.ts           # Ghostery adblocker integration
-│   │   ├── deploy.ts              # Desktop shortcut deployment (.desktop Linux)
+│   │   ├── deploy/                # Platform-specific deployment (Strategy pattern)
+│   │   │   ├── index.ts           # Cross-platform facade + deployer selection
+│   │   │   ├── types.ts           # Deployer interface definition
+│   │   │   ├── linux.ts           # LinuxDeployer (.desktop files)
+│   │   │   ├── windows.ts         # WindowsDeployer (Start Menu + PNG→ICO conversion)
+│   │   │   └── mac.ts             # MacDeployer (Applications folder)
 │   │   ├── icons.ts               # Icon fetching, storage, import
 │   │   └── notify.ts              # Notification system (with auto-dismiss)
 │   ├── input/                     # Input handling (2 files)
 │   │   ├── inputListener.ts       # Global keyboard listener (uiohook-napi)
 │   │   └── menu.ts                # Native application menu
-│   ├── utils/                     # Main process utilities (6 files)
-│   │   ├── observable.ts          # **Core pattern**: StateObservable, BroadcastObservable
+│   ├── utils/                     # Main process utilities (≈8 files)
+│   │   ├── observable.ts          # **Core pattern**: StateObservable, BroadcastObservable, BroadcastEvent
 │   │   ├── userAgents.ts          # User-agent resolution (desktop:chrome, mobile:android)
-│   │   ├── platform.ts            # Platform detection, file opening
+│   │   ├── platform.ts            # Platform detection, file opening, MD5 computation
 │   │   ├── parseSize.ts           # Human-readable size parsing (10MB → bytes)
 │   │   ├── executableDetection.ts # Dangerous file detection
-│   │   └── fileDetection.ts       # File type detection
+│   │   ├── fileDetection.ts       # File type detection (MIME types, signatures)
+│   │   ├── logger.ts              # Logger with namespaces (debug, info, warn, error)
+│   │   ├── naming.ts              # App name sanitization, AppUserModelId generation (Windows taskbar grouping)
+│   │   └── cleanup.ts             # Cleanup: shortcuts → userData → config → installer cache
 │   └── handlers.ts                # All IPC handlers registration
 ├── preload/                       # Context bridge (1 file)
 │   └── index.ts                   # window.bird API exposure (11 namespaces)
-├── shared/                        # Shared code (5 files)
+├── shared/                        # Shared code (≈15 files)
 │   ├── config.schema.ts           # **Zod schemas** (source of truth for types)
 │   ├── types.ts                   # TypeScript types (NavigationState, TabInfo, IpcChannels, BirdApi)
 │   ├── routing.ts                 # URL routing utilities (pattern derivation)
 │   ├── partition.ts               # Partition name validation (lowercase + underscore)
-│   └── i18n/
-│       └── translations.ts        # Translation files (EN/FR)
-└── ui/                            # React overlays (32 files)
+│   └── i18n/                      # Internationalization (10 languages)
+│       ├── ar.ts                  # Arabic
+│       ├── de.ts                  # German
+│       ├── en.ts                  # English
+│       ├── es.ts                  # Spanish
+│       ├── fr.ts                  # French
+│       ├── hi.ts                  # Hindi
+│       ├── it.ts                  # Italian
+│       ├── pt.ts                  # Portuguese
+│       ├── ru.ts                  # Russian
+│       └── zh.ts                  # Chinese
+└── ui/                            # React overlays (≈60 files)
     ├── shared/                    # Shared UI code (3 files)
     │   └── hooks/
     │       ├── useBirdState.ts    # **Universal hook** for main → renderer sync
     │       ├── useTranslations.ts # i18n hook with singleton cache
     │       └── index.ts
-    ├── config/                    # Configuration app (26 files)
+    ├── config/                    # Configuration app (≈30 files)
     │   ├── App.tsx                # Root component + router + state management
     │   ├── useHashRouter.ts       # Client-side hash-based router
     │   ├── pages/                 # Main pages (3 files)
     │   │   ├── HomePage.tsx       # Dashboard + global config
     │   │   ├── AppPage.tsx        # Per-app configuration
     │   │   └── PartitionPage.tsx  # Partition management
-    │   ├── components/            # Reusable components (18 files)
+    │   ├── components/            # Reusable components (≈22 files)
     │   │   ├── AppList.tsx        # App list with cards
     │   │   ├── AppCard.tsx        # Individual app card (shows partition)
     │   │   ├── PartitionList.tsx  # Partition list
     │   │   ├── PartitionCard.tsx  # Individual partition card
     │   │   ├── CreateAppDialog.tsx
-    │   │   ├── EditStartUrlDialog.tsx
+    │   │   ├── EditAppDialog.tsx  # Edit app name/start URL
     │   │   ├── RenameDialog.tsx
     │   │   ├── IconPickerDialog.tsx
+    │   │   ├── MimeTypesDialog.tsx    # MIME types configuration
+    │   │   ├── DirectoryPicker.tsx    # Directory selection dialog
+    │   │   ├── DownloadsConfigForm.tsx # Downloads configuration form
     │   │   ├── SwitchField.tsx
     │   │   ├── NumberField.tsx
     │   │   ├── SegmentSelect.tsx
     │   │   ├── TriStateSegmentSelect.tsx
+    │   │   ├── TriStateSwitch.tsx     # 3-state toggle component
     │   │   ├── PartitionSelect.tsx
+    │   │   ├── UserAgentSelect.tsx    # User-agent selection dropdown
     │   │   ├── RoutingRulesEditor.tsx
     │   │   ├── NavBarConfigForm.tsx
     │   │   ├── PageHeader.tsx
@@ -136,13 +158,15 @@ src/
                          ▼
 ┌─────────────────────────────────────────────────────────┐
 │                   config/store.ts                        │
-│            Reads, writes, caches BirdConfig              │
+│     Reads, writes, caches BirdConfig (Zod validation)    │
+│     Generates bird.config.schema.json for IDE support    │
 └────────────────────────┬────────────────────────────────┘
                          │ resolve
                          ▼
 ┌─────────────────────────────────────────────────────────┐
 │                  config/resolver.ts                      │
 │     Merges defaults + global + app → EffectiveConfig     │
+│     Resolves NavBar, Routing, Downloads configurations   │
 └────────────────────────┬────────────────────────────────┘
                          │ emit
                          ▼
@@ -157,6 +181,16 @@ src/
         Main process           UI (via IPC)
 ```
 
+**Project Name Inference** (`cli.ts`):
+When `--cleanall` is used, the project name is inferred from:
+1. Config file path (`/path/to/myapp.bird.json` → `myapp`)
+2. Presence of `bird.config.schema.json` in directory
+
+**UserData Resolution**:
+- Linux: `$XDG_DATA_HOME/bird-{project}` or `~/.local/share/bird-{project}`
+- Windows: `%AppData%\bird-{project}`
+- macOS: `~/Library/Application Support/bird-{project}`
+
 ## Key Patterns
 
 ### Observables (`utils/observable.ts`)
@@ -164,7 +198,8 @@ src/
 Reactive state management without external deps:
 
 - `StateObservable<T>` — Simple state with subscribers
-- `BroadcastObservable<T>` — Auto-sends to registered WebContents
+- `BroadcastObservable<T>` — Auto-sends to registered WebContents (with state caching)
+- `BroadcastEvent<T>` — Events without state (used for one-time events like downloads, external opens)
 - `CombinedObservable<T>` — Derives from multiple sources
 
 ### View Hierarchy
@@ -234,6 +269,29 @@ Bird tracks two separate concepts:
 2. If validation fails (empty/invalid content), tab auto-closes
 3. Valid tabs persist and can track parent for "back to parent" navigation
 
+### NavBar Auto-Hide
+
+Sophisticated visibility system based on multiple triggers:
+
+**State Structure** (`NavBarForceShowState`):
+```typescript
+{
+  urlEdit: boolean,       // URL bar is being edited
+  mouseHover: boolean,    // Mouse is hovering over navbar
+  downloading: boolean    // Active downloads in progress
+}
+```
+
+**Computed Visibility**:
+- `navBarEffectiveVisible$` — CombinedObservable from 3 sources
+- Shows navbar when ANY trigger is true
+- Config-based auto-hide can be overridden by user interaction
+
+**Use Cases**:
+- Stays visible during URL editing
+- Appears on mouse hover (UX)
+- Persists during active downloads (user feedback)
+
 ### Utilities Organization
 
 **Config utilities** (`ui/config/utils/`):
@@ -269,23 +327,24 @@ App.tsx (root + router)
 
 ### API Surface (`window.bird`)
 
-The preload bridge exposes a type-safe API (11 namespaces):
+The preload bridge exposes a type-safe API (15 namespaces):
 ```typescript
 window.bird = {
   navigation,      // Navigation controls (go, back, forward, reload, stop)
   tabs,            // Tab management (list, create, close, activate)
   config,          // Get effective config (reactive)
   navbar,          // Navbar resize, state sync
+  commands,        // Command events (focus URL bar via onFocusUrl)
   notifications,   // Notification center (show, dismiss)
   downloads,       // Downloads management (list, pause, resume, cancel, open)
   find,            // Find in page (start, next, previous, stop)
-  keyboard,        // Keyboard state (isTyping)
-  settings,        // Read/write user config (userconfig, cliargs, version)
-  i18n,            // Translations (get, list, onChanged)
-  icons,           // Icon fetching and storage (fetch, get, getAll, pick, import)
+  keyboard,        // Keyboard state (Ctrl pressed)
+  settings,        // Settings dialogs & utilities (userconfig, directory selection)
+  i18n,            // Translations (get translations for current language)
+  icons,           // Icon fetching and storage (fetch, save, import, delete)
   deploy,          // Desktop shortcut deployment (deploy, undeploy, getStatus)
   partition,       // Partition management (list, cleanup, reset, delete, rename)
-  app,             // App launching (launch, canLaunch)
+  app,             // App launching and cleanup (launch, cleanAll)
 }
 ```
 
@@ -293,6 +352,50 @@ Each namespace follows consistent patterns:
 - `get*()` / `list()` — Fetch current state
 - `on*Changed()` — Subscribe to updates (returns unsubscribe function)
 - Actions return `Promise<void>` for async operations
+
+## Cleanup & Deployment
+
+### Cleanup Process
+
+Bird implements a comprehensive cleanup system via `cleanAll()` for complete application removal:
+
+**Sequence** (`utils/cleanup.ts`):
+1. **Undeploy shortcuts** — Remove all desktop/Start Menu shortcuts for all apps
+2. **Close windows** — Gracefully close all windows with 500ms grace period
+3. **Remove userData** — Delete entire userData folder (cache, sessions, storage)
+4. **Remove config** — Delete `bird.config.json` and `bird.config.schema.json`
+5. **Remove installer cache** — Windows only: clean NSIS installer cache from AppData
+
+**CLI Support**:
+- `--cleanall` — Interactive cleanup with confirmation prompts (i18n)
+- `--cleanall --force` — Silent cleanup without prompts
+
+**Safety**:
+- `cleanAllInProgress` flag prevents premature app quit during cleanup
+- Grace period ensures windows finish closing before file deletion
+- Multi-language confirmation prompts (10 languages supported)
+
+### Deployment System
+
+Platform-specific desktop integration via **Strategy Pattern** (`services/deploy/`):
+
+**Interface** (`types.ts`):
+```typescript
+interface Deployer {
+  deploy(app: App): Promise<void>
+  undeploy(appId: string): Promise<void>
+  isDeployed(appId: string): Promise<boolean>
+}
+```
+
+**Platform Implementations**:
+- **Linux** (`linux.ts`): `.desktop` files in `~/.local/share/applications/`
+- **Windows** (`windows.ts`): Start Menu shortcuts with PNG→ICO conversion, AppUserModelId for taskbar grouping
+- **macOS** (`mac.ts`): Symlinks in Applications folder
+
+**Naming Utilities** (`utils/naming.ts`):
+- `sanitizeAppName()` — Cross-platform name sanitization (WM_CLASS, file names)
+- `getAppUserModelId()` — Windows taskbar grouping via AppUserModelId
 
 ## Core Architectural Principles
 
