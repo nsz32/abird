@@ -5,5 +5,9 @@ release/
 *.log
 .DS_Store
 
+# Generated icons (from icon.svg via pnpm gen:icons)
+assets/icons/
+src/ui/public/favicon.png
+
 # electron-vite temp files
 electron.vite.config.*.mjs

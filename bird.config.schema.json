@@ -10,7 +10,11 @@
 				},
 				"theme": {
 					"type": "string",
-					"enum": ["system", "light", "dark"],
+					"enum": [
+						"system",
+						"light",
+						"dark"
+					],
 					"default": "system"
 				},
 				"navBar": {
@@ -18,7 +22,10 @@
 					"properties": {
 						"position": {
 							"type": "string",
-							"enum": ["top", "bottom"],
+							"enum": [
+								"top",
+								"bottom"
+							],
 							"default": "bottom"
 						},
 						"visible": {
@@ -64,7 +71,10 @@
 							"type": "string"
 						},
 						"autoOpenMaxSize": {
-							"type": ["number", "string"]
+							"type": [
+								"number",
+								"string"
+							]
 						},
 						"autoOpenMimeTypes": {
 							"type": "array",
@@ -102,7 +112,11 @@
 							},
 							"theme": {
 								"type": "string",
-								"enum": ["system", "light", "dark"]
+								"enum": [
+									"system",
+									"light",
+									"dark"
+								]
 							},
 							"userAgent": {
 								"type": "string"
@@ -115,7 +129,10 @@
 								"properties": {
 									"position": {
 										"type": "string",
-										"enum": ["top", "bottom"],
+										"enum": [
+											"top",
+											"bottom"
+										],
 										"default": "bottom"
 									},
 									"visible": {
@@ -160,7 +177,12 @@
 										"type": "object",
 										"additionalProperties": {
 											"type": "string",
-											"enum": ["internal", "download", "external", "ignore"]
+											"enum": [
+												"internal",
+												"download",
+												"external",
+												"ignore"
+											]
 										},
 										"default": {}
 									}
@@ -174,7 +196,10 @@
 										"type": "string"
 									},
 									"autoOpenMaxSize": {
-										"type": ["number", "string"]
+										"type": [
+											"number",
+											"string"
+										]
 									},
 									"autoOpenMimeTypes": {
 										"type": "array",
@@ -192,7 +217,10 @@
 								"additionalProperties": false
 							}
 						},
-						"required": ["partition", "startUrl"],
+						"required": [
+							"partition",
+							"startUrl"
+						],
 						"additionalProperties": false
 					},
 					"default": {}

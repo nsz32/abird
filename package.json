@@ -13,7 +13,7 @@
 		"build:fresh": "pnpm clean && pnpm build",
 		"start": "electron .",
 		"clean": "rm -rf out release",
-		"dev": "electron-vite dev -- --config bird.config.json",
+		"dev": "electron-vite dev -- --config bird.config.dev.json",
 		"dev:bare": "electron-vite dev",
 		"lint": "biome check .",
 		"lint:fix": "biome check --write .",

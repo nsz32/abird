@@ -9,6 +9,7 @@
 
 ```bash
 pnpm install
+pnpm gen:icons   # Required before first run (icons are gitignored)
 ```
 
 ## Commands
@@ -17,7 +18,7 @@ pnpm install
 
 | Command | Description |
 |---------|-------------|
-| `pnpm dev` | Development mode with hot reload (uses `bird.config.json`) |
+| `pnpm dev` | Development mode with hot reload (uses `bird.config.dev.json`) |
 | `pnpm dev:bare` | Development mode without config file |
 | `pnpm start` | Run the built app |
 
@@ -51,7 +52,7 @@ pnpm install
 
 ## Configuration
 
-Bird uses a JSON config file (`bird.config.json` or `~/.config/bird/config.json`).
+Bird uses a JSON config file (`bird.config.dev.json` or `~/.config/bird/config.json`).
 
 ```bash
 # Run with custom config
@@ -182,7 +183,7 @@ The main process doesn't hot reload. Restart `pnpm dev` for main process changes
 
 ### Config changes not applied?
 
-Check that the config file path is correct. In dev mode, `bird.config.json` in project root is used.
+Check that the config file path is correct. In dev mode, `bird.config.dev.json` in project root is used.
 
 ### Native module errors?
 
