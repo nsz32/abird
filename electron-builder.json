@@ -25,7 +25,7 @@
 		"icon": "assets/icons"
 	},
 	"win": {
-		"target": [{ "target": "nsis", "arch": ["x64"] }, { "target": "portable", "arch": ["x64"] }],
+		"target": [{ "target": "nsis", "arch": ["x64"] }],
 		"icon": "assets/icons/icon.ico"
 	},
 	"nsis": {
@@ -36,9 +36,6 @@
 		"include": "scripts/installer.nsh",
 		"installerLanguages": ["en-US", "fr", "de", "es", "it", "pt-BR", "ru", "zh-CN"],
 		"warningsAsErrors": false
-	},
-	"portable": {
-		"artifactName": "${productName}-${version}-${arch}-portable.${ext}"
 	},
 	"mac": {
 		"target": ["dmg"],

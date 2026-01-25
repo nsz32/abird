@@ -4,12 +4,16 @@
 	"description": "Bird - Desktop Redistribuable Isolated Browser",
 	"main": "out/main/index.js",
 	"pnpm": {
-		"onlyBuiltDependencies": ["@biomejs/biome", "electron", "esbuild"]
+		"onlyBuiltDependencies": [
+			"@biomejs/biome",
+			"electron",
+			"esbuild"
+		]
 	},
 	"scripts": {
 		"gen:schema": "tsx scripts/generate-schema.ts",
 		"gen:icons": "bash scripts/generate-icons.sh icon.svg",
-		"build": "pnpm gen:icons && pnpm gen:schema && electron-vite build",
+		"build": "pnpm gen:schema && electron-vite build",
 		"build:fresh": "pnpm clean && pnpm build",
 		"start": "electron .",
 		"clean": "rm -rf out release",
@@ -26,7 +30,11 @@
 		"package:win": "electron-builder --win",
 		"package:mac": "echo 'WIP: macOS packaging not yet implemented'"
 	},
-	"keywords": ["electron", "webapp", "wrapper"],
+	"keywords": [
+		"electron",
+		"webapp",
+		"wrapper"
+	],
 	"author": "Bird Team",
 	"license": "MIT",
 	"type": "module",
@@ -60,6 +68,7 @@
 		"electron-context-menu": "^4.1.1",
 		"file-type": "^21.3.0",
 		"jimp": "^1.6.0",
+		"node-gyp-build": "^4.8.4",
 		"png-to-ico": "^3.0.1",
 		"uiohook-napi": "^1.5.4",
 		"zod": "^3.25.76"

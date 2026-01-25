@@ -28,13 +28,12 @@ async function main() {
 	const outDir = join(rootDir, "out")
 	const releaseDir = join(rootDir, "release")
 	const stagingDir = join(releaseDir, "staging")
-	const unpackedDir = join(releaseDir, "app.asar.unpacked")
+	const unpackedDir = join(releaseDir, "bird.asar.unpacked")
 
 	// Clean
 	if (existsSync(stagingDir)) rmSync(stagingDir, { recursive: true })
 	if (existsSync(unpackedDir)) rmSync(unpackedDir, { recursive: true })
 	mkdirSync(stagingDir, { recursive: true })
-	mkdirSync(unpackedDir, { recursive: true })
 
 	// Copy compiled code
 	cpSync(outDir, stagingDir, { recursive: true })
@@ -55,7 +54,7 @@ async function main() {
 		const modDst = join(stagingDir, "node_modules", mod)
 		if (!existsSync(modSrc)) continue
 
-		cpSync(modSrc, modDst, { recursive: true })
+		cpSync(modSrc, modDst, { recursive: true, dereference: true })
 
 		// Filter prebuilds to keep only target platform
 		const prebuildsPath = join(modDst, "prebuilds")
@@ -69,14 +68,14 @@ async function main() {
 		console.log(`Included: ${mod}`)
 	}
 
-	// Pack ASAR
+	// Pack ASAR (unpack native .node files to bird.asar.unpacked/)
 	console.log("Packing ASAR...")
-	execSync(`pnpm dlx @electron/asar pack "${stagingDir}" "${join(releaseDir, "app.asar")}"`, { stdio: "inherit" })
+	execSync(`pnpm dlx @electron/asar pack "${stagingDir}" "${join(releaseDir, "bird.asar")}" --unpack "**/*.node"`, { stdio: "inherit" })
 
-	// Create tarball
-	const tarballName = `bird-${packageJson.version}-${platform}-${arch}.tar.gz`
+	// Create tarball (zstd compression)
+	const tarballName = `Bird-${packageJson.version}-asar-${platform}-${arch}.tar.zst`
 	console.log(`Creating tarball: ${tarballName}`)
-	execSync(`tar -czf "${join(releaseDir, tarballName)}" -C "${releaseDir}" app.asar app.asar.unpacked`, {
+	execSync(`tar --zstd -cf "${join(releaseDir, tarballName)}" -C "${releaseDir}" bird.asar bird.asar.unpacked`, {
 		stdio: "inherit",
 	})
 
@@ -84,7 +83,7 @@ async function main() {
 	rmSync(stagingDir, { recursive: true })
 
 	console.log("\nAsar packaging complete:")
-	console.log(`  - ${join(releaseDir, "app.asar")}`)
+	console.log(`  - ${join(releaseDir, "bird.asar")}`)
 	console.log(`  - ${unpackedDir}/`)
 	console.log(`  - ${join(releaseDir, tarballName)}`)
 }

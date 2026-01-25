@@ -23,6 +23,9 @@ importers:
       jimp:
         specifier: ^1.6.0
         version: 1.6.0
+      node-gyp-build:
+        specifier: ^4.8.4
+        version: 4.8.4
       png-to-ico:
         specifier: ^3.0.1
         version: 3.0.1
@@ -3700,7 +3703,7 @@ snapshots:
 
   '@electron/universal@2.0.1':
     dependencies:
-      '@electron/asar': 3.2.18
+      '@electron/asar': 3.4.1
       '@malept/cross-spawn-promise': 2.0.0
       debug: 4.4.3
       dir-compare: 4.2.0
