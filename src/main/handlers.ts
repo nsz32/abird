@@ -1,5 +1,5 @@
 import { IpcChannels } from "@shared/types"
-import { app, BrowserWindow, dialog, ipcMain, shell } from "electron"
+import { app, BaseWindow, dialog, ipcMain, shell } from "electron"
 import { getBirdConfig, readRawConfig, writeRawConfig } from "./config"
 import { DOWNLOADS_VIEW_ID } from "./core/App"
 import { getTranslations } from "./core/I18n"
@@ -145,7 +145,7 @@ export function registerHandlers() {
 	ipcMain.handle(IpcChannels.APP_CLEAN_ALL, async () => {
 		setCleanAllInProgress(true)
 
-		const windows = BrowserWindow.getAllWindows()
+		const windows = BaseWindow.getAllWindows()
 		await Promise.all(
 			windows.map(
 				(win) =>
@@ -155,6 +155,8 @@ export function registerHandlers() {
 					}),
 			),
 		)
+
+		await new Promise((resolve) => setTimeout(resolve, 500))
 
 		performCleanAll()
 		app.quit()
