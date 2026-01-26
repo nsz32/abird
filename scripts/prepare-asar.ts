@@ -48,6 +48,11 @@ async function main() {
 	// Copy schema
 	cpSync(join(rootDir, "bird.config.schema.json"), join(stagingDir, "bird.config.schema.json"))
 
+	// Copy default icon (used for shortcuts when no custom icon is set)
+	const iconsDir = join(stagingDir, "assets", "icons")
+	mkdirSync(iconsDir, { recursive: true })
+	cpSync(join(rootDir, "assets", "icons", "256x256.png"), join(iconsDir, "256x256.png"))
+
 	// Include external modules in asar
 	for (const mod of EXTERNAL_MODULES) {
 		const modSrc = join(rootDir, "node_modules", mod)

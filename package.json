@@ -1,14 +1,10 @@
 {
 	"name": "bird",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "Bird - Desktop Redistribuable Isolated Browser",
 	"main": "out/main/index.js",
 	"pnpm": {
-		"onlyBuiltDependencies": [
-			"@biomejs/biome",
-			"electron",
-			"esbuild"
-		]
+		"onlyBuiltDependencies": ["@biomejs/biome", "electron", "esbuild"]
 	},
 	"scripts": {
 		"gen:schema": "tsx scripts/generate-schema.ts",
@@ -30,11 +26,7 @@
 		"package:win": "electron-builder --win",
 		"package:mac": "echo 'WIP: macOS packaging not yet implemented'"
 	},
-	"keywords": [
-		"electron",
-		"webapp",
-		"wrapper"
-	],
+	"keywords": ["electron", "webapp", "wrapper"],
 	"author": "Bird Team",
 	"license": "MIT",
 	"type": "module",

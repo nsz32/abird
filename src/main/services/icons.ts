@@ -322,10 +322,14 @@ export function getDefaultIconPath(): string | null {
 		return targetPath
 	}
 
-	// Copy from app resources on first use
-	const sourcePath = app.isPackaged ? join(process.resourcesPath, "assets", "icons", "256x256.png") : join(app.getAppPath(), "assets", "icons", "256x256.png")
+	// Copy from app resources on first use (extraResources for AppImage/installer, asar for standalone)
+	const candidates = [
+		join(process.resourcesPath, "assets", "icons", "256x256.png"),
+		join(app.getAppPath(), "assets", "icons", "256x256.png"),
+	]
+	const sourcePath = candidates.find((p) => existsSync(p))
 
-	if (!existsSync(sourcePath)) {
+	if (!sourcePath) {
 		return null
 	}
 
