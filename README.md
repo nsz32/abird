@@ -6,60 +6,47 @@
 
 Bird turns any website into a standalone desktop application with complete session isolation, advanced kiosk mode, and (WIP) enterprise-ready packaging.
 
+<details>
+<summary>📸 Screenshots</summary>
+
+![Bird Home](docs/screenshots/bird_home.png)
+![Bird App](docs/screenshots/bird_app.png)
+![Bird Part](docs/screenshots/bird_part.png)
+
+</details>
+
 ## Why Bird?
 
-- **Session Isolation**: Each app runs in its own partition (cookies, localStorage, cache) — no cross-contamination between apps
-- **Ship Your SaaS as a Desktop App** *(coming soon)*: SaaS vendors will be able to package Bird with a locked config to distribute their web app as a native desktop experience — out of the browser, branded, and ready to install
-- **Kiosk Mode**: Lock users to specific URLs with custom escape shortcuts — perfect for public terminals, dashboards, or controlled environments
-- **User-Agent Spoofing**: Test how sites behave with different browsers/devices, or bypass Electron detection
+- **Session Isolation**: Run Gmail, Slack, Notion as separate apps — each with its own partition (cookies, localStorage, cache). No more "you're signed into another account" issues.
+- **Ship Your SaaS as a Desktop App** *(WIP)*: Package Bird with a locked config to distribute your web app as a native desktop experience — branded, installable, out of the browser.
+- **Kiosk Mode**: Lock terminals to specific URLs with custom escape shortcuts — perfect for dashboards, public kiosks, or digital signage.
+- **User-Agent Spoofing**: Test mobile layouts, browser-specific features, or bypass Electron detection without switching browsers.
+
+## Platforms
+
+- **Linux** — AppImage, Asar, Flatpak (planned)
+- **Windows** — NSIS installer
+- **macOS** — WIP
+
+> **Arch Linux**: `yay -S bird-apps-bin`
 
 ## Features
 
 | Feature | Description |
 |---------|-------------|
-| **Partition Isolation** | Each app has its own session (cookies, storage, cache) |
-| **URL Routing** | Control which links open internally, externally, or get blocked |
-| **Navigation Bar** | Configurable (position, buttons, auto-hide, URL editing) |
-| **Ad Blocking** | Built-in ad blocker powered by Ghostery |
-| **User-Agent Presets** | Chrome, Firefox, Safari, Edge, mobile devices, even IE6 |
-| **Kiosk Mode** | Fullscreen lock with custom exit shortcut |
-| **Desktop Shortcuts** | Deploy apps as native shortcuts (.desktop on Linux, Start Menu on Windows) |
-| **Downloads** | Auto-open by MIME type, configurable directory, dangerous file detection |
-| **Themes** | System, light, or dark mode |
+| **Configuration UI** | Visual interface to manage apps, partitions, and settings |
 | **i18n** | 10 languages (EN, FR, DE, ES, PT, IT, RU, ZH, AR, HI) |
-| **Find in Page** | Built-in find with match highlighting |
+| **Themes** | System, light, or dark mode |
+| **Desktop Shortcuts** | Deploy apps as native shortcuts (.desktop on Linux, Start Menu on Windows) |
+| **Navigation Bar** | Configurable (position, buttons, auto-hide, URL editing) |
 | **Tab Management** | Multi-tab support with smart validation |
-
-## Use Cases
-
-### 1. Isolated Web Apps
-
-Run Gmail, Slack, and Notion as separate apps — each with its own cookies and session. No more "you're signed into another account" issues.
-
-### 2. SaaS Distribution *(coming soon)*
-
-Ship your web application as a real desktop app. Package Bird with a preconfigured `config.json` pointing to your SaaS — your customers get a native installer, a dedicated window, and a focused experience outside the browser.
-
-**For SaaS vendors:**
-- Your app lives outside the browser — no tabs, no distractions, no "which tab was it?"
-- Users launch your app from their dock/taskbar like any native software
-- Session isolation means your app never conflicts with their personal accounts
-- Custom branding through icons and window titles
-
-**For enterprises:**
-- Deploy internal tools as standalone apps (CRM, dashboards, ticketing)
-- Control the experience: disable URL bar, lock navigation, enforce routing rules
-- Distribute via standard enterprise deployment (deb, AppImage, NSIS installer)
-
-> **Status**: Single-app distribution mode is in development. Currently, you can already use `--app <name>` to launch a specific app directly.
-
-### 3. Kiosk & Digital Signage
-
-Lock a terminal to your dashboard or customer portal. Custom escape shortcuts mean only authorized users can exit. Auto-return to home URL on idle.
-
-### 4. Testing & Development
-
-Quickly test how your site behaves with different user-agents. Check mobile layouts, browser-specific features, or legacy IE compatibility without switching browsers.
+| **URL Routing** | Control which links open internally, externally, or get blocked |
+| **Downloads** | Auto-open by MIME type, configurable directory, dangerous file detection |
+| **Find in Page** | Built-in find with match highlighting |
+| **Partition Isolation** | Each app has its own session (cookies, storage, cache) with cache limits (max age, max size) |
+| **Ad Blocking** | Built-in ad blocker powered by Ghostery |
+| **Kiosk Mode** | Fullscreen lock with custom exit shortcut |
+| **User-Agent Presets** | Chrome, Firefox, Safari, Edge, mobile devices, even IE6 |
 
 ## Quick Start
 
