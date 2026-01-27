@@ -5,6 +5,7 @@ import { getContextMenuLabels } from "../core/I18n"
 import { getNavigationAction } from "../core/UrlRouter"
 import { config$ } from "../core/states"
 import { disableAdBlock, enableAdBlock } from "../services/AdBlocker"
+import { resolveAppIcon } from "../services/icons"
 import { setupDownloads } from "../services/DownloadManager"
 import { getPartitionConfig } from "../services/PartitionManager"
 import { createLogger } from "../utils/logger"
@@ -109,6 +110,7 @@ export class WebView extends BrowserView {
 			overrideBrowserWindowOptions: {
 				width: 500,
 				height: 700,
+				icon: resolveAppIcon(),
 				autoHideMenuBar: true,
 				webPreferences: {
 					session: this.webContents.session,

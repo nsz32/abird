@@ -2,7 +2,8 @@ import { randomBytes } from "node:crypto"
 import { copyFileSync, existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 import type { IconData, IconFetchResult, IconResult, IconSource } from "@shared/types"
-import { net, WebContentsView, app, dialog } from "electron"
+import { net, WebContentsView, app, dialog, nativeImage } from "electron"
+import { getBirdConfig, getCurrentAppName } from "../config"
 import { Jimp } from "jimp"
 import pngToIco from "png-to-ico"
 import { paths } from "../utils/platform"
@@ -337,6 +338,20 @@ export function getDefaultIconPath(): string | null {
 	copyFileSync(sourcePath, targetPath)
 
 	return targetPath
+}
+
+/**
+ * Resolves the app icon as a NativeImage for window/popup usage.
+ */
+export function resolveAppIcon(): Electron.NativeImage | undefined {
+	const appName = getCurrentAppName()
+	const config = getBirdConfig()
+	const iconFilename = appName ? config.apps[appName]?.icon : undefined
+
+	const iconPath = (iconFilename && getIconPath(iconFilename)) || getDefaultIconPath()
+	if (!iconPath) return undefined
+
+	return nativeImage.createFromPath(iconPath)
 }
 
 /**
