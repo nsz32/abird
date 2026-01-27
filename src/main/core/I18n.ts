@@ -1,5 +1,6 @@
 import { type Locale, type Translations, translations } from "@shared/i18n"
 import { app } from "electron"
+import type { Labels } from "electron-context-menu"
 import { createLogger } from "../utils/logger"
 
 const log = createLogger("I18n")
@@ -29,4 +30,22 @@ export function getTranslations(): Translations {
 
 export function t(key: keyof Translations): string {
 	return translations[currentLocale][key]
+}
+
+let contextMenuLabels: Labels | undefined
+
+/** Cached context menu labels for the current locale. */
+export function getContextMenuLabels(): Labels {
+	contextMenuLabels ??= {
+		cut: t("contextMenu.cut"),
+		copy: t("contextMenu.copy"),
+		paste: t("contextMenu.paste"),
+		selectAll: t("contextMenu.selectAll"),
+		saveImageAs: t("contextMenu.saveImageAs"),
+		copyImageAddress: t("contextMenu.copyImageAddress"),
+		copyLink: t("contextMenu.copyLink"),
+		saveLinkAs: t("contextMenu.saveLinkAs"),
+		inspect: t("contextMenu.inspect"),
+	}
+	return contextMenuLabels
 }

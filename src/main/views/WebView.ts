@@ -1,6 +1,7 @@
 import type { ResolvedRoutingConfig, TabOrigin } from "@shared/types"
 import { type BrowserWindow, Menu, app } from "electron"
 import contextMenu from "electron-context-menu"
+import { getContextMenuLabels } from "../core/I18n"
 import { getNavigationAction } from "../core/UrlRouter"
 import { config$ } from "../core/states"
 import { disableAdBlock, enableAdBlock } from "../services/AdBlocker"
@@ -46,7 +47,10 @@ export class WebView extends BrowserView {
 			showSaveImageAs: true,
 			showCopyImageAddress: true,
 			showSaveLinkAs: true,
+			showSearchWithGoogle: false,
+			showLookUpSelection: false,
 			showInspectElement: !app.isPackaged,
+			labels: getContextMenuLabels(),
 		})
 	}
 

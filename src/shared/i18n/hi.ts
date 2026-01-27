@@ -197,4 +197,15 @@ export const hiTranslations: Translations = {
 	"menu.developer.devtoolsNavbar": "DevTools Navbar",
 	"menu.help": "सहायता",
 	"menu.help.about": "Bird के बारे में",
+
+	// Context menu
+	"contextMenu.cut": "काटें",
+	"contextMenu.copy": "कॉपी करें",
+	"contextMenu.paste": "चिपकाएँ",
+	"contextMenu.selectAll": "सभी चुनें",
+	"contextMenu.saveImageAs": "छवि इस रूप में सहेजें…",
+	"contextMenu.copyImageAddress": "छवि का पता कॉपी करें",
+	"contextMenu.copyLink": "लिंक कॉपी करें",
+	"contextMenu.saveLinkAs": "लिंक इस रूप में सहेजें…",
+	"contextMenu.inspect": "तत्व का निरीक्षण करें",
 } as const

@@ -197,4 +197,15 @@ export const arTranslations: Translations = {
 	"menu.developer.devtoolsNavbar": "أدوات المطور لشريط التنقل",
 	"menu.help": "المساعدة",
 	"menu.help.about": "حول Bird",
+
+	// Context menu
+	"contextMenu.cut": "قص",
+	"contextMenu.copy": "نسخ",
+	"contextMenu.paste": "لصق",
+	"contextMenu.selectAll": "تحديد الكل",
+	"contextMenu.saveImageAs": "حفظ الصورة باسم…",
+	"contextMenu.copyImageAddress": "نسخ عنوان الصورة",
+	"contextMenu.copyLink": "نسخ الرابط",
+	"contextMenu.saveLinkAs": "حفظ الرابط باسم…",
+	"contextMenu.inspect": "فحص العنصر",
 } as const

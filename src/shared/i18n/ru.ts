@@ -197,4 +197,15 @@ export const ruTranslations: Translations = {
 	"menu.developer.devtoolsNavbar": "DevTools навигации",
 	"menu.help": "Справка",
 	"menu.help.about": "О Bird",
+
+	// Context menu
+	"contextMenu.cut": "Вырезать",
+	"contextMenu.copy": "Копировать",
+	"contextMenu.paste": "Вставить",
+	"contextMenu.selectAll": "Выделить всё",
+	"contextMenu.saveImageAs": "Сохранить изображение как…",
+	"contextMenu.copyImageAddress": "Копировать адрес изображения",
+	"contextMenu.copyLink": "Копировать ссылку",
+	"contextMenu.saveLinkAs": "Сохранить ссылку как…",
+	"contextMenu.inspect": "Просмотреть код элемента",
 } as const

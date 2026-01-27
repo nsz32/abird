@@ -197,4 +197,15 @@ export const zhTranslations: Translations = {
 	"menu.developer.devtoolsNavbar": "DevTools 导航栏",
 	"menu.help": "帮助",
 	"menu.help.about": "关于 Bird",
+
+	// Context menu
+	"contextMenu.cut": "剪切",
+	"contextMenu.copy": "复制",
+	"contextMenu.paste": "粘贴",
+	"contextMenu.selectAll": "全选",
+	"contextMenu.saveImageAs": "图片另存为…",
+	"contextMenu.copyImageAddress": "复制图片地址",
+	"contextMenu.copyLink": "复制链接",
+	"contextMenu.saveLinkAs": "链接另存为…",
+	"contextMenu.inspect": "检查元素",
 } as const

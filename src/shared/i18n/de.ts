@@ -197,4 +197,15 @@ export const deTranslations: Translations = {
 	"menu.developer.devtoolsNavbar": "DevTools Navigationsleiste",
 	"menu.help": "Hilfe",
 	"menu.help.about": "Über Bird",
+
+	// Context menu
+	"contextMenu.cut": "Ausschneiden",
+	"contextMenu.copy": "Kopieren",
+	"contextMenu.paste": "Einfügen",
+	"contextMenu.selectAll": "Alles auswählen",
+	"contextMenu.saveImageAs": "Bild speichern unter…",
+	"contextMenu.copyImageAddress": "Bildadresse kopieren",
+	"contextMenu.copyLink": "Link kopieren",
+	"contextMenu.saveLinkAs": "Link speichern unter…",
+	"contextMenu.inspect": "Element untersuchen",
 } as const

@@ -195,6 +195,17 @@ const en = {
 	"menu.developer.devtoolsNavbar": "DevTools Navbar",
 	"menu.help": "Help",
 	"menu.help.about": "About Bird",
+
+	// Context menu
+	"contextMenu.cut": "Cut",
+	"contextMenu.copy": "Copy",
+	"contextMenu.paste": "Paste",
+	"contextMenu.selectAll": "Select All",
+	"contextMenu.saveImageAs": "Save Image As…",
+	"contextMenu.copyImageAddress": "Copy Image Address",
+	"contextMenu.copyLink": "Copy Link",
+	"contextMenu.saveLinkAs": "Save Link As…",
+	"contextMenu.inspect": "Inspect Element",
 }
 
 export type TranslationKey = keyof typeof en
