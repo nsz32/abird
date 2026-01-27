@@ -26,7 +26,7 @@ import { activateTab, closeTab, createTab, getActiveTab, getTabsList } from "./t
 import { performCleanAll } from "./utils/cleanup"
 import { createLogger } from "./utils/logger"
 import { openFile } from "./utils/platform"
-import { getAvailableUserAgents } from "./utils/userAgents"
+import { getAvailableUserAgents, getDefaultUserAgent } from "./utils/userAgents"
 
 const log = createLogger("IPC")
 
@@ -179,5 +179,8 @@ export function registerHandlers() {
 		})
 		return result.canceled ? null : result.filePaths[0]
 	})
-	ipcMain.handle(IpcChannels.SETTINGS_GET_USER_AGENTS, () => getAvailableUserAgents())
+	ipcMain.handle(IpcChannels.SETTINGS_GET_USER_AGENTS, () => ({
+		keys: getAvailableUserAgents(),
+		defaultKey: getDefaultUserAgent(),
+	}))
 }

@@ -60,7 +60,7 @@ const USER_AGENTS: Record<string, string> = {
 }
 
 // Mapping process.platform -> OS for shortcodes
-function getHostOS(): string {
+export function getHostOS(): string {
 	switch (process.platform) {
 		case "win32":
 			return "windows"
@@ -103,6 +103,16 @@ function parseShortcode(shortcode: string): string | null {
 	return null
 }
 
+// Default user agent shortcode (Chrome on host OS)
+export function getDefaultUserAgent(): string {
+	return `desktop:chrome:${getHostOS()}`
+}
+
+// Checks whether a shortcode is a known key in USER_AGENTS
+export function isKnownUserAgent(shortcode: string): boolean {
+	return shortcode in USER_AGENTS
+}
+
 // List of available shortcodes
 export function getAvailableUserAgents(): string[] {
 	return Object.keys(USER_AGENTS)
@@ -119,6 +129,7 @@ export function resolveUserAgent(userAgent: string): string {
 	const parsed = parseShortcode(userAgent)
 	if (parsed) return parsed
 
-	log.warn(`Unknown shortcode: ${userAgent}, using desktop:bird`)
-	return getCleanDefaultUA()
+	const fallback = getDefaultUserAgent()
+	log.warn(`Unknown user agent shortcode "${userAgent}", falling back to ${fallback}`)
+	return parseShortcode(fallback) as string
 }

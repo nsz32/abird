@@ -126,6 +126,12 @@ export interface DeployState {
 	apps: Record<string, boolean> // appName -> isDeployed
 }
 
+// User agent presets (available shortcodes + default)
+export interface UserAgentPresets {
+	keys: string[]
+	defaultKey: string
+}
+
 // IPC channels (prevents typos, enables autocompletion)
 export const IpcChannels = {
 	// Navigation
@@ -330,7 +336,7 @@ export interface BirdApi {
 		}
 		selectDirectory: (defaultPath?: string) => Promise<string | null>
 		getDefaultDownloadsPath: () => Promise<string>
-		getUserAgents: () => Promise<string[]>
+		getUserAgents: () => Promise<UserAgentPresets>
 	}
 	i18n: {
 		getTranslations: () => Promise<Translations>

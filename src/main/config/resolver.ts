@@ -8,9 +8,10 @@ import { config$ } from "../core/states"
 import { acquirePartitionLock } from "../services/CacheManager"
 import { resolveDownloadConfig } from "../services/DownloadManager"
 import { createLogger } from "../utils/logger"
+import { getDefaultUserAgent, isKnownUserAgent } from "../utils/userAgents"
 import { getBirdConfig, setCurrentAppName, setOnConfigChanged } from "./store"
 
-const log = createLogger("Routing")
+const log = createLogger("Resolver")
 
 interface ResolvedNavBarOverrides {
 	showBackButton?: boolean
@@ -71,15 +72,33 @@ export interface CliOverrides {
 	userAgent?: string
 }
 
+function isRawUserAgent(value: string): boolean {
+	return value.includes(" ") || value.startsWith("Mozilla")
+}
+
+function resolveUserAgentKey(value: string | undefined): string {
+	if (!value) return getDefaultUserAgent()
+	if (isRawUserAgent(value)) return value
+
+	if (isKnownUserAgent(value)) return value
+
+	const fallback = getDefaultUserAgent()
+	log.warn(`Unknown user agent "${value}", falling back to ${fallback}`)
+	return fallback
+}
+
 function buildEffectiveConfig(app: Partial<AppConfig>, birdConfig: BirdConfig, options?: BuildOptions): EffectiveConfig {
 	const mergedNavBar: NavBarConfig = { ...DEFAULT_NAVBAR, ...birdConfig.navBar, ...app.navBar }
 	const cli = options?.cliOverrides
+
+	const rawUserAgent = cli?.userAgent || app.userAgentRaw || app.userAgent
+	const userAgent = resolveUserAgentKey(rawUserAgent)
 
 	return {
 		startUrl: app.startUrl || "about:blank",
 		partition: app.partition || null,
 		theme: app.theme || birdConfig.theme,
-		userAgent: cli?.userAgent || app.userAgentRaw || app.userAgent || "desktop:bird",
+		userAgent,
 		navBar: resolveNavBarConfig(mergedNavBar, options?.navBarOverrides),
 		routing: resolveRoutingConfig(app.routing, app.startUrl),
 		downloads: resolveDownloadConfig({ ...birdConfig.downloads, ...app.downloads }),
@@ -104,7 +123,6 @@ export function selectConfigMode(): void {
 
 	const configApp: Partial<AppConfig> = {
 		startUrl: "bird://config/",
-		userAgent: "Bird",
 		navBar: {
 			visible: true,
 			autoHide: false,
@@ -125,7 +143,7 @@ export function selectConfigMode(): void {
 	config$.emit(effective)
 }
 
-export function selectBrowserMode(startUrl: string, userAgent = "desktop:bird"): void {
+export function selectBrowserMode(startUrl: string, userAgent?: string): void {
 	const birdConfig = getBirdConfig()
 	setCurrentAppName("Bird")
 
