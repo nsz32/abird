@@ -1,6 +1,7 @@
 import { resolve } from "node:path"
 import react from "@vitejs/plugin-react"
 import { defineConfig, externalizeDepsPlugin } from "electron-vite"
+import pkg from "./package.json"
 
 const sharedAlias = {
 	"@shared": resolve(__dirname, "src/shared"),
@@ -51,6 +52,7 @@ export default defineConfig({
 		root: "src/ui",
 		publicDir: "public",
 		plugins: [react()],
+		define: { __APP_VERSION__: JSON.stringify(pkg.version) },
 		resolve: { alias: rendererAlias },
 		build: {
 			minify: true,

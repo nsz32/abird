@@ -14,8 +14,9 @@ export const esTranslations: Translations = {
 	"settings.partitions": "Particiones",
 	"settings.partitionsHint": "Una partición aísla los datos (cookies, caché, almacenamiento). Varias aplicaciones pueden compartir la misma partición.",
 	"settings.stats": '{{apps}} app{{apps>1?"s":""}} · {{partitions}} particion{{partitions>1?"es":""}}',
-	"settings.cleanAll": "Eliminar todos los datos",
-	"settings.cleanAllConfirm": "Se eliminarán TODOS los datos y accesos directos de Bird. Perderá toda su configuración. ¿Continuar?",
+	"settings.reloadPartitions": "Recargar particiones",
+	"settings.cleanAll": "Limpiar todo",
+	"settings.cleanAllConfirm": "Se eliminarán TODOS los datos y accesos directos de Bird. Perderá toda su configuración.\n\nAsegúrese de que no haya aplicaciones abiertas.\n\nLa ventana se cerrará automáticamente. ¿Continuar?",
 
 	// Theme
 	"theme.system": "Sistema",

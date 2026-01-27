@@ -4,6 +4,7 @@ import type { ReactNode } from "react"
 
 interface PageHeaderProps {
 	title: string
+	titleBadge?: ReactNode
 	leftInfo: ReactNode
 	rightInfo?: ReactNode
 	actions?: ReactNode
@@ -13,13 +14,18 @@ interface PageHeaderProps {
 	children: ReactNode
 }
 
-export function PageHeader({ title, leftInfo, rightInfo, actions, onRename, renameLabel, noScroll, children }: PageHeaderProps) {
+export function PageHeader({ title, titleBadge, leftInfo, rightInfo, actions, onRename, renameLabel, noScroll, children }: PageHeaderProps) {
 	return (
 		<Box display="flex" flexDirection="column" h="100%">
 			<Box pt={6} pb={4} flexShrink={0}>
 				<HStack justify="space-between" mb={2}>
 					<HStack gap={2}>
 						<Heading size="lg">{title}</Heading>
+						{titleBadge && (
+							<Text fontSize="sm" color="fg.muted" fontWeight="normal">
+								{titleBadge}
+							</Text>
+						)}
 						{onRename && (
 							<IconButton aria-label={renameLabel || "Rename"} variant="ghost" size="sm" onClick={onRename}>
 								<Pencil size={16} />

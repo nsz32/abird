@@ -14,8 +14,9 @@ export const arTranslations: Translations = {
 	"settings.partitions": "الأقسام",
 	"settings.partitionsHint": "القسم يعزل البيانات (ملفات تعريف الارتباط، ذاكرة التخزين المؤقت، التخزين). يمكن لتطبيقات متعددة مشاركة نفس القسم.",
 	"settings.stats": "{{apps}} تطبيق · {{partitions}} قسم",
-	"settings.cleanAll": "حذف جميع البيانات",
-	"settings.cleanAllConfirm": "سيؤدي هذا إلى حذف جميع بيانات واختصارات Bird. ستفقد جميع إعداداتك. هل تريد المتابعة؟",
+	"settings.reloadPartitions": "إعادة تحميل الأقسام",
+	"settings.cleanAll": "تنظيف الكل",
+	"settings.cleanAllConfirm": "سيؤدي هذا إلى حذف جميع بيانات واختصارات Bird. ستفقد جميع إعداداتك.\n\nيرجى التأكد من عدم وجود تطبيقات مفتوحة.\n\nسيتم إغلاق النافذة تلقائيًا. هل تريد المتابعة؟",
 
 	// Theme
 	"theme.system": "النظام",

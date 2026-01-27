@@ -14,8 +14,9 @@ export const deTranslations: Translations = {
 	"settings.partitions": "Partitionen",
 	"settings.partitionsHint": "Eine Partition isoliert Daten (Cookies, Cache, Speicher). Mehrere Anwendungen können dieselbe Partition teilen.",
 	"settings.stats": '{{apps}} App{{apps>1?"s":""}} · {{partitions}} Partition{{partitions>1?"en":""}}',
-	"settings.cleanAll": "Alle Daten löschen",
-	"settings.cleanAllConfirm": "Alle Bird-Daten und Verknüpfungen werden gelöscht. Ihre gesamte Konfiguration geht verloren. Fortfahren?",
+	"settings.reloadPartitions": "Partitionen neu laden",
+	"settings.cleanAll": "Alles bereinigen",
+	"settings.cleanAllConfirm": "Alle Bird-Daten und Verknüpfungen werden gelöscht. Ihre gesamte Konfiguration geht verloren.\n\nBitte stellen Sie sicher, dass keine Anwendungen geöffnet sind.\n\nDas Fenster wird automatisch geschlossen. Fortfahren?",
 
 	// Theme
 	"theme.system": "System",

@@ -14,8 +14,9 @@ export const ruTranslations: Translations = {
 	"settings.partitions": "Разделы",
 	"settings.partitionsHint": "Раздел изолирует данные (куки, кэш, хранилище). Несколько приложений могут использовать один раздел.",
 	"settings.stats": "{{apps}} прил. · {{partitions}} разд.",
-	"settings.cleanAll": "Удалить все данные",
-	"settings.cleanAllConfirm": "ВСЕ данные и ярлыки Bird будут удалены. Вся конфигурация будет потеряна. Продолжить?",
+	"settings.reloadPartitions": "Перезагрузить разделы",
+	"settings.cleanAll": "Очистить всё",
+	"settings.cleanAllConfirm": "ВСЕ данные и ярлыки Bird будут удалены. Вся конфигурация будет потеряна.\n\nУбедитесь, что ни одно приложение не открыто.\n\nОкно закроется автоматически. Продолжить?",
 
 	// Theme
 	"theme.system": "Системная",

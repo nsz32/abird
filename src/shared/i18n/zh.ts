@@ -14,8 +14,9 @@ export const zhTranslations: Translations = {
 	"settings.partitions": "分区",
 	"settings.partitionsHint": "分区隔离数据（cookies、缓存、存储）。多个应用程序可以共享同一分区。",
 	"settings.stats": "{{apps}} 个应用 · {{partitions}} 个分区",
-	"settings.cleanAll": "删除所有数据",
-	"settings.cleanAllConfirm": "这将删除此项目的所有 Bird 数据和快捷方式。您的所有配置都将丢失。继续吗？",
+	"settings.reloadPartitions": "重新加载分区",
+	"settings.cleanAll": "清理全部",
+	"settings.cleanAllConfirm": "这将删除此项目的所有 Bird 数据和快捷方式。您的所有配置都将丢失。\n\n请确保没有应用程序处于打开状态。\n\n窗口将自动关闭。继续吗？",
 
 	// Theme
 	"theme.system": "系统",

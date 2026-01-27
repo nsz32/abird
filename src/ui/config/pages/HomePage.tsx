@@ -1,10 +1,10 @@
-import { HStack, IconButton, Text, VStack } from "@chakra-ui/react"
+import { Button, HStack, IconButton, Text, VStack } from "@chakra-ui/react"
 import type { BirdConfig, DownloadConfig, NavBarConfig } from "@shared/config.schema"
 import { normalizePartitionName } from "@shared/partition"
 import { deriveInternalPattern } from "@shared/routing"
 import type { DeployState, PartitionsState } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
-import { BrushCleaning } from "lucide-react"
+import { BrushCleaning, RefreshCw } from "lucide-react"
 import { useEffect, useState } from "react"
 import { AppList } from "../components/AppList"
 import { ConfigSection } from "../components/ConfigSection"
@@ -125,6 +125,7 @@ export function HomePage({ config, configPath, partitionsState, deployState, act
 	return (
 		<PageHeader
 			title={t("settings.title")}
+			titleBadge={`v${__APP_VERSION__}`}
 			leftInfo={t("settings.stats", { apps: appCount, partitions: partitionCount })}
 			rightInfo={
 				<HStack>
@@ -133,16 +134,10 @@ export function HomePage({ config, configPath, partitionsState, deployState, act
 							{t("settings.project")} : {config.projectName}
 						</Text>
 					)}
-					<IconButton
-						aria-label={t("settings.cleanAll")}
-						variant="ghost"
-						size="xs"
-						colorPalette="red"
-						onClick={handleCleanAll}
-						title={t("settings.cleanAll")}
-					>
+					<Button variant="ghost" size="xs" colorPalette="red" onClick={handleCleanAll}>
 						<BrushCleaning size={14} />
-					</IconButton>
+						{t("settings.cleanAll")}
+					</Button>
 				</HStack>
 			}
 			actions={
@@ -189,7 +184,15 @@ export function HomePage({ config, configPath, partitionsState, deployState, act
 						/>
 					</ConfigSection>
 
-					<ConfigSection title={t("settings.partitions")} hint={t("settings.partitionsHint")}>
+					<ConfigSection
+						title={t("settings.partitions")}
+						hint={t("settings.partitionsHint")}
+						headerAction={
+							<IconButton aria-label={t("settings.reloadPartitions")} variant="ghost" size="xs" onClick={reloadPartitions}>
+								<RefreshCw size={14} />
+							</IconButton>
+						}
+					>
 						<PartitionList
 							partitions={partitionsState.partitions}
 							activePartition={activePartition}
