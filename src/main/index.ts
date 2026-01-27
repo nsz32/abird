@@ -83,10 +83,15 @@ app.setPath("userData", resolveUserDataPath())
  * Must be called before creating windows.
  */
 function setAppIdentity(projectName: string, appName: string): void {
-	app.setName(`${projectName}-${sanitizeAppName(appName)}`)
+	const identity = `${projectName}-${sanitizeAppName(appName)}`
+	app.setName(identity)
 
 	if (process.platform === "win32") {
 		app.setAppUserModelId(getAppUserModelId(projectName, appName))
+	}
+
+	if (process.platform === "linux") {
+		;(app as Record<string, unknown>).setDesktopName(`${identity}.desktop`)
 	}
 }
 
@@ -106,6 +111,7 @@ async function handleCleanAll(force: boolean): Promise<void> {
 }
 
 // Must be called before app.whenReady()
+app.commandLine.appendSwitch("ozone-platform-hint", "auto")
 registerBirdScheme()
 
 app.whenReady().then(() => {
