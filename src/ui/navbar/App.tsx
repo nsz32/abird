@@ -1,5 +1,5 @@
 import { ArrowLeft, ArrowRight, Download, Home, HousePlus, RotateCw, X } from "lucide-react"
-import { type KeyboardEvent, useEffect, useState } from "react"
+import { type KeyboardEvent, useEffect, useRef, useState } from "react"
 import type { ActiveDownload } from "../../shared/types"
 import { DownloadProgressIcon } from "./DownloadProgressIcon"
 import { TabButton } from "./TabButton"
@@ -10,25 +10,47 @@ export function App() {
 	const [hasDownloads, setHasDownloads] = useState(false)
 	const [activeDownloads, setActiveDownloads] = useState<ActiveDownload[]>([])
 	const [ctrlPressed, setCtrlPressed] = useState(false)
+	const [bump, setBump] = useState(false)
+	const [highlighted, setHighlighted] = useState(false)
+	const prevActiveCount = useRef(0)
 
 	useEffect(() => {
-		// Check for any downloads (active or history)
 		Promise.all([window.bird.downloads.getActive(), window.bird.downloads.getHistory()]).then(([active, history]) => {
 			setActiveDownloads(active)
 			setHasDownloads(active.length > 0 || history.length > 0)
+			prevActiveCount.current = active.length
 		})
+
 		const unsubActive = window.bird.downloads.onActiveChanged((items) => {
 			setActiveDownloads(items)
 			if (items.length > 0) setHasDownloads(true)
+
+			if (prevActiveCount.current > 0 && items.length === 0) {
+				setBump(true)
+			}
+			prevActiveCount.current = items.length
 		})
+
 		const unsubHistory = window.bird.downloads.onHistoryChanged((items) => {
 			if (items.length > 0) setHasDownloads(true)
 		})
+
+		const unsubEvent = window.bird.downloads.onEvent((event) => {
+			if (event.type === "completed" && event.autoOpened === false) {
+				setHighlighted(true)
+			}
+		})
+
 		return () => {
 			unsubActive()
 			unsubHistory()
+			unsubEvent()
 		}
 	}, [])
+
+	useEffect(() => {
+		if (navState?.isDownloadsPanelActive) setHighlighted(false)
+	}, [navState?.isDownloadsPanelActive])
 
 	useEffect(() => {
 		return window.bird.keyboard.onCtrlChanged(setCtrlPressed)
@@ -51,6 +73,8 @@ export function App() {
 	}
 
 	const navDisabled = navState.isStandalonePanel
+
+	const downloadButtonClass = [highlighted && "highlighted", bump && "bump"].filter(Boolean).join(" ") || undefined
 
 	return (
 		<div ref={containerRef} className="navigation-bar">
@@ -91,7 +115,12 @@ export function App() {
 				</div>
 			)}
 			{hasDownloads && (
-				<NavButton onClick={() => window.bird.downloads.toggle()} active={navState.isDownloadsPanelActive}>
+				<NavButton
+					onClick={() => window.bird.downloads.toggle()}
+					active={navState.isDownloadsPanelActive}
+					className={downloadButtonClass}
+					onAnimationEnd={() => setBump(false)}
+				>
 					{activeDownloads.length > 0 ? <DownloadProgressIcon downloads={activeDownloads} /> : <Download />}
 				</NavButton>
 			)}
@@ -103,12 +132,15 @@ interface NavButtonProps {
 	onClick: () => void
 	disabled?: boolean
 	active?: boolean
+	className?: string
+	onAnimationEnd?: () => void
 	children: React.ReactNode
 }
 
-function NavButton({ onClick, disabled, active, children }: NavButtonProps) {
+function NavButton({ onClick, disabled, active, className, onAnimationEnd, children }: NavButtonProps) {
+	const classes = ["nav-button", active && "active", className].filter(Boolean).join(" ")
 	return (
-		<button type="button" className={`nav-button ${active ? "active" : ""}`} onClick={onClick} disabled={disabled}>
+		<button type="button" className={classes} onClick={onClick} disabled={disabled} onAnimationEnd={onAnimationEnd}>
 			{children}
 		</button>
 	)

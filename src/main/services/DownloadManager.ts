@@ -90,10 +90,12 @@ function addToHistory(
 	status: DownloadStatus,
 	totalBytes: number,
 	message?: string,
+	autoOpened?: boolean,
 ): void {
 	const item: DownloadHistoryItem = { id, filename, savePath, url, partition, status, totalBytes, message, completedAt: Date.now() }
 	downloadHistory$.emit([item, ...downloadHistory$.get()])
-	downloadEvents$.emit({ type: status === "duplicate" ? "completed" : status, id })
+	const type = status === "duplicate" ? "completed" : status
+	downloadEvents$.emit({ type, id, autoOpened: type === "completed" ? autoOpened : undefined })
 }
 
 export function getDownloadPath(id: string): string | null {
@@ -305,7 +307,7 @@ async function handleCompletedDownload(
 				dismissable: true,
 				autoDismiss: 5000,
 			})
-			addToHistory(downloadId, filename, finalPath, url, partition, "completed", size, t("downloads.executableType").replace("{name}", execName))
+			addToHistory(downloadId, filename, finalPath, url, partition, "completed", size, t("downloads.executableType").replace("{name}", execName), false)
 		}
 		return
 	}
@@ -340,9 +342,10 @@ async function handleCompletedDownload(
 				completedAt: Date.now(),
 			}
 			downloadHistory$.emit([item, ...history])
-			downloadEvents$.emit({ type: "completed", id: downloadId })
+			const autoOpened = shouldAutoOpen(result, size, config)
+			downloadEvents$.emit({ type: "completed", id: downloadId, autoOpened })
 
-			if (shouldAutoOpen(result, size, config)) {
+			if (autoOpened) {
 				openFile(originalPath).then((error) => {
 					if (error) log.error(`Open file failed: ${originalPath}`, error)
 				})
@@ -351,9 +354,10 @@ async function handleCompletedDownload(
 		}
 	}
 
-	addToHistory(downloadId, filename, finalPath, url, partition, "completed", size)
+	const autoOpened = shouldAutoOpen(result, size, config)
+	addToHistory(downloadId, filename, finalPath, url, partition, "completed", size, undefined, autoOpened)
 
-	if (shouldAutoOpen(result, size, config)) {
+	if (autoOpened) {
 		openFile(finalPath).then((error) => {
 			if (error) log.error(`Open file failed: ${finalPath}`, error)
 		})

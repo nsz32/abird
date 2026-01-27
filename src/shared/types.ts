@@ -94,6 +94,7 @@ export interface DownloadEvent {
 	type: DownloadEventType
 	id: string
 	progress?: number // 0-100, for "progress"
+	autoOpened?: boolean // for "completed"
 }
 
 // Find in page state
