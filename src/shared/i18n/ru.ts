@@ -16,7 +16,8 @@ export const ruTranslations: Translations = {
 	"settings.stats": "{{apps}} прил. · {{partitions}} разд.",
 	"settings.reloadPartitions": "Перезагрузить разделы",
 	"settings.cleanAll": "Очистить всё",
-	"settings.cleanAllConfirm": "ВСЕ данные и ярлыки Bird будут удалены. Вся конфигурация будет потеряна.\n\nУбедитесь, что ни одно приложение не открыто.\n\nОкно закроется автоматически. Продолжить?",
+	"settings.cleanAllConfirm":
+		"ВСЕ данные и ярлыки ABird будут удалены. Вся конфигурация будет потеряна.\n\nУбедитесь, что ни одно приложение не открыто.\n\nОкно закроется автоматически. Продолжить?",
 
 	// Theme
 	"theme.system": "Системная",
@@ -49,7 +50,7 @@ export const ruTranslations: Translations = {
 	"app.icon": "Иконка",
 	"app.fetchIcons": "Получить с сайта",
 	"app.importIcon": "Импорт файла",
-	"app.useDefaultIcon": "Использовать иконку Bird",
+	"app.useDefaultIcon": "Использовать иконку ABird",
 	"app.selectIcon": "Выбрать иконку",
 	"app.noIconsFound": "Иконки на этом сайте не найдены",
 	"app.loadingIcons": "Получение иконок...",
@@ -182,7 +183,7 @@ export const ruTranslations: Translations = {
 	"name.invalidFormat": "Не может начинаться/заканчиваться точкой или заканчиваться пробелом",
 
 	// Menu
-	"menu.app": "Bird",
+	"menu.app": "ABird",
 	"menu.app.settings": "Настройки...",
 	"menu.app.quit": "Выход",
 	"menu.tab": "Вкладка",
@@ -199,7 +200,7 @@ export const ruTranslations: Translations = {
 	"menu.developer.devtoolsSite": "DevTools сайта",
 	"menu.developer.devtoolsNavbar": "DevTools навигации",
 	"menu.help": "Справка",
-	"menu.help.about": "О Bird",
+	"menu.help.about": "О ABird",
 
 	// Context menu
 	"contextMenu.cut": "Вырезать",

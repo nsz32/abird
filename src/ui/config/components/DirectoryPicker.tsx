@@ -16,14 +16,14 @@ export function DirectoryPicker({ label, value, defaultValue, onChange, showInhe
 	const [systemDefault, setSystemDefault] = useState<string>("")
 
 	useEffect(() => {
-		window.bird.settings.getDefaultDownloadsPath().then(setSystemDefault)
+		window.abird.settings.getDefaultDownloadsPath().then(setSystemDefault)
 	}, [])
 
 	const isInherited = showInheritance && value === undefined
 	const displayPath = value ?? defaultValue ?? systemDefault
 
 	const handleSelect = async () => {
-		const selected = await window.bird.settings.selectDirectory(displayPath || undefined)
+		const selected = await window.abird.settings.selectDirectory(displayPath || undefined)
 		if (selected) {
 			onChange(selected)
 		}

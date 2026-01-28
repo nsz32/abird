@@ -38,7 +38,7 @@ export function IconPickerDialog({ isOpen, startUrl, partition, onClose, onSelec
 		setIcons([])
 		setIconSizes({})
 
-		window.bird.icons.fetch(startUrl, partition).then((result) => {
+		window.abird.icons.fetch(startUrl, partition).then((result) => {
 			setIcons(result.icons)
 			setState(result.icons.length > 0 ? "results" : "empty")
 		})

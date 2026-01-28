@@ -136,88 +136,88 @@ export interface UserAgentPresets {
 // IPC channels (prevents typos, enables autocompletion)
 export const IpcChannels = {
 	// Navigation
-	NAVIGATION_BACK: "bird:navigation:back",
-	NAVIGATION_FORWARD: "bird:navigation:forward",
-	NAVIGATION_RELOAD: "bird:navigation:reload",
-	NAVIGATION_STOP: "bird:navigation:stop",
-	NAVIGATION_GO_TO: "bird:navigation:go-to",
-	NAVIGATION_GO_HOME: "bird:navigation:go-home",
-	NAVIGATION_GET_STATE: "bird:navigation:get-state",
-	NAVIGATION_STATE_CHANGED: "bird:navigation:state-changed",
+	NAVIGATION_BACK: "abird:navigation:back",
+	NAVIGATION_FORWARD: "abird:navigation:forward",
+	NAVIGATION_RELOAD: "abird:navigation:reload",
+	NAVIGATION_STOP: "abird:navigation:stop",
+	NAVIGATION_GO_TO: "abird:navigation:go-to",
+	NAVIGATION_GO_HOME: "abird:navigation:go-home",
+	NAVIGATION_GET_STATE: "abird:navigation:get-state",
+	NAVIGATION_STATE_CHANGED: "abird:navigation:state-changed",
 	// Tabs
-	TABS_GET_LIST: "bird:tabs:get-list",
-	TABS_LIST_CHANGED: "bird:tabs:list-changed",
-	TABS_ACTIVATE: "bird:tabs:activate",
-	TABS_CLOSE: "bird:tabs:close",
-	TABS_CREATE: "bird:tabs:create",
-	TABS_EXTERNAL_OPENED: "bird:tabs:external-opened",
+	TABS_GET_LIST: "abird:tabs:get-list",
+	TABS_LIST_CHANGED: "abird:tabs:list-changed",
+	TABS_ACTIVATE: "abird:tabs:activate",
+	TABS_CLOSE: "abird:tabs:close",
+	TABS_CREATE: "abird:tabs:create",
+	TABS_EXTERNAL_OPENED: "abird:tabs:external-opened",
 	// Config
-	CONFIG_GET: "bird:config:get",
+	CONFIG_GET: "abird:config:get",
 	// Notifications
-	NOTIF_LIST_CHANGED: "bird:notif:list-changed",
-	NOTIF_DISMISS: "bird:notif:dismiss",
-	NOTIF_GET_LIST: "bird:notif:get-list",
-	NOTIF_RESIZE: "bird:notif:resize",
+	NOTIF_LIST_CHANGED: "abird:notif:list-changed",
+	NOTIF_DISMISS: "abird:notif:dismiss",
+	NOTIF_GET_LIST: "abird:notif:get-list",
+	NOTIF_RESIZE: "abird:notif:resize",
 	// Navbar
-	NAVBAR_RESIZE: "bird:navbar:resize",
-	NAVBAR_URL_EDIT_MODE: "bird:navbar:url-edit-mode",
+	NAVBAR_RESIZE: "abird:navbar:resize",
+	NAVBAR_URL_EDIT_MODE: "abird:navbar:url-edit-mode",
 	// Commands
-	COMMAND_FOCUS_URL: "bird:command:focus-url",
+	COMMAND_FOCUS_URL: "abird:command:focus-url",
 	// Downloads panel
-	DOWNLOADS_TOGGLE: "bird:downloads:toggle",
-	DOWNLOADS_GET_HISTORY: "bird:downloads:get-history",
-	DOWNLOADS_HISTORY_CHANGED: "bird:downloads:history-changed",
-	DOWNLOADS_GET_ACTIVE: "bird:downloads:get-active",
-	DOWNLOADS_ACTIVE_CHANGED: "bird:downloads:active-changed",
-	DOWNLOADS_EVENT: "bird:downloads:event",
-	DOWNLOADS_PANEL_RESIZE: "bird:downloads:panel-resize",
-	DOWNLOADS_OPEN_FILE: "bird:downloads:open-file",
-	DOWNLOADS_OPEN_FOLDER: "bird:downloads:open-folder",
-	DOWNLOADS_CANCEL: "bird:downloads:cancel",
-	DOWNLOADS_RETRY: "bird:downloads:retry",
-	DOWNLOADS_REMOVE: "bird:downloads:remove",
+	DOWNLOADS_TOGGLE: "abird:downloads:toggle",
+	DOWNLOADS_GET_HISTORY: "abird:downloads:get-history",
+	DOWNLOADS_HISTORY_CHANGED: "abird:downloads:history-changed",
+	DOWNLOADS_GET_ACTIVE: "abird:downloads:get-active",
+	DOWNLOADS_ACTIVE_CHANGED: "abird:downloads:active-changed",
+	DOWNLOADS_EVENT: "abird:downloads:event",
+	DOWNLOADS_PANEL_RESIZE: "abird:downloads:panel-resize",
+	DOWNLOADS_OPEN_FILE: "abird:downloads:open-file",
+	DOWNLOADS_OPEN_FOLDER: "abird:downloads:open-folder",
+	DOWNLOADS_CANCEL: "abird:downloads:cancel",
+	DOWNLOADS_RETRY: "abird:downloads:retry",
+	DOWNLOADS_REMOVE: "abird:downloads:remove",
 	// Find in page
-	FIND_OPEN: "bird:find:open",
-	FIND_SEARCH: "bird:find:search",
-	FIND_NEXT: "bird:find:next",
-	FIND_PREV: "bird:find:prev",
-	FIND_CLOSE: "bird:find:close",
-	FIND_STATE_CHANGED: "bird:find:state-changed",
-	FIND_PANEL_RESIZE: "bird:find:panel-resize",
+	FIND_OPEN: "abird:find:open",
+	FIND_SEARCH: "abird:find:search",
+	FIND_NEXT: "abird:find:next",
+	FIND_PREV: "abird:find:prev",
+	FIND_CLOSE: "abird:find:close",
+	FIND_STATE_CHANGED: "abird:find:state-changed",
+	FIND_PANEL_RESIZE: "abird:find:panel-resize",
 	// Keyboard
-	CTRL_PRESSED: "bird:keyboard:ctrl-pressed",
+	CTRL_PRESSED: "abird:keyboard:ctrl-pressed",
 	// User config (raw JSON)
 	USERCONFIG_READ: "userconfig:read",
 	USERCONFIG_WRITE: "userconfig:write",
 	// I18n
-	I18N_GET_TRANSLATIONS: "bird:i18n:get-translations",
+	I18N_GET_TRANSLATIONS: "abird:i18n:get-translations",
 	// Icons
-	ICONS_FETCH: "bird:icons:fetch",
-	ICONS_SAVE: "bird:icons:save",
-	ICONS_IMPORT_FILE: "bird:icons:import-file",
-	ICONS_DELETE: "bird:icons:delete",
-	ICONS_GET_DATA: "bird:icons:get-data",
+	ICONS_FETCH: "abird:icons:fetch",
+	ICONS_SAVE: "abird:icons:save",
+	ICONS_IMPORT_FILE: "abird:icons:import-file",
+	ICONS_DELETE: "abird:icons:delete",
+	ICONS_GET_DATA: "abird:icons:get-data",
 	// Deploy
-	DEPLOY_SUPPORTED: "bird:deploy:supported",
-	DEPLOY_STATUS: "bird:deploy:status",
-	DEPLOY_LIST: "bird:deploy:list",
-	DEPLOY_APP: "bird:deploy:app",
-	UNDEPLOY_APP: "bird:deploy:undeploy",
-	DEPLOY_RENAME: "bird:deploy:rename",
+	DEPLOY_SUPPORTED: "abird:deploy:supported",
+	DEPLOY_STATUS: "abird:deploy:status",
+	DEPLOY_LIST: "abird:deploy:list",
+	DEPLOY_APP: "abird:deploy:app",
+	UNDEPLOY_APP: "abird:deploy:undeploy",
+	DEPLOY_RENAME: "abird:deploy:rename",
 	// Partition
-	PARTITION_LIST: "bird:partition:list",
-	PARTITION_CLEANUP: "bird:partition:cleanup",
-	PARTITION_RESET: "bird:partition:reset",
-	PARTITION_DELETE: "bird:partition:delete",
-	PARTITION_RENAME: "bird:partition:rename",
+	PARTITION_LIST: "abird:partition:list",
+	PARTITION_CLEANUP: "abird:partition:cleanup",
+	PARTITION_RESET: "abird:partition:reset",
+	PARTITION_DELETE: "abird:partition:delete",
+	PARTITION_RENAME: "abird:partition:rename",
 	// App launch & cleanup
-	APP_LAUNCH_SUPPORTED: "bird:app:launch-supported",
-	APP_LAUNCH: "bird:app:launch",
-	APP_CLEAN_ALL: "bird:app:clean-all",
+	APP_LAUNCH_SUPPORTED: "abird:app:launch-supported",
+	APP_LAUNCH: "abird:app:launch",
+	APP_CLEAN_ALL: "abird:app:clean-all",
 	// Settings
-	SETTINGS_SELECT_DIRECTORY: "bird:settings:select-directory",
-	SETTINGS_GET_DEFAULT_DOWNLOADS_PATH: "bird:settings:get-default-downloads-path",
-	SETTINGS_GET_USER_AGENTS: "bird:settings:get-user-agents",
+	SETTINGS_SELECT_DIRECTORY: "abird:settings:select-directory",
+	SETTINGS_GET_DEFAULT_DOWNLOADS_PATH: "abird:settings:get-default-downloads-path",
+	SETTINGS_GET_USER_AGENTS: "abird:settings:get-user-agents",
 } as const
 
 // Utility type for IpcChannels values
@@ -268,7 +268,7 @@ export interface EffectiveConfig {
 	preload?: string
 }
 
-// Bird API exposed to overlays via contextBridge
+// ABird API exposed to overlays via contextBridge
 export interface BirdApi {
 	navigation: {
 		back: () => Promise<void>
@@ -393,9 +393,9 @@ export interface IconFetchResult {
 	themeColor?: string
 }
 
-// Global declaration for window.bird
+// Global declaration for window.abird
 declare global {
 	interface Window {
-		bird: BirdApi
+		abird: BirdApi
 	}
 }

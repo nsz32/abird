@@ -18,7 +18,7 @@ import {
 import { contextBridge, ipcRenderer } from "electron"
 
 // API exposed to UI components
-contextBridge.exposeInMainWorld("bird", {
+contextBridge.exposeInMainWorld("abird", {
 	navigation: {
 		back: () => ipcRenderer.invoke(IpcChannels.NAVIGATION_BACK),
 		forward: () => ipcRenderer.invoke(IpcChannels.NAVIGATION_FORWARD),

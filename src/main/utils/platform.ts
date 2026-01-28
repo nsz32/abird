@@ -8,9 +8,9 @@ const log = createLogger("Platform")
 /**
  * Centralized paths for the application.
  * Uses Electron's app.getPath for cross-platform compatibility:
- * - Linux: ~/.local/share/bird
- * - Windows: C:\Users\<user>\AppData\Roaming\bird
- * - macOS: ~/Library/Application Support/bird
+ * - Linux: ~/.local/share/abird
+ * - Windows: C:\Users\<user>\AppData\Roaming\abird
+ * - macOS: ~/Library/Application Support/abird
  */
 export const paths = {
 	get userData() {

@@ -11,7 +11,7 @@ export function UserAgentSelect({ value, onChange }: UserAgentSelectProps) {
 	const [presets, setPresets] = useState<UserAgentPresets | null>(null)
 
 	useEffect(() => {
-		window.bird.settings.getUserAgents().then(setPresets)
+		window.abird.settings.getUserAgents().then(setPresets)
 	}, [])
 
 	const defaultKey = presets?.defaultKey || ""

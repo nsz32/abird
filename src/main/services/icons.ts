@@ -3,12 +3,12 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync, unlinkSync, writeFil
 import { join } from "node:path"
 import type { IconData, IconFetchResult, IconResult, IconSource } from "@shared/types"
 import { net, WebContentsView, app, dialog, nativeImage } from "electron"
-import { getBirdConfig, getCurrentAppName } from "../config"
 import { Jimp } from "jimp"
 import pngToIco from "png-to-ico"
+import { getBirdConfig, getCurrentAppName } from "../config"
 import { paths } from "../utils/platform"
 
-const DEFAULT_ICON_FILENAME = "bird-default.png"
+const DEFAULT_ICON_FILENAME = "abird-default.png"
 
 const STANDARD_SIZES = [256, 128, 96, 64, 48, 32, 24, 16] as const
 
@@ -324,10 +324,7 @@ export function getDefaultIconPath(): string | null {
 	}
 
 	// Copy from app resources on first use (extraResources for AppImage/installer, asar for standalone)
-	const candidates = [
-		join(process.resourcesPath, "assets", "icons", "256x256.png"),
-		join(app.getAppPath(), "assets", "icons", "256x256.png"),
-	]
+	const candidates = [join(process.resourcesPath, "assets", "icons", "256x256.png"), join(app.getAppPath(), "assets", "icons", "256x256.png")]
 	const sourcePath = candidates.find((p) => existsSync(p))
 
 	if (!sourcePath) {

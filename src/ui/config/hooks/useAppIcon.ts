@@ -15,7 +15,7 @@ export function useAppIcon(iconFilename?: string): UseAppIconResult {
 
 	useEffect(() => {
 		if (iconFilename) {
-			window.bird.icons.getData(iconFilename).then((result) => {
+			window.abird.icons.getData(iconFilename).then((result) => {
 				if (result) {
 					setIconData(result.data)
 					setIconSize({ w: result.width, h: result.height })

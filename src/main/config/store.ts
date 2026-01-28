@@ -12,7 +12,7 @@ import { paths } from "../utils/platform"
 
 const log = createLogger("Config")
 
-const SCHEMA_FILENAME = "bird.config.schema.json"
+const SCHEMA_FILENAME = "abird.config.schema.json"
 const PROJECT_NAME_PATTERN = /^[a-zA-Z0-9_-]+$/
 
 let configPath: string = paths.config
@@ -36,7 +36,7 @@ export function setCurrentAppName(name: string | null): void {
 }
 
 export function getProjectName(): string {
-	return birdConfig.projectName ?? "bird"
+	return birdConfig.projectName ?? "abird"
 }
 
 export function loadConfig(customPath?: string | null): void {

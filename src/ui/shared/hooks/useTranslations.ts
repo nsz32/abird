@@ -8,7 +8,7 @@ export function useTranslations() {
 
 	useEffect(() => {
 		if (cachedTranslations) return
-		window.bird.i18n.getTranslations().then((t) => {
+		window.abird.i18n.getTranslations().then((t) => {
 			cachedTranslations = t
 			setTranslations(t)
 		})

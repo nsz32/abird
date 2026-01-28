@@ -19,7 +19,7 @@ const CLI_OPTIONS: CliOption[] = [
 	{ name: "--config", hasValue: true, description: "Path to config file" },
 	{ name: "--userAgent", hasValue: true, description: "User agent preset (omit value to list)" },
 	{ name: "--kiosk", hasValue: true, description: "Enable kiosk mode with exit shortcut" },
-	{ name: "--cleanall", hasValue: false, description: "Remove all Bird data and shortcuts" },
+	{ name: "--cleanall", hasValue: false, description: "Remove all ABird data and shortcuts" },
 	{ name: "--force", hasValue: false, description: "Skip confirmation prompts" },
 	{ name: "--help", hasValue: false, description: "Show this help message" },
 ]
@@ -62,7 +62,7 @@ export function parseCliArgs(argv: string[] = getArgv()): CliArgs | null {
 }
 
 export function printHelp(): void {
-	console.log("Usage: bird [URL] [options]\n")
+	console.log("Usage: abird [URL] [options]\n")
 	console.log("Options:")
 	for (const opt of CLI_OPTIONS) {
 		const valueHint = opt.hasValue ? " <value>" : ""

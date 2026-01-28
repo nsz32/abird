@@ -28,7 +28,7 @@ async function main() {
 	const outDir = join(rootDir, "out")
 	const releaseDir = join(rootDir, "release")
 	const stagingDir = join(releaseDir, "staging")
-	const unpackedDir = join(releaseDir, "bird.asar.unpacked")
+	const unpackedDir = join(releaseDir, "abird.asar.unpacked")
 
 	// Clean
 	if (existsSync(stagingDir)) rmSync(stagingDir, { recursive: true })
@@ -46,7 +46,7 @@ async function main() {
 	)
 
 	// Copy schema
-	cpSync(join(rootDir, "bird.config.schema.json"), join(stagingDir, "bird.config.schema.json"))
+	cpSync(join(rootDir, "abird.config.schema.json"), join(stagingDir, "abird.config.schema.json"))
 
 	// Copy default icon (used for shortcuts when no custom icon is set)
 	const iconsDir = join(stagingDir, "assets", "icons")
@@ -73,14 +73,14 @@ async function main() {
 		console.log(`Included: ${mod}`)
 	}
 
-	// Pack ASAR (unpack native .node files to bird.asar.unpacked/)
+	// Pack ASAR (unpack native .node files to abird.asar.unpacked/)
 	console.log("Packing ASAR...")
-	execSync(`pnpm dlx @electron/asar pack "${stagingDir}" "${join(releaseDir, "bird.asar")}" --unpack "**/*.node"`, { stdio: "inherit" })
+	execSync(`pnpm dlx @electron/asar pack "${stagingDir}" "${join(releaseDir, "abird.asar")}" --unpack "**/*.node"`, { stdio: "inherit" })
 
 	// Create tarball (zstd compression)
-	const tarballName = `Bird-${packageJson.version}-asar-${platform}-${arch}.tar.zst`
+	const tarballName = `ABird-${packageJson.version}-asar-${platform}-${arch}.tar.zst`
 	console.log(`Creating tarball: ${tarballName}`)
-	execSync(`tar --zstd -cf "${join(releaseDir, tarballName)}" -C "${releaseDir}" bird.asar bird.asar.unpacked`, {
+	execSync(`tar --zstd -cf "${join(releaseDir, tarballName)}" -C "${releaseDir}" abird.asar abird.asar.unpacked`, {
 		stdio: "inherit",
 	})
 
@@ -88,7 +88,7 @@ async function main() {
 	rmSync(stagingDir, { recursive: true })
 
 	console.log("\nAsar packaging complete:")
-	console.log(`  - ${join(releaseDir, "bird.asar")}`)
+	console.log(`  - ${join(releaseDir, "abird.asar")}`)
 	console.log(`  - ${unpackedDir}/`)
 	console.log(`  - ${join(releaseDir, tarballName)}`)
 }

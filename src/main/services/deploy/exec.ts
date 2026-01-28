@@ -12,7 +12,7 @@ export interface ExecInfo {
 }
 
 /**
- * Returns execution info for launching Bird.
+ * Returns execution info for launching ABird.
  * Handles 3 modes:
  * - AppImage: uses APPIMAGE env variable
  * - Standalone asar: electron + asar path

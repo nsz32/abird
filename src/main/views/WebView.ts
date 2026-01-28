@@ -5,9 +5,9 @@ import { getContextMenuLabels } from "../core/I18n"
 import { getNavigationAction } from "../core/UrlRouter"
 import { config$ } from "../core/states"
 import { disableAdBlock, enableAdBlock } from "../services/AdBlocker"
-import { resolveAppIcon } from "../services/icons"
 import { setupDownloads } from "../services/DownloadManager"
 import { getPartitionConfig } from "../services/PartitionManager"
+import { resolveAppIcon } from "../services/icons"
 import { createLogger } from "../utils/logger"
 import { resolveUserAgent } from "../utils/userAgents"
 import { BrowserView, type BrowserViewCallbacks } from "./BrowserView"
@@ -86,7 +86,7 @@ export class WebView extends BrowserView {
 	}
 
 	private resolveWindowOpen(url: string, disposition: string): Electron.WindowOpenHandlerResponse {
-		if (url.startsWith("bird://")) return { action: "deny" }
+		if (url.startsWith("abird://")) return { action: "deny" }
 
 		if (disposition === "new-window" || disposition === "popup") {
 			return this.allowPopup()
@@ -152,7 +152,7 @@ export class WebView extends BrowserView {
 	// Navigation handling
 
 	private handleNavigation(event: Electron.Event, url: string) {
-		if (url.startsWith("bird://")) return event.preventDefault()
+		if (url.startsWith("abird://")) return event.preventDefault()
 
 		const action = getNavigationAction(url, this.routing)
 

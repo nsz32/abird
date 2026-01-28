@@ -22,23 +22,23 @@ function loadCustomCSS(): string {
 }
 
 /**
- * Register the bird:// scheme as privileged.
+ * Register the abird:// scheme as privileged.
  * MUST be called BEFORE app.whenReady()
  */
 export function registerBirdScheme() {
-	protocol.registerSchemesAsPrivileged([{ scheme: "bird", privileges: { standard: true, secure: true, supportFetchAPI: true } }])
+	protocol.registerSchemesAsPrivileged([{ scheme: "abird", privileges: { standard: true, secure: true, supportFetchAPI: true } }])
 }
 
 /**
- * Setup the bird:// protocol handler.
+ * Setup the abird:// protocol handler.
  *
- * URL structure: bird://[view]/[path]
- * - bird://custom.css serves user custom stylesheet from config directory
+ * URL structure: abird://[view]/[path]
+ * - abird://custom.css serves user custom stylesheet from config directory
  * - Assets and public files (favicon.png) are served from renderer root
  * - View-specific files are served from renderer/[view]/
  */
 export function setupBirdProtocol() {
-	protocol.handle("bird", (request) => {
+	protocol.handle("abird", (request) => {
 		const { host, pathname } = new URL(request.url)
 
 		if (host === CUSTOM_CSS_FILENAME) {

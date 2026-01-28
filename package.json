@@ -1,7 +1,7 @@
 {
-	"name": "bird",
-	"version": "0.1.2",
-	"description": "Bird - Desktop Redistribuable Isolated Browser",
+	"name": "abird",
+	"version": "0.1.3",
+	"description": "ABird - Desktop Redistribuable Isolated Browser",
 	"main": "out/main/index.js",
 	"pnpm": {
 		"onlyBuiltDependencies": ["@biomejs/biome", "electron", "esbuild"]
@@ -13,7 +13,7 @@
 		"build:fresh": "pnpm clean && pnpm build",
 		"start": "electron .",
 		"clean": "rm -rf out release",
-		"dev": "electron-vite dev -- --config bird.config.dev.json",
+		"dev": "electron-vite dev -- --config abird.config.dev.json",
 		"dev:bare": "electron-vite dev",
 		"lint": "biome check .",
 		"lint:fix": "biome check --write .",
@@ -27,7 +27,7 @@
 		"package:mac": "echo 'WIP: macOS packaging not yet implemented'"
 	},
 	"keywords": ["electron", "webapp", "wrapper"],
-	"author": "Bird Team",
+	"author": "ABird Team",
 	"license": "MIT",
 	"type": "module",
 	"engines": {

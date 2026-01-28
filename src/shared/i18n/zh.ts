@@ -16,7 +16,8 @@ export const zhTranslations: Translations = {
 	"settings.stats": "{{apps}} 个应用 · {{partitions}} 个分区",
 	"settings.reloadPartitions": "重新加载分区",
 	"settings.cleanAll": "清理全部",
-	"settings.cleanAllConfirm": "这将删除此项目的所有 Bird 数据和快捷方式。您的所有配置都将丢失。\n\n请确保没有应用程序处于打开状态。\n\n窗口将自动关闭。继续吗？",
+	"settings.cleanAllConfirm":
+		"这将删除此项目的所有 ABird 数据和快捷方式。您的所有配置都将丢失。\n\n请确保没有应用程序处于打开状态。\n\n窗口将自动关闭。继续吗？",
 
 	// Theme
 	"theme.system": "系统",
@@ -49,7 +50,7 @@ export const zhTranslations: Translations = {
 	"app.icon": "图标",
 	"app.fetchIcons": "从网站获取",
 	"app.importIcon": "导入文件",
-	"app.useDefaultIcon": "使用 Bird 图标",
+	"app.useDefaultIcon": "使用 ABird 图标",
 	"app.selectIcon": "选择图标",
 	"app.noIconsFound": "该网站未找到图标",
 	"app.loadingIcons": "正在获取图标...",
@@ -182,7 +183,7 @@ export const zhTranslations: Translations = {
 	"name.invalidFormat": "不能以点开头/结尾，也不能以空格结尾",
 
 	// Menu
-	"menu.app": "Bird",
+	"menu.app": "ABird",
 	"menu.app.settings": "设置...",
 	"menu.app.quit": "退出",
 	"menu.tab": "标签页",
@@ -199,7 +200,7 @@ export const zhTranslations: Translations = {
 	"menu.developer.devtoolsSite": "DevTools 站点",
 	"menu.developer.devtoolsNavbar": "DevTools 导航栏",
 	"menu.help": "帮助",
-	"menu.help.about": "关于 Bird",
+	"menu.help.about": "关于 ABird",
 
 	// Context menu
 	"contextMenu.cut": "剪切",

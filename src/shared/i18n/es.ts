@@ -16,7 +16,8 @@ export const esTranslations: Translations = {
 	"settings.stats": '{{apps}} app{{apps>1?"s":""}} · {{partitions}} particion{{partitions>1?"es":""}}',
 	"settings.reloadPartitions": "Recargar particiones",
 	"settings.cleanAll": "Limpiar todo",
-	"settings.cleanAllConfirm": "Se eliminarán TODOS los datos y accesos directos de Bird. Perderá toda su configuración.\n\nAsegúrese de que no haya aplicaciones abiertas.\n\nLa ventana se cerrará automáticamente. ¿Continuar?",
+	"settings.cleanAllConfirm":
+		"Se eliminarán TODOS los datos y accesos directos de ABird. Perderá toda su configuración.\n\nAsegúrese de que no haya aplicaciones abiertas.\n\nLa ventana se cerrará automáticamente. ¿Continuar?",
 
 	// Theme
 	"theme.system": "Sistema",
@@ -49,7 +50,7 @@ export const esTranslations: Translations = {
 	"app.icon": "Icono",
 	"app.fetchIcons": "Obtener del sitio web",
 	"app.importIcon": "Importar archivo",
-	"app.useDefaultIcon": "Usar icono de Bird",
+	"app.useDefaultIcon": "Usar icono de ABird",
 	"app.selectIcon": "Seleccionar un icono",
 	"app.noIconsFound": "No se encontraron iconos en este sitio",
 	"app.loadingIcons": "Obteniendo iconos...",
@@ -182,7 +183,7 @@ export const esTranslations: Translations = {
 	"name.invalidFormat": "No puede empezar/terminar con un punto o terminar con un espacio",
 
 	// Menu
-	"menu.app": "Bird",
+	"menu.app": "ABird",
 	"menu.app.settings": "Configuración...",
 	"menu.app.quit": "Salir",
 	"menu.tab": "Pestaña",
@@ -199,7 +200,7 @@ export const esTranslations: Translations = {
 	"menu.developer.devtoolsSite": "DevTools Sitio",
 	"menu.developer.devtoolsNavbar": "DevTools Navbar",
 	"menu.help": "Ayuda",
-	"menu.help.about": "Acerca de Bird",
+	"menu.help.about": "Acerca de ABird",
 
 	// Context menu
 	"contextMenu.cut": "Cortar",

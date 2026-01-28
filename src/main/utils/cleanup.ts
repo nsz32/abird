@@ -9,7 +9,7 @@ import { paths } from "./platform"
 
 const log = createLogger("Cleanup")
 
-const SCHEMA_FILENAME = "bird.config.schema.json"
+const SCHEMA_FILENAME = "abird.config.schema.json"
 
 /**
  * Clean up the NSIS installer cache folder on Windows.
@@ -25,7 +25,7 @@ export async function cleanupInstallerCache(): Promise<void> {
 }
 
 /**
- * Remove all Bird data: shortcuts, config files, and userData folder.
+ * Remove all ABird data: shortcuts, config files, and userData folder.
  * Order: shortcuts → config files → userData folder → installer cache
  */
 export function performCleanAll(): void {

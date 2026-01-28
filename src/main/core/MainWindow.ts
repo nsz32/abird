@@ -48,5 +48,4 @@ export class MainWindow {
 			setTimeout(() => this.emitBounds(), delay)
 		}
 	}
-
 }

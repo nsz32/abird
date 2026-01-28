@@ -16,7 +16,8 @@ export const arTranslations: Translations = {
 	"settings.stats": "{{apps}} تطبيق · {{partitions}} قسم",
 	"settings.reloadPartitions": "إعادة تحميل الأقسام",
 	"settings.cleanAll": "تنظيف الكل",
-	"settings.cleanAllConfirm": "سيؤدي هذا إلى حذف جميع بيانات واختصارات Bird. ستفقد جميع إعداداتك.\n\nيرجى التأكد من عدم وجود تطبيقات مفتوحة.\n\nسيتم إغلاق النافذة تلقائيًا. هل تريد المتابعة؟",
+	"settings.cleanAllConfirm":
+		"سيؤدي هذا إلى حذف جميع بيانات واختصارات ABird. ستفقد جميع إعداداتك.\n\nيرجى التأكد من عدم وجود تطبيقات مفتوحة.\n\nسيتم إغلاق النافذة تلقائيًا. هل تريد المتابعة؟",
 
 	// Theme
 	"theme.system": "النظام",
@@ -49,7 +50,7 @@ export const arTranslations: Translations = {
 	"app.icon": "الأيقونة",
 	"app.fetchIcons": "جلب من الموقع",
 	"app.importIcon": "استيراد ملف",
-	"app.useDefaultIcon": "استخدام أيقونة Bird",
+	"app.useDefaultIcon": "استخدام أيقونة ABird",
 	"app.selectIcon": "اختر أيقونة",
 	"app.noIconsFound": "لم يتم العثور على أيقونات في هذا الموقع",
 	"app.loadingIcons": "جارٍ جلب الأيقونات...",
@@ -182,7 +183,7 @@ export const arTranslations: Translations = {
 	"name.invalidFormat": "لا يمكن أن يبدأ/ينتهي بنقطة أو ينتهي بمسافة",
 
 	// Menu
-	"menu.app": "Bird",
+	"menu.app": "ABird",
 	"menu.app.settings": "الإعدادات...",
 	"menu.app.quit": "خروج",
 	"menu.tab": "علامة تبويب",
@@ -199,7 +200,7 @@ export const arTranslations: Translations = {
 	"menu.developer.devtoolsSite": "أدوات المطور للموقع",
 	"menu.developer.devtoolsNavbar": "أدوات المطور لشريط التنقل",
 	"menu.help": "المساعدة",
-	"menu.help.about": "حول Bird",
+	"menu.help.about": "حول ABird",
 
 	// Context menu
 	"contextMenu.cut": "قص",

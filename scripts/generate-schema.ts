@@ -14,7 +14,7 @@ jsonSchema.definitions.BirdConfig.properties.partitions.propertyNames = {
 	pattern: PARTITION_NAME_PATTERN.source,
 }
 
-const outputPath = join(import.meta.dirname, "..", "bird.config.schema.json")
+const outputPath = join(import.meta.dirname, "..", "abird.config.schema.json")
 writeFileSync(outputPath, JSON.stringify(jsonSchema, null, "\t"))
 
 console.log(`JSON Schema generated: ${outputPath}`)

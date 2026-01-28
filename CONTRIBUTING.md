@@ -57,7 +57,7 @@ function createTab(url: string): Tab {
 
 ### State Management
 
-Bird uses custom observables without external dependencies:
+ABird uses custom observables without external dependencies:
 
 ```typescript
 // StateObservable — Simple state with subscribers
@@ -76,7 +76,7 @@ const navBarVisible$ = new CombinedObservable(
 ### Process Separation
 
 - **Main process** (`src/main/`) — Source of truth for config, state, navigation
-- **Preload** (`src/preload/`) — Context bridge exposing `window.bird.*` API
+- **Preload** (`src/preload/`) — Context bridge exposing `window.abird.*` API
 - **Renderer** (`src/ui/`) — React overlays, display-only, communicates via IPC
 
 ## Commits

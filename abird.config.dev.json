@@ -1,5 +1,5 @@
 {
-	"$schema": "./bird.config.schema.json",
+	"$schema": "./abird.config.schema.json",
 	"projectName": "bird_devel",
 	"theme": "dark",
 	"navBar": {

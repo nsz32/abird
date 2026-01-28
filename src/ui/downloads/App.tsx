@@ -59,7 +59,7 @@ function ActiveDownloadItem({ item }: { item: ActiveDownload }) {
 				</div>
 			</div>
 			<div className="download-actions">
-				<button type="button" className="action-btn" onClick={() => window.bird.downloads.cancel(item.id)} title={t("downloads.cancel")}>
+				<button type="button" className="action-btn" onClick={() => window.abird.downloads.cancel(item.id)} title={t("downloads.cancel")}>
 					<X size={16} />
 				</button>
 			</div>
@@ -92,21 +92,21 @@ function HistoryDownloadItem({ item }: { item: DownloadHistoryItem }) {
 			</div>
 			{canOpen && (
 				<div className="download-actions">
-					<button type="button" className="action-btn" onClick={() => window.bird.downloads.openFile(item.id)} title={t("downloads.openFile")}>
+					<button type="button" className="action-btn" onClick={() => window.abird.downloads.openFile(item.id)} title={t("downloads.openFile")}>
 						<ExternalLink size={16} />
 					</button>
-					<button type="button" className="action-btn" onClick={() => window.bird.downloads.openFolder(item.id)} title={t("downloads.openFolder")}>
+					<button type="button" className="action-btn" onClick={() => window.abird.downloads.openFolder(item.id)} title={t("downloads.openFolder")}>
 						<FolderOpen size={16} />
 					</button>
 				</div>
 			)}
 			{canRetry && (
 				<div className="download-actions">
-					<button type="button" className="action-btn" onClick={() => window.bird.downloads.retry(item.id)} title={t("downloads.retry")}>
+					<button type="button" className="action-btn" onClick={() => window.abird.downloads.retry(item.id)} title={t("downloads.retry")}>
 						<RefreshCw size={16} />
 					</button>
 					{canRemove && (
-						<button type="button" className="action-btn" onClick={() => window.bird.downloads.remove(item.id)} title={t("downloads.remove")}>
+						<button type="button" className="action-btn" onClick={() => window.abird.downloads.remove(item.id)} title={t("downloads.remove")}>
 							<Trash2 size={16} />
 						</button>
 					)}
@@ -118,8 +118,8 @@ function HistoryDownloadItem({ item }: { item: DownloadHistoryItem }) {
 
 export function App() {
 	const { t, ready } = useTranslations()
-	const active = useBirdState(window.bird.downloads.getActive, window.bird.downloads.onActiveChanged, [])
-	const history = useBirdState(window.bird.downloads.getHistory, window.bird.downloads.onHistoryChanged, [])
+	const active = useBirdState(window.abird.downloads.getActive, window.abird.downloads.onActiveChanged, [])
+	const history = useBirdState(window.abird.downloads.getHistory, window.abird.downloads.onHistoryChanged, [])
 
 	if (!ready) return null
 

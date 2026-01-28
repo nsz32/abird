@@ -22,7 +22,7 @@ export function setCleanAllInProgress(value: boolean): void {
 	cleanAllInProgress = value
 }
 
-const DEFAULT_PROJECT_NAME = "bird"
+const DEFAULT_PROJECT_NAME = "abird"
 const PROJECT_NAME_PATTERN = /^[a-zA-Z0-9_-]+$/
 
 /**
@@ -91,13 +91,13 @@ function setAppIdentity(projectName: string, appName: string): void {
 	}
 
 	if (process.platform === "linux") {
-		;(app as Record<string, unknown>).setDesktopName(`${identity}.desktop`)
+		;(app as unknown as { setDesktopName: (name: string) => void }).setDesktopName(`${identity}.desktop`)
 	}
 }
 
 async function handleCleanAll(force: boolean): Promise<void> {
 	if (!force) {
-		const confirmed = await promptConfirmation("This will remove all Bird data and shortcuts. Continue?")
+		const confirmed = await promptConfirmation("This will remove all ABird data and shortcuts. Continue?")
 		if (!confirmed) {
 			console.log("Aborted.")
 			app.quit()
@@ -106,7 +106,7 @@ async function handleCleanAll(force: boolean): Promise<void> {
 	}
 
 	performCleanAll()
-	console.log("All Bird data has been removed.")
+	console.log("All ABird data has been removed.")
 	app.quit()
 }
 

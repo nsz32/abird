@@ -14,7 +14,8 @@ const en = {
 	"settings.stats": '{{apps}} app{{apps>1?"s":""}} · {{partitions}} partition{{partitions>1?"s":""}}',
 	"settings.reloadPartitions": "Reload partitions",
 	"settings.cleanAll": "Clean all",
-	"settings.cleanAllConfirm": "This will remove ALL Bird data and shortcuts for this project. Your entire configuration will be lost.\n\nPlease make sure no applications are currently open.\n\nThe window will close automatically. Continue?",
+	"settings.cleanAllConfirm":
+		"This will remove ALL ABird data and shortcuts for this project. Your entire configuration will be lost.\n\nPlease make sure no applications are currently open.\n\nThe window will close automatically. Continue?",
 
 	// Theme
 	"theme.system": "System",
@@ -47,7 +48,7 @@ const en = {
 	"app.icon": "Icon",
 	"app.fetchIcons": "Get from website",
 	"app.importIcon": "Import file",
-	"app.useDefaultIcon": "Use Bird icon",
+	"app.useDefaultIcon": "Use ABird icon",
 	"app.selectIcon": "Select an icon",
 	"app.noIconsFound": "No icons found on this website",
 	"app.loadingIcons": "Fetching icons...",
@@ -180,7 +181,7 @@ const en = {
 	"name.invalidFormat": "Cannot start/end with a dot or end with a space",
 
 	// Menu
-	"menu.app": "Bird",
+	"menu.app": "ABird",
 	"menu.app.settings": "Settings...",
 	"menu.app.quit": "Quit",
 	"menu.tab": "Tab",
@@ -197,7 +198,7 @@ const en = {
 	"menu.developer.devtoolsSite": "DevTools Site",
 	"menu.developer.devtoolsNavbar": "DevTools Navbar",
 	"menu.help": "Help",
-	"menu.help.about": "About Bird",
+	"menu.help.about": "About ABird",
 
 	// Context menu
 	"contextMenu.cut": "Cut",

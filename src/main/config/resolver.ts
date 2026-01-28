@@ -119,17 +119,17 @@ export function selectApp(appName: string, cliOverrides?: CliOverrides): boolean
 
 export function selectConfigMode(): void {
 	const birdConfig = getBirdConfig()
-	setCurrentAppName("Bird")
+	setCurrentAppName("ABird")
 
 	const configApp: Partial<AppConfig> = {
-		startUrl: "bird://config/",
+		startUrl: "abird://config/",
 		navBar: {
 			visible: true,
 			autoHide: false,
 			allowUrlEdit: false,
 			allowSingleTabClose: true,
 		},
-		routing: { rules: { "^bird://": "internal" } },
+		routing: { rules: { "^abird://": "internal" } },
 	}
 
 	const effective = buildEffectiveConfig(configApp, birdConfig, {
@@ -145,7 +145,7 @@ export function selectConfigMode(): void {
 
 export function selectBrowserMode(startUrl: string, userAgent?: string): void {
 	const birdConfig = getBirdConfig()
-	setCurrentAppName("Bird")
+	setCurrentAppName("ABird")
 
 	const browserApp: Partial<AppConfig> = {
 		startUrl,

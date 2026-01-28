@@ -17,8 +17,8 @@ function showAboutDialog(): void {
 	dialog.showMessageBox({
 		type: "info",
 		icon: nativeImage.createFromPath(getAppIconPath()),
-		title: "About Bird",
-		message: `Bird v${app.getVersion()}`,
+		title: "About ABird",
+		message: `ABird v${app.getVersion()}`,
 		detail,
 		buttons: ["OK"],
 	})

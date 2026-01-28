@@ -15,13 +15,13 @@ export function App() {
 	const prevActiveCount = useRef(0)
 
 	useEffect(() => {
-		Promise.all([window.bird.downloads.getActive(), window.bird.downloads.getHistory()]).then(([active, history]) => {
+		Promise.all([window.abird.downloads.getActive(), window.abird.downloads.getHistory()]).then(([active, history]) => {
 			setActiveDownloads(active)
 			setHasDownloads(active.length > 0 || history.length > 0)
 			prevActiveCount.current = active.length
 		})
 
-		const unsubActive = window.bird.downloads.onActiveChanged((items) => {
+		const unsubActive = window.abird.downloads.onActiveChanged((items) => {
 			setActiveDownloads(items)
 			if (items.length > 0) setHasDownloads(true)
 
@@ -31,11 +31,11 @@ export function App() {
 			prevActiveCount.current = items.length
 		})
 
-		const unsubHistory = window.bird.downloads.onHistoryChanged((items) => {
+		const unsubHistory = window.abird.downloads.onHistoryChanged((items) => {
 			if (items.length > 0) setHasDownloads(true)
 		})
 
-		const unsubEvent = window.bird.downloads.onEvent((event) => {
+		const unsubEvent = window.abird.downloads.onEvent((event) => {
 			if (event.type === "completed" && event.autoOpened === false) {
 				setHighlighted(true)
 			}
@@ -53,7 +53,7 @@ export function App() {
 	}, [navState?.isDownloadsPanelActive])
 
 	useEffect(() => {
-		return window.bird.keyboard.onCtrlChanged(setCtrlPressed)
+		return window.abird.keyboard.onCtrlChanged(setCtrlPressed)
 	}, [])
 
 	if (!config || !navState || !tabs) return null
@@ -66,7 +66,7 @@ export function App() {
 		} else if (e.key === "Enter") {
 			const url = urlInputRef.current?.value.trim()
 			if (url) {
-				window.bird.navigation.goTo(url)
+				window.abird.navigation.goTo(url)
 			}
 			exitUrlMode()
 		}
@@ -79,22 +79,22 @@ export function App() {
 	return (
 		<div ref={containerRef} className="navigation-bar">
 			{navBar.showBackButton && (
-				<NavButton onClick={() => window.bird.navigation.back()} disabled={navDisabled || !navState.canGoBack}>
+				<NavButton onClick={() => window.abird.navigation.back()} disabled={navDisabled || !navState.canGoBack}>
 					<ArrowLeft />
 				</NavButton>
 			)}
 			{navBar.showForwardButton && (
-				<NavButton onClick={() => window.bird.navigation.forward()} disabled={navDisabled || !navState.canGoForward}>
+				<NavButton onClick={() => window.abird.navigation.forward()} disabled={navDisabled || !navState.canGoForward}>
 					<ArrowRight />
 				</NavButton>
 			)}
 			{navBar.showRefreshButton && (
-				<NavButton onClick={() => (navState.isLoading ? window.bird.navigation.stop() : window.bird.navigation.reload())} disabled={navDisabled}>
+				<NavButton onClick={() => (navState.isLoading ? window.abird.navigation.stop() : window.abird.navigation.reload())} disabled={navDisabled}>
 					{navState.isLoading ? <X strokeWidth={2.5} /> : <RotateCw />}
 				</NavButton>
 			)}
 			{navBar.showHomeButton && (
-				<NavButton onClick={() => (ctrlPressed ? window.bird.navigation.goHome() : window.bird.tabs.create(0))}>
+				<NavButton onClick={() => (ctrlPressed ? window.abird.navigation.goHome() : window.abird.tabs.create(0))}>
 					{ctrlPressed ? <Home /> : <HousePlus />}
 				</NavButton>
 			)}
@@ -108,15 +108,15 @@ export function App() {
 							tab={tab}
 							showClose={navBar.allowSingleTabClose || tabs.length > 1}
 							showExternalIndicator={externalTabIds.has(tab.id)}
-							onActivate={() => window.bird.tabs.activate(tab.id)}
-							onClose={() => window.bird.tabs.close(tab.id)}
+							onActivate={() => window.abird.tabs.activate(tab.id)}
+							onClose={() => window.abird.tabs.close(tab.id)}
 						/>
 					))}
 				</div>
 			)}
 			{hasDownloads && (
 				<NavButton
-					onClick={() => window.bird.downloads.toggle()}
+					onClick={() => window.abird.downloads.toggle()}
 					active={navState.isDownloadsPanelActive}
 					className={downloadButtonClass}
 					onAnimationEnd={() => setBump(false)}

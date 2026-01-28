@@ -1,24 +1,24 @@
 <img src="icon.svg" align="right" width="96" />
 
-# Bird
+# ABird
 
 **Desktop, redistribuable, isolated browser.**
 
-Bird turns any website into a standalone desktop application with complete session isolation, advanced kiosk mode, and (WIP) enterprise-ready packaging.
+ABird turns any website into a standalone desktop application with complete session isolation, advanced kiosk mode, and (WIP) enterprise-ready packaging.
 
 <details>
 <summary>📸 Screenshots</summary>
 
-![Bird Home](docs/screenshots/bird_home.png)
-![Bird App](docs/screenshots/bird_app.png)
-![Bird Part](docs/screenshots/bird_part.png)
+![ABird Home](docs/screenshots/abird_home.png)
+![ABird App](docs/screenshots/abird_app.png)
+![ABird Part](docs/screenshots/abird_part.png)
 
 </details>
 
-## Why Bird?
+## Why ABird?
 
 - **Session Isolation**: Run Gmail, Slack, Notion as separate apps — each with its own partition (cookies, localStorage, cache). No more "you're signed into another account" issues.
-- **Ship Your SaaS as a Desktop App** *(WIP)*: Package Bird with a locked config to distribute your web app as a native desktop experience — branded, installable, out of the browser.
+- **Ship Your SaaS as a Desktop App** *(WIP)*: Package ABird with a locked config to distribute your web app as a native desktop experience — branded, installable, out of the browser.
 - **Kiosk Mode**: Lock terminals to specific URLs with custom escape shortcuts — perfect for dashboards, public kiosks, or digital signage.
 - **User-Agent Spoofing**: Test mobile layouts, browser-specific features, or bypass Electron detection without switching browsers.
 
@@ -28,7 +28,17 @@ Bird turns any website into a standalone desktop application with complete sessi
 - **Windows** — NSIS installer
 - **macOS** — WIP
 
-> **Arch Linux**: `yay -S bird-apps-bin`
+> **Arch Linux**: `yay -S abird-bin`
+
+### Migration from Bird (Linux)
+
+If you were using the previous "bird" version:
+
+```bash
+mv ~/.config/bird ~/.config/abird
+mv ~/.local/share/bird ~/.local/share/abird
+rm -rf ~/.local/share/applications/bird-*
+```
 
 ## Features
 
@@ -71,27 +81,27 @@ pnpm package:win              # Create installer (Windows)
 
 ```bash
 # Open configuration UI
-bird
+abird
 
 # Launch a specific app
-bird --app gmail
+abird --app gmail
 
 # Browser mode (quick access to any URL)
-bird https://example.com
+abird https://example.com
 
 # Kiosk mode with exit shortcut
-bird --app dashboard --kiosk Ctrl+Alt+K
+abird --app dashboard --kiosk Ctrl+Alt+K
 
 # Test with different user-agent
-bird --app myapp --userAgent mobile:chrome
+abird --app myapp --userAgent mobile:chrome
 
 # Complete uninstall (remove shortcuts, data, config)
-bird --cleanall
+abird --cleanall
 ```
 
 ## Configuration
 
-Bird uses a JSON configuration file (`~/.config/bird/config.json` or via `--config`).
+ABird uses a JSON configuration file (`~/.config/abird/config.json` or via `--config`).
 
 ```json
 {

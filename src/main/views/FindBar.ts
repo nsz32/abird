@@ -18,7 +18,7 @@ export class FindBar extends View {
 		super({
 			layer: ZLayer.FIND_BAR,
 			preload: true,
-			url: "bird://findbar/",
+			url: "abird://findbar/",
 		})
 
 		this.init()

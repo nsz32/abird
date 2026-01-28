@@ -2,7 +2,7 @@
 
 ## Overview
 
-Bird is an Electron app that wraps web applications as isolated desktop apps. Each website runs in its own `WebContentsView` with configurable behavior.
+ABird is an Electron app that wraps web applications as isolated desktop apps. Each website runs in its own `WebContentsView` with configurable behavior.
 
 ## Directory Structure
 
@@ -20,7 +20,7 @@ src/
 │   │   ├── View.ts                # Abstract base class for all views
 │   │   ├── states.ts              # **Single source of truth** - all observables
 │   │   ├── UrlRouter.ts           # URL action resolver (internal/external/download/ignore)
-│   │   ├── Protocol.ts            # bird:// protocol handler (privileged scheme)
+│   │   ├── Protocol.ts            # abird:// protocol handler (privileged scheme)
 │   │   ├── I18n.ts                # Internationalization (system language detection)
 │   │   ├── cli.ts                 # CLI arguments parsing (app/browser/config modes)
 │   │   ├── kiosk.ts               # Kiosk mode with custom escape shortcut
@@ -31,7 +31,7 @@ src/
 │   ├── views/                     # UI views (9 files)
 │   │   ├── BrowserView.ts         # Abstract navigable content (navigation, find-in-page)
 │   │   ├── WebView.ts             # External HTTP/HTTPS content (no preload, sandboxed)
-│   │   ├── PanelView.ts           # Internal bird:// URLs (with preload, trusted)
+│   │   ├── PanelView.ts           # Internal abird:// URLs (with preload, trusted)
 │   │   ├── NavBar.ts              # Navigation bar React overlay
 │   │   ├── FindBar.ts             # Find-in-page overlay
 │   │   ├── NotificationCenter.ts  # Notifications overlay
@@ -67,7 +67,7 @@ src/
 │   │   └── cleanup.ts             # Cleanup: shortcuts → userData → config → installer cache
 │   └── handlers.ts                # All IPC handlers registration
 ├── preload/                       # Context bridge (1 file)
-│   └── index.ts                   # window.bird API exposure (11 namespaces)
+│   └── index.ts                   # window.abird API exposure (11 namespaces)
 ├── shared/                        # Shared code (≈15 files)
 │   ├── config.schema.ts           # **Zod schemas** (source of truth for types)
 │   ├── types.ts                   # TypeScript types (NavigationState, TabInfo, IpcChannels, BirdApi)
@@ -160,7 +160,7 @@ src/
 ┌─────────────────────────────────────────────────────────┐
 │                   config/store.ts                        │
 │     Reads, writes, caches BirdConfig (Zod validation)    │
-│     Generates bird.config.schema.json for IDE support    │
+│     Generates abird.config.schema.json for IDE support    │
 └────────────────────────┬────────────────────────────────┘
                          │ resolve
                          ▼
@@ -184,13 +184,13 @@ src/
 
 **Project Name Inference** (`cli.ts`):
 When `--cleanall` is used, the project name is inferred from:
-1. Config file path (`/path/to/myapp.bird.json` → `myapp`)
-2. Presence of `bird.config.schema.json` in directory
+1. Config file path (`/path/to/myapp.abird.json` → `myapp`)
+2. Presence of `abird.config.schema.json` in directory
 
 **UserData Resolution**:
-- Linux: `$XDG_DATA_HOME/bird-{project}` or `~/.local/share/bird-{project}`
-- Windows: `%AppData%\bird-{project}`
-- macOS: `~/Library/Application Support/bird-{project}`
+- Linux: `$XDG_DATA_HOME/abird-{project}` or `~/.local/share/abird-{project}`
+- Windows: `%AppData%\abird-{project}`
+- macOS: `~/Library/Application Support/abird-{project}`
 
 ## Key Patterns
 
@@ -211,7 +211,7 @@ MainWindow (BaseWindow)
 │   ├── Watermark (z=0)
 │   ├── Content views (z=10)
 │   │   ├── WebView (external HTTP/HTTPS tabs, no preload, popups open native BrowserWindow via did-create-window bypassing routing)
-│   │   └── PanelView (internal bird:// pages, with preload)
+│   │   └── PanelView (internal abird:// pages, with preload)
 │   ├── NavBar (z=100)
 │   ├── FindBar (z=101)
 │   └── NotificationCenter (z=102)
@@ -261,7 +261,7 @@ Used throughout UI to sync with main process state (config, tabs, partitions, et
 
 ### Tab Management
 
-Bird tracks two separate concepts:
+ABird tracks two separate concepts:
 - **activeTabId$**: The selected tab (persists even when a panel is active)
 - **activeContentId$**: The currently visible view (tab id or "downloads")
 
@@ -324,13 +324,13 @@ App.tsx (root + router)
 
 - **Main → Renderer**: `BroadcastObservable` auto-sends to registered WebContents, or direct `webContents.send()`
 - **Renderer → Main**: `ipcRenderer.invoke()` via preload bridge
-- **Channels**: Defined in `shared/types.ts` (`IpcChannels`), follow pattern `bird:module:action`
+- **Channels**: Defined in `shared/types.ts` (`IpcChannels`), follow pattern `abird:module:action`
 
-### API Surface (`window.bird`)
+### API Surface (`window.abird`)
 
 The preload bridge exposes a type-safe API (15 namespaces):
 ```typescript
-window.bird = {
+window.abird = {
   navigation,      // Navigation controls (go, back, forward, reload, stop)
   tabs,            // Tab management (list, create, close, activate)
   config,          // Get effective config (reactive)
@@ -358,13 +358,13 @@ Each namespace follows consistent patterns:
 
 ### Cleanup Process
 
-Bird implements a comprehensive cleanup system via `cleanAll()` for complete application removal:
+ABird implements a comprehensive cleanup system via `cleanAll()` for complete application removal:
 
 **Sequence** (`utils/cleanup.ts`):
 1. **Undeploy shortcuts** — Remove all desktop/Start Menu shortcuts for all apps
 2. **Close windows** — Gracefully close all windows with 500ms grace period
 3. **Remove userData** — Delete entire userData folder (cache, sessions, storage)
-4. **Remove config** — Delete `bird.config.json` and `bird.config.schema.json`
+4. **Remove config** — Delete `abird.config.json` and `abird.config.schema.json`
 5. **Remove installer cache** — Windows only: clean NSIS installer cache from AppData
 
 **CLI Support**:
@@ -411,9 +411,9 @@ interface Deployer {
 - **Partition isolation**: Each app runs in separate Electron session (strict isolation)
 - **Selective preload**:
   - `WebView` (external sites): NO preload, full sandbox
-  - `PanelView` (bird:// internal): WITH preload, trusted context bridge
+  - `PanelView` (abird:// internal): WITH preload, trusted context bridge
 - **Sandbox everywhere**: All views have `sandbox: true`, `contextIsolation: true`
-- **Protocol privileges**: `bird://` registered as privileged scheme
+- **Protocol privileges**: `abird://` registered as privileged scheme
 
 ### Performance
 

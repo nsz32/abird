@@ -16,7 +16,8 @@ export const deTranslations: Translations = {
 	"settings.stats": '{{apps}} App{{apps>1?"s":""}} · {{partitions}} Partition{{partitions>1?"en":""}}',
 	"settings.reloadPartitions": "Partitionen neu laden",
 	"settings.cleanAll": "Alles bereinigen",
-	"settings.cleanAllConfirm": "Alle Bird-Daten und Verknüpfungen werden gelöscht. Ihre gesamte Konfiguration geht verloren.\n\nBitte stellen Sie sicher, dass keine Anwendungen geöffnet sind.\n\nDas Fenster wird automatisch geschlossen. Fortfahren?",
+	"settings.cleanAllConfirm":
+		"Alle ABird-Daten und Verknüpfungen werden gelöscht. Ihre gesamte Konfiguration geht verloren.\n\nBitte stellen Sie sicher, dass keine Anwendungen geöffnet sind.\n\nDas Fenster wird automatisch geschlossen. Fortfahren?",
 
 	// Theme
 	"theme.system": "System",
@@ -49,7 +50,7 @@ export const deTranslations: Translations = {
 	"app.icon": "Symbol",
 	"app.fetchIcons": "Von Website holen",
 	"app.importIcon": "Datei importieren",
-	"app.useDefaultIcon": "Bird-Symbol verwenden",
+	"app.useDefaultIcon": "ABird-Symbol verwenden",
 	"app.selectIcon": "Symbol auswählen",
 	"app.noIconsFound": "Keine Symbole auf dieser Website gefunden",
 	"app.loadingIcons": "Symbole werden abgerufen...",
@@ -182,7 +183,7 @@ export const deTranslations: Translations = {
 	"name.invalidFormat": "Kann nicht mit einem Punkt beginnen/enden oder mit einem Leerzeichen enden",
 
 	// Menu
-	"menu.app": "Bird",
+	"menu.app": "ABird",
 	"menu.app.settings": "Einstellungen...",
 	"menu.app.quit": "Beenden",
 	"menu.tab": "Tab",
@@ -199,7 +200,7 @@ export const deTranslations: Translations = {
 	"menu.developer.devtoolsSite": "DevTools Website",
 	"menu.developer.devtoolsNavbar": "DevTools Navigationsleiste",
 	"menu.help": "Hilfe",
-	"menu.help.about": "Über Bird",
+	"menu.help.about": "Über ABird",
 
 	// Context menu
 	"contextMenu.cut": "Ausschneiden",

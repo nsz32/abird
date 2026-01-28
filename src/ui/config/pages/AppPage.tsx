@@ -109,7 +109,7 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 	// Icon actions
 	const handleSelectIcon = async (base64: string) => {
 		try {
-			const filename = await window.bird.icons.save(name, base64, app.icon)
+			const filename = await window.abird.icons.save(name, base64, app.icon)
 			updateApp({ icon: filename })
 		} catch (err) {
 			console.error("Failed to save icon:", err)
@@ -118,7 +118,7 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 
 	const handleImportIcon = async () => {
 		try {
-			const filename = await window.bird.icons.importFile(name, app.icon)
+			const filename = await window.abird.icons.importFile(name, app.icon)
 			if (filename) {
 				updateApp({ icon: filename })
 			}
@@ -129,7 +129,7 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 
 	const handleRemoveIcon = async () => {
 		if (app.icon) {
-			await window.bird.icons.delete(app.icon)
+			await window.abird.icons.delete(app.icon)
 		}
 		updateApp({ icon: undefined })
 	}
@@ -141,7 +141,7 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 			return
 		}
 		try {
-			await window.bird.app.launch(name)
+			await window.abird.app.launch(name)
 		} catch (err) {
 			console.error("Failed to launch app:", err)
 		}

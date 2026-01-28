@@ -50,7 +50,7 @@ export function PartitionPage({ name, config, partitionsState, activePartition, 
 
 		setCleaning(true)
 		try {
-			await window.bird.partition.cleanup(name)
+			await window.abird.partition.cleanup(name)
 			reloadPartitions()
 		} catch (err) {
 			console.error("Failed to cleanup partition:", err)
@@ -64,7 +64,7 @@ export function PartitionPage({ name, config, partitionsState, activePartition, 
 
 		setResetting(true)
 		try {
-			await window.bird.partition.reset(name)
+			await window.abird.partition.reset(name)
 			reloadPartitions()
 		} catch (err) {
 			console.error("Failed to reset partition:", err)

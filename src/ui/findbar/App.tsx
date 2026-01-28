@@ -13,12 +13,12 @@ export function App() {
 	const debounceRef = useRef<ReturnType<typeof setTimeout>>(null)
 
 	useEffect(() => {
-		const unsubOpen = window.bird.find.onOpen(() => {
+		const unsubOpen = window.abird.find.onOpen(() => {
 			inputRef.current?.focus()
 			inputRef.current?.select()
 		})
 
-		const unsubState = window.bird.find.onStateChanged((state) => {
+		const unsubState = window.abird.find.onStateChanged((state) => {
 			setFindState(state)
 			setInputValue(state.text)
 		})
@@ -32,7 +32,7 @@ export function App() {
 	const handleSearch = (text: string) => {
 		setInputValue(text)
 		if (debounceRef.current) clearTimeout(debounceRef.current)
-		debounceRef.current = setTimeout(() => window.bird.find.search(text), DEBOUNCE_MS)
+		debounceRef.current = setTimeout(() => window.abird.find.search(text), DEBOUNCE_MS)
 	}
 
 	const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -40,9 +40,9 @@ export function App() {
 			handleClose()
 		} else if (e.key === "Enter") {
 			if (e.shiftKey) {
-				window.bird.find.prev()
+				window.abird.find.prev()
 			} else {
-				window.bird.find.next()
+				window.abird.find.next()
 			}
 		}
 	}
@@ -50,7 +50,7 @@ export function App() {
 	const handleClose = () => {
 		if (debounceRef.current) clearTimeout(debounceRef.current)
 		setInputValue("")
-		window.bird.find.close()
+		window.abird.find.close()
 	}
 
 	const handleBlur = () => {
@@ -76,10 +76,10 @@ export function App() {
 			<span className={`find-count ${noResults ? "no-results" : ""}`}>
 				{inputValue.length > 0 && !isStale ? (hasResults ? `${findState.activeMatch} / ${findState.totalMatches}` : "0") : ""}
 			</span>
-			<button type="button" className="find-button" onClick={() => window.bird.find.prev()} disabled={!hasResults} title={t("find.previous")}>
+			<button type="button" className="find-button" onClick={() => window.abird.find.prev()} disabled={!hasResults} title={t("find.previous")}>
 				<ChevronUp size={16} />
 			</button>
-			<button type="button" className="find-button" onClick={() => window.bird.find.next()} disabled={!hasResults} title={t("find.next")}>
+			<button type="button" className="find-button" onClick={() => window.abird.find.next()} disabled={!hasResults} title={t("find.next")}>
 				<ChevronDown size={16} />
 			</button>
 			<button type="button" className="find-button close" onClick={handleClose} title={t("find.close")}>

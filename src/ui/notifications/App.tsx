@@ -35,19 +35,19 @@ function NotificationItem({ notification, onDismiss }: { notification: Notificat
 }
 
 export function App() {
-	const notifications = useBirdState(window.bird.notifications.getList, window.bird.notifications.onListChanged, [])
+	const notifications = useBirdState(window.abird.notifications.getList, window.abird.notifications.onListChanged, [])
 	const containerRef = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
 		const container = containerRef.current
 		if (!container) {
-			window.bird.notifications.resize(0, 0)
+			window.abird.notifications.resize(0, 0)
 			return
 		}
 
 		const observer = new ResizeObserver((entries) => {
 			const { width, height } = entries[0].contentRect
-			window.bird.notifications.resize(Math.ceil(width), Math.ceil(height))
+			window.abird.notifications.resize(Math.ceil(width), Math.ceil(height))
 		})
 
 		observer.observe(container)
@@ -59,7 +59,7 @@ export function App() {
 	return (
 		<div ref={containerRef} className="notification-center">
 			{notifications.map((notif) => (
-				<NotificationItem key={notif.id} notification={notif} onDismiss={() => window.bird.notifications.dismiss(notif.id)} />
+				<NotificationItem key={notif.id} notification={notif} onDismiss={() => window.abird.notifications.dismiss(notif.id)} />
 			))}
 		</div>
 	)

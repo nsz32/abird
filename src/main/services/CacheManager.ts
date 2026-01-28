@@ -11,7 +11,7 @@ import { paths } from "../utils/platform"
 
 const log = createLogger("CacheManager")
 
-const LOCK_FILENAME = ".bird-lock"
+const LOCK_FILENAME = ".abird-lock"
 
 interface LockHolder {
 	pid: number

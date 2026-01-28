@@ -17,7 +17,7 @@ const DEFAULT_CONFIG: EffectiveConfig = {
 	startUrl: "about:blank",
 	partition: null,
 	theme: "system",
-	userAgent: "desktop:bird",
+	userAgent: "desktop:abird",
 	navBar: {
 		position: "bottom",
 		visible: true,

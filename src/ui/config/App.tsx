@@ -26,13 +26,13 @@ export function App() {
 
 	const loadAll = async () => {
 		const [userConfig, effectiveConfig, partitionsState] = await Promise.all([
-			window.bird.settings.userconfig.read(),
-			window.bird.config.get(),
-			window.bird.partition.list(),
+			window.abird.settings.userconfig.read(),
+			window.abird.config.get(),
+			window.abird.partition.list(),
 		])
 
 		const appNames = Object.keys((userConfig.content as BirdConfig).apps)
-		const deployState = await window.bird.deploy.list(appNames)
+		const deployState = await window.abird.deploy.list(appNames)
 
 		setState({
 			config: userConfig.content as BirdConfig,
@@ -44,7 +44,7 @@ export function App() {
 	}
 
 	const reloadPartitions = async () => {
-		const partitionsState = await window.bird.partition.list()
+		const partitionsState = await window.abird.partition.list()
 		setState((prev) => (prev ? { ...prev, partitionsState } : null))
 	}
 
@@ -53,13 +53,13 @@ export function App() {
 
 	const reloadDeploy = useCallback(async () => {
 		if (appNames.length === 0) return
-		const deployState = await window.bird.deploy.list(appNames)
+		const deployState = await window.abird.deploy.list(appNames)
 		setState((prev) => (prev ? { ...prev, deployState } : null))
 	}, [appNames])
 
 	const handleChange = async (newConfig: BirdConfig) => {
 		setState((prev) => (prev ? { ...prev, config: newConfig } : null))
-		const result = await window.bird.settings.userconfig.write(newConfig)
+		const result = await window.abird.settings.userconfig.write(newConfig)
 		if (!result.success) {
 			console.error("Failed to save config:", result.errors)
 		}
@@ -79,14 +79,14 @@ export function App() {
 		}
 
 		await handleChange(newConfig)
-		await window.bird.deploy.rename(oldName, newName)
+		await window.abird.deploy.rename(oldName, newName)
 		await reloadPartitions()
 		replace(`#app/${newName}`)
 	}
 
 	const handleRenamePartition = async (oldName: string, newName: string) => {
 		// Rename physical folder first (may fail if partition is active)
-		await window.bird.partition.rename(oldName, newName)
+		await window.abird.partition.rename(oldName, newName)
 
 		const partitionConfig = config.partitions?.[oldName]
 

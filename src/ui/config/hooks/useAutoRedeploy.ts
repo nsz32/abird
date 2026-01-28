@@ -33,7 +33,7 @@ export function useAutoRedeploy(appName: string, appIcon?: string, appDescriptio
 		}
 
 		debounceRef.current = setTimeout(() => {
-			window.bird.deploy.deploy(appName).catch((err) => {
+			window.abird.deploy.deploy(appName).catch((err) => {
 				console.error("Failed to redeploy after config change:", err)
 			})
 		}, REDEPLOY_DEBOUNCE_MS)

@@ -6,7 +6,7 @@ export class Watermark extends View {
 	constructor() {
 		super({
 			layer: ZLayer.WATERMARK,
-			url: "bird://watermark/",
+			url: "abird://watermark/",
 		})
 
 		this.init()

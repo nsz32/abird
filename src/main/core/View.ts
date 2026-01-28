@@ -50,8 +50,9 @@ export abstract class View {
 	load() {
 		if (!this.url) return
 
+		const scheme = "abird://"
 		const finalUrl =
-			process.env.ELECTRON_RENDERER_URL && this.url.startsWith("bird://") ? `${process.env.ELECTRON_RENDERER_URL}/${this.url.slice(7)}/` : this.url
+			process.env.ELECTRON_RENDERER_URL && this.url.startsWith(scheme) ? `${process.env.ELECTRON_RENDERER_URL}/${this.url.slice(scheme.length)}/` : this.url
 		this.webContents.loadURL(finalUrl)
 	}
 

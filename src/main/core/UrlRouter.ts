@@ -1,6 +1,6 @@
 import type { ResolvedRoutingConfig, RoutingAction } from "@shared/types"
 
-const SPECIAL_PREFIXES = ["bird:", "about:", "javascript:", "data:"]
+const SPECIAL_PREFIXES = ["abird:", "about:", "javascript:", "data:"]
 
 function matchesAny(url: string, patterns: RegExp[]): boolean {
 	return patterns.some((p) => p.test(url))

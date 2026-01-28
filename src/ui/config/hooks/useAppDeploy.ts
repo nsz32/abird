@@ -18,12 +18,12 @@ export function useAppDeploy(appName: string): UseAppDeployResult {
 	const [deploying, setDeploying] = useState(false)
 
 	useEffect(() => {
-		window.bird.deploy.isSupported().then(setSupported)
+		window.abird.deploy.isSupported().then(setSupported)
 	}, [])
 
 	useEffect(() => {
 		if (supported) {
-			window.bird.deploy.getStatus(appName).then(setDeployed)
+			window.abird.deploy.getStatus(appName).then(setDeployed)
 		}
 	}, [appName, supported])
 
@@ -31,7 +31,7 @@ export function useAppDeploy(appName: string): UseAppDeployResult {
 		if (deploying) return
 		setDeploying(true)
 		try {
-			await window.bird.deploy.deploy(appName)
+			await window.abird.deploy.deploy(appName)
 			setDeployed(true)
 		} catch (err) {
 			console.error("Failed to deploy:", err)
@@ -44,7 +44,7 @@ export function useAppDeploy(appName: string): UseAppDeployResult {
 		if (deploying) return
 		setDeploying(true)
 		try {
-			await window.bird.deploy.undeploy(appName)
+			await window.abird.deploy.undeploy(appName)
 			setDeployed(false)
 		} catch (err) {
 			console.error("Failed to undeploy:", err)

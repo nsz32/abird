@@ -16,7 +16,8 @@ export const hiTranslations: Translations = {
 	"settings.stats": "{{apps}} ऐप · {{partitions}} पार्टीशन",
 	"settings.reloadPartitions": "पार्टीशन पुनः लोड करें",
 	"settings.cleanAll": "सब साफ़ करें",
-	"settings.cleanAllConfirm": "इससे सभी Bird डेटा और शॉर्टकट हटा दिए जाएंगे। आपकी पूरी कॉन्फ़िगरेशन खो जाएगी।\n\nकृपया सुनिश्चित करें कि कोई एप्लिकेशन खुला नहीं है।\n\nविंडो स्वचालित रूप से बंद हो जाएगी। जारी रखें?",
+	"settings.cleanAllConfirm":
+		"इससे सभी ABird डेटा और शॉर्टकट हटा दिए जाएंगे। आपकी पूरी कॉन्फ़िगरेशन खो जाएगी।\n\nकृपया सुनिश्चित करें कि कोई एप्लिकेशन खुला नहीं है।\n\nविंडो स्वचालित रूप से बंद हो जाएगी। जारी रखें?",
 
 	// Theme
 	"theme.system": "सिस्टम",
@@ -49,7 +50,7 @@ export const hiTranslations: Translations = {
 	"app.icon": "आइकन",
 	"app.fetchIcons": "वेबसाइट से प्राप्त करें",
 	"app.importIcon": "फ़ाइल आयात करें",
-	"app.useDefaultIcon": "Bird आइकन का उपयोग करें",
+	"app.useDefaultIcon": "ABird आइकन का उपयोग करें",
 	"app.selectIcon": "आइकन चुनें",
 	"app.noIconsFound": "इस वेबसाइट पर कोई आइकन नहीं मिला",
 	"app.loadingIcons": "आइकन प्राप्त कर रहे हैं...",
@@ -182,7 +183,7 @@ export const hiTranslations: Translations = {
 	"name.invalidFormat": "डॉट से शुरू/समाप्त नहीं हो सकता या स्पेस से समाप्त नहीं हो सकता",
 
 	// Menu
-	"menu.app": "Bird",
+	"menu.app": "ABird",
 	"menu.app.settings": "सेटिंग्स...",
 	"menu.app.quit": "बाहर निकलें",
 	"menu.tab": "टैब",
@@ -199,7 +200,7 @@ export const hiTranslations: Translations = {
 	"menu.developer.devtoolsSite": "DevTools साइट",
 	"menu.developer.devtoolsNavbar": "DevTools Navbar",
 	"menu.help": "सहायता",
-	"menu.help.about": "Bird के बारे में",
+	"menu.help.about": "ABird के बारे में",
 
 	// Context menu
 	"contextMenu.cut": "काटें",

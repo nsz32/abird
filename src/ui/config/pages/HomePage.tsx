@@ -83,9 +83,9 @@ export function HomePage({ config, configPath, partitionsState, deployState, act
 	const handleDeleteApp = async (name: string) => {
 		const app = config.apps[name]
 
-		await window.bird.deploy.undeploy(name)
+		await window.abird.deploy.undeploy(name)
 		if (app.icon) {
-			await window.bird.icons.delete(app.icon)
+			await window.abird.icons.delete(app.icon)
 		}
 
 		const { [name]: _, ...rest } = config.apps
@@ -94,7 +94,7 @@ export function HomePage({ config, configPath, partitionsState, deployState, act
 	}
 
 	const handleDeletePartition = async (name: string) => {
-		await window.bird.partition.delete(name)
+		await window.abird.partition.delete(name)
 
 		if (config.partitions[name]) {
 			const { [name]: _, ...rest } = config.partitions
@@ -106,7 +106,7 @@ export function HomePage({ config, configPath, partitionsState, deployState, act
 
 	const handleCleanAll = () => {
 		if (!confirm(t("settings.cleanAllConfirm"))) return
-		window.bird.app.cleanAll()
+		window.abird.app.cleanAll()
 	}
 
 	const appCount = Object.keys(config.apps).length

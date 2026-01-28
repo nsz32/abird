@@ -17,7 +17,7 @@ pnpm install
 
 | Command | Description |
 |---------|-------------|
-| `pnpm dev` | Development mode with hot reload (uses `bird.config.dev.json`) |
+| `pnpm dev` | Development mode with hot reload (uses `abird.config.dev.json`) |
 | `pnpm dev:bare` | Development mode without config file |
 | `pnpm start` | Run the built app |
 
@@ -46,12 +46,12 @@ pnpm install
 
 | Command | Description |
 |---------|-------------|
-| `pnpm gen:schema` | Generate `bird.config.schema.json` for IDE autocomplete |
+| `pnpm gen:schema` | Generate `abird.config.schema.json` for IDE autocomplete |
 | `pnpm gen:icons` | Generate icons from SVG source |
 
 ## Configuration
 
-Bird uses a JSON config file (`bird.config.dev.json` or `~/.config/bird/config.json`).
+ABird uses a JSON config file (`abird.config.dev.json` or `~/.config/abird/config.json`).
 
 ```bash
 # Run with custom config
@@ -69,11 +69,11 @@ pnpm dev -- --app dashboard --kiosk Ctrl+Alt+K
 
 ### IDE Support
 
-Run `pnpm gen:schema` to generate `bird.config.schema.json`. Add this to your config file for autocomplete:
+Run `pnpm gen:schema` to generate `abird.config.schema.json`. Add this to your config file for autocomplete:
 
 ```json
 {
-  "$schema": "./bird.config.schema.json",
+  "$schema": "./abird.config.schema.json",
   "apps": { ... }
 }
 ```
@@ -119,7 +119,7 @@ src/
 │   ├── input/           # Keyboard listener, app menu
 │   ├── utils/           # Observables, platform utils, user-agents
 │   └── handlers.ts      # All IPC handlers
-├── preload/             # Context bridge (window.bird.* API)
+├── preload/             # Context bridge (window.abird.* API)
 ├── shared/              # Types, schemas, i18n
 │   ├── config.schema.ts # Zod schemas (source of truth)
 │   ├── types.ts         # TypeScript types, IPC channels
@@ -140,7 +140,7 @@ src/
 2. **State** — Add observable in `core/states.ts` if needed
 3. **Main logic** — Implement in appropriate module
 4. **IPC** — Add channel in `IpcChannels`, handler in `handlers.ts`
-5. **UI** — Update React component, use `window.bird.*` API
+5. **UI** — Update React component, use `window.abird.*` API
 
 ### Example: Adding a new config option
 
@@ -182,7 +182,7 @@ The main process doesn't hot reload. Restart `pnpm dev` for main process changes
 
 ### Config changes not applied?
 
-Check that the config file path is correct. In dev mode, `bird.config.dev.json` in project root is used.
+Check that the config file path is correct. In dev mode, `abird.config.dev.json` in project root is used.
 
 ### Native module errors?
 

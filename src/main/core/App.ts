@@ -51,7 +51,7 @@ export function startApp() {
 	navBar = new NavBar()
 	setNavBar(navBar)
 	notificationCenter = new NotificationCenter()
-	downloadsPanel = new OverlayPanel("bird://downloads/")
+	downloadsPanel = new OverlayPanel("abird://downloads/")
 	findBar = new FindBar()
 
 	// Register downloads panel as a content view (not a tab)
@@ -93,7 +93,7 @@ export function startApp() {
 }
 
 function updateWindowTitle(isDownloadsActive: boolean, pageTitle: string) {
-	const appName = getCurrentAppName() || "Bird"
+	const appName = getCurrentAppName() || "ABird"
 	const contextTitle = isDownloadsActive ? getTranslations()["downloads.title"] : pageTitle
 
 	const title = contextTitle ? `${appName} - ${contextTitle}` : appName

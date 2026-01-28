@@ -1,6 +1,6 @@
 {
-	"appId": "com.bird.app",
-	"productName": "Bird",
+	"appId": "com.abird.app",
+	"productName": "ABird",
 	"publish": null,
 	"directories": {
 		"output": "release"
@@ -10,7 +10,7 @@
 	"files": [
 		"out/**/*",
 		"package.json",
-		"bird.config.schema.json",
+		"abird.config.schema.json",
 		"!**/*.map",
 		"!**/node_modules/**",
 		"node_modules/@ghostery/adblocker-electron-preload/**",
