@@ -13,7 +13,12 @@
 	},
 	"downloads": {
 		"autoOpenMaxSize": "10M",
-		"autoOpenMimeTypes": ["image/*", "application/pdf", "video/*", "audio/*"]
+		"autoOpenMimeTypes": [
+			"image/*",
+			"application/pdf",
+			"video/*",
+			"audio/*"
+		]
 	},
 	"apps": {
 		"news": {
@@ -26,6 +31,19 @@
 				"rules": {
 					"^https?://([^/]+\\.)?google\\.com(/|$)": "internal"
 				}
+			},
+			"downloads": {
+				"autoOpenMimeTypes": [
+					"application/msword",
+					"application/vnd.ms-*",
+					"application/vnd.openxmlformats-officedocument.*",
+					"application/vnd.oasis.opendocument.*",
+					"application/rtf",
+					"application/pdf",
+					"image/*",
+					"video/*",
+					"audio/*"
+				]
 			}
 		},
 		"test1": {
@@ -37,6 +55,19 @@
 					"^https?://([^/]+\\.)?the-internet\\.herokuapp\\.com(/|$)": "internal",
 					"^https?://([^/]+\\.)?herokuapp\\.com(/|$)": "internal"
 				}
+			},
+			"downloads": {
+				"autoOpenMimeTypes": [
+					"application/msword",
+					"application/vnd.ms-*",
+					"application/vnd.openxmlformats-officedocument.*",
+					"application/vnd.oasis.opendocument.*",
+					"application/rtf",
+					"application/pdf",
+					"image/*",
+					"video/*",
+					"audio/*"
+				]
 			}
 		},
 		"test2": {

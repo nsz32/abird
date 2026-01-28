@@ -13,6 +13,7 @@ const STANDARD_MIME_TYPES = [
 	"application/vnd.ms-*",
 	"application/vnd.openxmlformats-officedocument.*",
 	"application/vnd.oasis.opendocument.*",
+	"application/rtf",
 	"application/pdf",
 	"image/*",
 	"video/*",
