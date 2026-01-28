@@ -8,6 +8,7 @@ import { config$ } from "../core/states"
 import { acquirePartitionLock } from "../services/CacheManager"
 import { resolveDownloadConfig } from "../services/DownloadManager"
 import { createLogger } from "../utils/logger"
+import { sanitizeAppName } from "../utils/naming"
 import { getDefaultUserAgent, isKnownUserAgent } from "../utils/userAgents"
 import { getBirdConfig, setCurrentAppName, setOnConfigChanged } from "./store"
 
@@ -110,6 +111,7 @@ export function selectApp(appName: string, cliOverrides?: CliOverrides): boolean
 	const app = birdConfig.apps[appName]
 	if (!app) return false
 
+	log.info(`Running app "${appName}" (${sanitizeAppName(appName)})`)
 	setCurrentAppName(appName)
 	const effective = buildEffectiveConfig(app, birdConfig, { cliOverrides })
 	if (effective.partition) acquirePartitionLock(effective.partition)

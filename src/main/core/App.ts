@@ -19,6 +19,7 @@ import { registerHandlers } from "../handlers"
 import { setMainWindowRef, setupInputListener } from "../input/inputListener"
 import { createAppMenu } from "../input/menu"
 import { createTab, getTabsList } from "../tabs/Tabs"
+import { buildViewUrl } from "../utils/url"
 import { FindBar } from "../views/FindBar"
 import { NavBar } from "../views/NavBar"
 import { NotificationCenter } from "../views/NotificationCenter"
@@ -51,7 +52,7 @@ export function startApp() {
 	navBar = new NavBar()
 	setNavBar(navBar)
 	notificationCenter = new NotificationCenter()
-	downloadsPanel = new OverlayPanel("abird://downloads/")
+	downloadsPanel = new OverlayPanel(buildViewUrl("downloads"))
 	findBar = new FindBar()
 
 	// Register downloads panel as a content view (not a tab)

@@ -1,6 +1,9 @@
 import type { ActiveDownload, DownloadHistoryItem, DownloadStatus } from "@shared/types"
 import { useBirdState, useTranslations } from "@ui/shared/hooks"
+import { getAppClass } from "@ui/shared/viewContext"
 import { AlertCircle, CheckCircle, Download, ExternalLink, FolderOpen, Loader2, RefreshCw, ShieldX, Trash2, X, XCircle } from "lucide-react"
+
+const rootClass = ["downloads", getAppClass()].filter(Boolean).join(" ")
 
 const statusIcons: Record<DownloadStatus, typeof CheckCircle> = {
 	completed: CheckCircle,
@@ -126,7 +129,7 @@ export function App() {
 	const isEmpty = active.length === 0 && history.length === 0
 
 	return (
-		<div className="downloads-page">
+		<div className={rootClass}>
 			<div className="downloads-container">
 				<div className="downloads-header">
 					<Download size={24} />

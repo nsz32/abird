@@ -1,7 +1,10 @@
 import type { Notification, NotificationType } from "@shared/types"
 import { useBirdState } from "@ui/shared/hooks"
+import { getAppClass } from "@ui/shared/viewContext"
 import { AlertCircle, Download, ExternalLink, Info, X } from "lucide-react"
 import { useEffect, useRef } from "react"
+
+const rootClass = ["notifications", getAppClass()].filter(Boolean).join(" ")
 
 const iconMap: Record<NotificationType, typeof Info> = {
 	info: Info,
@@ -57,7 +60,7 @@ export function App() {
 	if (notifications.length === 0) return null
 
 	return (
-		<div ref={containerRef} className="notification-center">
+		<div ref={containerRef} className={rootClass}>
 			{notifications.map((notif) => (
 				<NotificationItem key={notif.id} notification={notif} onDismiss={() => window.abird.notifications.dismiss(notif.id)} />
 			))}

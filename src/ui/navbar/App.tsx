@@ -1,9 +1,12 @@
 import { ArrowLeft, ArrowRight, Download, Home, HousePlus, RotateCw, X } from "lucide-react"
 import { type KeyboardEvent, useEffect, useRef, useState } from "react"
 import type { ActiveDownload } from "../../shared/types"
+import { getAppClass } from "../shared/viewContext"
 import { DownloadProgressIcon } from "./DownloadProgressIcon"
 import { TabButton } from "./TabButton"
 import { useNavbarState } from "./useNavbarState"
+
+const rootClass = ["navbar", getAppClass()].filter(Boolean).join(" ")
 
 export function App() {
 	const { navState, config, tabs, externalTabIds, containerRef, isUrlMode, urlInputRef, exitUrlMode } = useNavbarState()
@@ -77,7 +80,7 @@ export function App() {
 	const downloadButtonClass = [highlighted && "highlighted", bump && "bump"].filter(Boolean).join(" ") || undefined
 
 	return (
-		<div ref={containerRef} className="navigation-bar">
+		<div ref={containerRef} className={rootClass}>
 			{navBar.showBackButton && (
 				<NavButton onClick={() => window.abird.navigation.back()} disabled={navDisabled || !navState.canGoBack}>
 					<ArrowLeft />

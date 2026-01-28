@@ -4,6 +4,7 @@ import type { Rectangle } from "electron"
 import { View } from "../core/View"
 import { ZLayer } from "../core/ViewManager"
 import { config$, navBarHeight$, windowBounds$ } from "../core/states"
+import { buildViewUrl } from "../utils/url"
 
 const DEFAULT_WIDTH = 350
 const DEFAULT_HEIGHT = 36
@@ -18,7 +19,7 @@ export class FindBar extends View {
 		super({
 			layer: ZLayer.FIND_BAR,
 			preload: true,
-			url: "abird://findbar/",
+			url: buildViewUrl("findbar"),
 		})
 
 		this.init()

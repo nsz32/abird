@@ -4,6 +4,7 @@ import { type Rectangle, ipcMain } from "electron"
 import { View } from "../core/View"
 import { ZLayer } from "../core/ViewManager"
 import { config$, navBarHeight$, windowBounds$ } from "../core/states"
+import { buildViewUrl } from "../utils/url"
 
 const MARGIN = 16
 
@@ -17,7 +18,7 @@ export class NotificationCenter extends View {
 		super({
 			layer: ZLayer.NOTIFICATIONS,
 			preload: true,
-			url: "abird://notifications/",
+			url: buildViewUrl("notifications"),
 		})
 
 		ipcMain.on(IpcChannels.NOTIF_RESIZE, (_, width: number, height: number) => {

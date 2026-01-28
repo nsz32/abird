@@ -1,12 +1,13 @@
 import { View } from "../core/View"
 import { ZLayer } from "../core/ViewManager"
 import { windowBounds$ } from "../core/states"
+import { buildViewUrl } from "../utils/url"
 
 export class Watermark extends View {
 	constructor() {
 		super({
 			layer: ZLayer.WATERMARK,
-			url: "abird://watermark/",
+			url: buildViewUrl("watermark"),
 		})
 
 		this.init()

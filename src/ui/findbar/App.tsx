@@ -1,7 +1,10 @@
 import type { FindState } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
+import { getAppClass } from "@ui/shared/viewContext"
 import { ChevronDown, ChevronUp, X } from "lucide-react"
 import { type KeyboardEvent, useEffect, useRef, useState } from "react"
+
+const rootClass = ["findbar", getAppClass()].filter(Boolean).join(" ")
 
 const DEBOUNCE_MS = 250
 
@@ -62,7 +65,7 @@ export function App() {
 	const noResults = !isStale && inputValue.length > 0 && findState.totalMatches === 0
 
 	return (
-		<div className="find-bar">
+		<div className={rootClass}>
 			<input
 				ref={inputRef}
 				type="text"

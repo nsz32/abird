@@ -4,6 +4,7 @@ import { ipcMain } from "electron"
 import { View } from "../core/View"
 import { ZLayer } from "../core/ViewManager"
 import { navBarBounds$, navBarHeight$ } from "../core/states"
+import { buildViewUrl } from "../utils/url"
 
 export class NavBar extends View {
 	constructor() {
@@ -11,7 +12,7 @@ export class NavBar extends View {
 			layer: ZLayer.NAVBAR,
 			preload: true,
 			backgroundColor: "#1a1a2e",
-			url: "abird://navbar/",
+			url: buildViewUrl("navbar"),
 		})
 
 		ipcMain.on(IpcChannels.NAVBAR_RESIZE, (_, height: number) => {

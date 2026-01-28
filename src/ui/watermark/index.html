@@ -39,5 +39,9 @@
 </head>
 <body>
 	<div class="watermark"></div>
+	<script>
+		const app = new URLSearchParams(location.search).get('app')
+		if (app) document.querySelector('.watermark').classList.add('app-' + app)
+	</script>
 </body>
 </html>

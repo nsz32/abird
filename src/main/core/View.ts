@@ -50,10 +50,12 @@ export abstract class View {
 	load() {
 		if (!this.url) return
 
-		const scheme = "abird://"
-		const finalUrl =
-			process.env.ELECTRON_RENDERER_URL && this.url.startsWith(scheme) ? `${process.env.ELECTRON_RENDERER_URL}/${this.url.slice(scheme.length)}/` : this.url
-		this.webContents.loadURL(finalUrl)
+		if (process.env.ELECTRON_RENDERER_URL && this.url.startsWith("abird://")) {
+			const { host, pathname, search } = new URL(this.url)
+			this.webContents.loadURL(`${process.env.ELECTRON_RENDERER_URL}/${host}${pathname}${search}`)
+		} else {
+			this.webContents.loadURL(this.url)
+		}
 	}
 
 	setBounds(bounds: Rectangle) {
