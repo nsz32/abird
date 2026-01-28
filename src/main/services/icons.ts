@@ -6,6 +6,7 @@ import { net, WebContentsView, app, dialog, nativeImage } from "electron"
 import { Jimp } from "jimp"
 import pngToIco from "png-to-ico"
 import { getBirdConfig, getCurrentAppName } from "../config"
+import { sanitizeAppName } from "../utils/naming"
 import { paths } from "../utils/platform"
 
 const DEFAULT_ICON_FILENAME = "abird-default.png"
@@ -211,14 +212,6 @@ export async function fetchIcons(url: string, partition?: string): Promise<IconF
 			resolve(await fallbackResult())
 		})
 	})
-}
-
-function sanitizeAppName(name: string): string {
-	// Keep only filename-safe characters
-	return name
-		.replace(/[^a-zA-Z0-9_-]/g, "_")
-		.replace(/_+/g, "_")
-		.substring(0, 32)
 }
 
 function generateFilename(appName: string): string {
