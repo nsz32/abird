@@ -67,6 +67,16 @@ export function getTabIndex(id: string): number {
 	return tabs$.get().findIndex((t) => t.id === id)
 }
 
+export function moveTab(id: string, toIndex: number) {
+	const list = tabs$.get()
+	const fromIndex = list.findIndex((t) => t.id === id)
+	if (fromIndex === -1 || fromIndex === toIndex) return
+
+	const [tab] = list.splice(fromIndex, 1)
+	list.splice(toIndex, 0, tab)
+	tabs$.emit([...list])
+}
+
 export function isTabActive(id: string): boolean {
 	return activeContentId$.get() === id
 }

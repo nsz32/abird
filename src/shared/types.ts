@@ -150,6 +150,7 @@ export const IpcChannels = {
 	TABS_ACTIVATE: "abird:tabs:activate",
 	TABS_CLOSE: "abird:tabs:close",
 	TABS_CREATE: "abird:tabs:create",
+	TABS_MOVE: "abird:tabs:move",
 	TABS_EXTERNAL_OPENED: "abird:tabs:external-opened",
 	// Config
 	CONFIG_GET: "abird:config:get",
@@ -287,6 +288,7 @@ export interface BirdApi {
 		activate: (id: string) => Promise<void>
 		close: (id: string) => Promise<void>
 		create: (index?: number) => Promise<void>
+		move: (id: string, toIndex: number) => Promise<void>
 	}
 	config: {
 		get: () => Promise<EffectiveConfig>

@@ -1,21 +1,29 @@
+import { DndContext, PointerSensor, closestCenter, useSensor, useSensors } from "@dnd-kit/core"
+import { restrictToHorizontalAxis } from "@dnd-kit/modifiers"
+import { SortableContext, horizontalListSortingStrategy } from "@dnd-kit/sortable"
 import { ArrowLeft, ArrowRight, Download, Home, HousePlus, RotateCw, X } from "lucide-react"
 import { type KeyboardEvent, useEffect, useRef, useState } from "react"
 import type { ActiveDownload } from "../../shared/types"
 import { getAppClass } from "../shared/viewContext"
 import { DownloadProgressIcon } from "./DownloadProgressIcon"
-import { TabButton } from "./TabButton"
+import { SortableTab } from "./SortableTab"
 import { useNavbarState } from "./useNavbarState"
+import { useSortableTabs } from "./useSortableTabs"
 
 const rootClass = ["navbar", getAppClass()].filter(Boolean).join(" ")
 
 export function App() {
-	const { navState, config, tabs, externalTabIds, containerRef, isUrlMode, urlInputRef, exitUrlMode } = useNavbarState()
+	const { navState, config, tabs: serverTabs, externalTabIds, containerRef, isUrlMode, urlInputRef, exitUrlMode } = useNavbarState()
 	const [hasDownloads, setHasDownloads] = useState(false)
 	const [activeDownloads, setActiveDownloads] = useState<ActiveDownload[]>([])
 	const [ctrlPressed, setCtrlPressed] = useState(false)
 	const [bump, setBump] = useState(false)
 	const [highlighted, setHighlighted] = useState(false)
 	const prevActiveCount = useRef(0)
+
+	const { tabs, tabIds, handleDragStart, handleDragEnd, handleDragCancel } = useSortableTabs(serverTabs ?? [])
+
+	const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
 
 	useEffect(() => {
 		Promise.all([window.abird.downloads.getActive(), window.abird.downloads.getHistory()]).then(([active, history]) => {
@@ -59,7 +67,7 @@ export function App() {
 		return window.abird.keyboard.onCtrlChanged(setCtrlPressed)
 	}, [])
 
-	if (!config || !navState || !tabs) return null
+	if (!config || !navState || !serverTabs) return null
 
 	const { navBar } = config
 
@@ -104,18 +112,27 @@ export function App() {
 			{isUrlMode && navBar.allowUrlEdit ? (
 				<input ref={urlInputRef} type="text" className="url-input" defaultValue={navState.url} onKeyDown={handleUrlKeyDown} onBlur={exitUrlMode} />
 			) : (
-				<div className="tabs-list">
-					{tabs.map((tab) => (
-						<TabButton
-							key={tab.id}
-							tab={tab}
-							showClose={navBar.allowSingleTabClose || tabs.length > 1}
-							showExternalIndicator={externalTabIds.has(tab.id)}
-							onActivate={() => window.abird.tabs.activate(tab.id)}
-							onClose={() => window.abird.tabs.close(tab.id)}
-						/>
-					))}
-				</div>
+				<DndContext
+					sensors={sensors}
+					collisionDetection={closestCenter}
+					modifiers={[restrictToHorizontalAxis]}
+					onDragStart={handleDragStart}
+					onDragEnd={handleDragEnd}
+					onDragCancel={handleDragCancel}
+				>
+					<SortableContext items={tabIds} strategy={horizontalListSortingStrategy}>
+						<div className="tabs-list">
+							{tabs.map((tab) => (
+								<SortableTab
+									key={tab.id}
+									tab={tab}
+									showClose={navBar.allowSingleTabClose || tabs.length > 1}
+									showExternalIndicator={externalTabIds.has(tab.id)}
+								/>
+							))}
+						</div>
+					</SortableContext>
+				</DndContext>
 			)}
 			{hasDownloads && (
 				<NavButton

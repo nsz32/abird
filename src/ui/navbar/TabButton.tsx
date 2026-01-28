@@ -1,5 +1,9 @@
+import type { DraggableAttributes } from "@dnd-kit/core"
+import type { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities"
 import type { TabInfo } from "@shared/types"
 import { ChevronsRight, LoaderCircle, X } from "lucide-react"
+import type { CSSProperties } from "react"
+import { forwardRef } from "react"
 
 interface TabButtonProps {
 	tab: TabInfo
@@ -7,19 +11,24 @@ interface TabButtonProps {
 	showExternalIndicator: boolean
 	onActivate: () => void
 	onClose: () => void
+	style?: CSSProperties
+	dragAttributes?: DraggableAttributes
+	dragListeners?: SyntheticListenerMap
 }
 
-export function TabButton({ tab, showClose, showExternalIndicator, onActivate, onClose }: TabButtonProps) {
-	const classes = ["tab-button", tab.isActive && "active", tab.isCurrent && "current", showExternalIndicator && "external-wave"].filter(Boolean).join(" ")
+export const TabButton = forwardRef<HTMLButtonElement, TabButtonProps>(
+	({ tab, showClose, showExternalIndicator, onActivate, onClose, style, dragAttributes, dragListeners }, ref) => {
+		const classes = ["tab-button", tab.isActive && "active", tab.isCurrent && "current", showExternalIndicator && "external-wave"].filter(Boolean).join(" ")
 
-	return (
-		<button type="button" className={classes} onClick={onActivate}>
-			<TabFavicon tab={tab} />
-			<span className="tab-title">{tab.title || tab.url}</span>
-			<TabAction showExternalIndicator={showExternalIndicator} showClose={showClose} onClose={onClose} />
-		</button>
-	)
-}
+		return (
+			<button ref={ref} type="button" className={classes} onClick={onActivate} style={style} {...dragAttributes} {...dragListeners}>
+				<TabFavicon tab={tab} />
+				<span className="tab-title">{tab.title || tab.url}</span>
+				<TabAction showExternalIndicator={showExternalIndicator} showClose={showClose} onClose={onClose} />
+			</button>
+		)
+	},
+)
 
 function TabFavicon({ tab }: { tab: TabInfo }) {
 	if (tab.isLoading) {

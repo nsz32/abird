@@ -48,6 +48,7 @@ contextBridge.exposeInMainWorld("abird", {
 		activate: (id: string) => ipcRenderer.invoke(IpcChannels.TABS_ACTIVATE, id),
 		close: (id: string) => ipcRenderer.invoke(IpcChannels.TABS_CLOSE, id),
 		create: (index?: number) => ipcRenderer.invoke(IpcChannels.TABS_CREATE, index),
+		move: (id: string, toIndex: number) => ipcRenderer.invoke(IpcChannels.TABS_MOVE, id, toIndex),
 	},
 	config: {
 		get: (): Promise<EffectiveConfig> => ipcRenderer.invoke(IpcChannels.CONFIG_GET),

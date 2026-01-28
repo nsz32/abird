@@ -22,7 +22,7 @@ import { cleanupPartition, deletePartition, getPartitionsState, renamePartition,
 import { deploy, getDeployState, isDeploySupported, isDeployed, isLaunchSupported, launchApp, renameDeploy, undeploy } from "./services/deploy"
 import { deleteIcon, fetchIcons, getIconData, importIconFile, saveIcon } from "./services/icons"
 import { dismissNotification } from "./services/notify"
-import { activateTab, closeTab, createTab, getActiveTab, getTabsList } from "./tabs/Tabs"
+import { activateTab, closeTab, createTab, getActiveTab, getTabsList, moveTab } from "./tabs/Tabs"
 import { performCleanAll } from "./utils/cleanup"
 import { createLogger } from "./utils/logger"
 import { openFile } from "./utils/platform"
@@ -44,6 +44,7 @@ export function registerHandlers() {
 	ipcMain.handle(IpcChannels.TABS_CREATE, (_, index?: number) => {
 		createTab(undefined, "user", index)
 	})
+	ipcMain.handle(IpcChannels.TABS_MOVE, (_, id: string, toIndex: number) => moveTab(id, toIndex))
 	ipcMain.handle(IpcChannels.CONFIG_GET, () => config$.get())
 	ipcMain.handle(IpcChannels.NOTIF_GET_LIST, () => notifications$.get())
 	ipcMain.handle(IpcChannels.NOTIF_DISMISS, (_, id: string) => dismissNotification(id))
