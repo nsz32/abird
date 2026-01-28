@@ -51,9 +51,10 @@ src/
 │   │   │   └── mac.ts             # MacDeployer (Applications folder)
 │   │   ├── icons.ts               # Icon fetching, storage, import
 │   │   └── notify.ts              # Notification system (with auto-dismiss)
-│   ├── input/                     # Input handling (2 files)
-│   │   ├── inputListener.ts       # Global keyboard listener (uiohook-napi)
-│   │   └── menu.ts                # Native application menu
+│   ├── input/                     # Input handling (3 files)
+│   │   ├── inputListener.ts       # Global keyboard/mouse listener (uiohook-napi)
+│   │   ├── menu.ts                # Native application menu
+│   │   └── zoom.ts                # Zoom control (±10% steps, 10%-300% bounds)
 │   ├── utils/                     # Main process utilities (≈8 files)
 │   │   ├── observable.ts          # **Core pattern**: StateObservable, BroadcastObservable, BroadcastEvent
 │   │   ├── userAgents.ts          # User-agent resolution (desktop:chrome, mobile:android)

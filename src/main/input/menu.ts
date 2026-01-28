@@ -5,6 +5,7 @@ import { findBarVisible$ } from "../core/states"
 import { closeTab, createTab, getActiveTab } from "../tabs/Tabs"
 import { openExternal } from "../utils/platform"
 import { getNavBar } from "../views/views"
+import { zoomActiveTab } from "./zoom"
 
 function getAppIconPath(): string {
 	return app.isPackaged ? join(process.resourcesPath, "assets", "icons", "256x256.png") : join(app.getAppPath(), "assets", "icons", "256x256.png")
@@ -73,6 +74,22 @@ export function createAppMenu(): Menu {
 					label: t["menu.page.find"],
 					accelerator: "CmdOrCtrl+F",
 					click: () => findBarVisible$.emit(true),
+				},
+				{ type: "separator" },
+				{
+					label: t["menu.page.zoomIn"],
+					accelerator: "CmdOrCtrl+=",
+					click: () => zoomActiveTab(0.1),
+				},
+				{
+					label: t["menu.page.zoomOut"],
+					accelerator: "CmdOrCtrl+-",
+					click: () => zoomActiveTab(-0.1),
+				},
+				{
+					label: t["menu.page.zoomReset"],
+					accelerator: "CmdOrCtrl+0",
+					click: () => zoomActiveTab(0),
 				},
 			],
 		},

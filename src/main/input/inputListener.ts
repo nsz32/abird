@@ -1,8 +1,9 @@
 import { type Rectangle, app } from "electron"
-import { UiohookKey, uIOhook } from "uiohook-napi"
+import { UiohookKey, WheelDirection, uIOhook } from "uiohook-napi"
 import { checkKioskExitShortcut } from "../core/kiosk"
 import { config$, ctrlPressed$, kioskMode$, navBarForceShow$, navBarHeight$ } from "../core/states"
 import { createLogger } from "../utils/logger"
+import { zoomActiveTab } from "./zoom"
 
 const log = createLogger("InputListener")
 
@@ -41,6 +42,14 @@ function checkMouseInNavBarZone(mouseX: number, mouseY: number): boolean {
 	return mouseY >= bounds.y + bounds.height - threshold && mouseY <= bounds.y + bounds.height
 }
 
+function checkMouseInWindow(mouseX: number, mouseY: number): boolean {
+	if (!mainWindowRef) return false
+
+	const bounds = mainWindowRef.getBounds()
+
+	return mouseX >= bounds.x && mouseX <= bounds.x + bounds.width && mouseY >= bounds.y && mouseY <= bounds.y + bounds.height
+}
+
 export function setupInputListener() {
 	uIOhook.on("keydown", (e) => {
 		pressed.add(e.keycode)
@@ -69,6 +78,23 @@ export function setupInputListener() {
 		if (inZone !== current.mouseHover) {
 			navBarForceShow$.emit({ ...current, mouseHover: inZone })
 		}
+	})
+
+	uIOhook.on("wheel", (e) => {
+		if (!e.ctrlKey) return
+		if (e.direction !== WheelDirection.VERTICAL) return
+		if (!checkMouseInWindow(e.x, e.y)) return
+
+		const zoomStep = e.rotation > 0 ? -0.1 : 0.1
+		zoomActiveTab(zoomStep)
+	})
+
+	uIOhook.on("mousedown", (e) => {
+		if (!e.ctrlKey) return
+		if (e.button !== 3) return
+		if (!checkMouseInWindow(e.x, e.y)) return
+
+		zoomActiveTab(0)
 	})
 
 	uIOhook.start()
