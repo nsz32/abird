@@ -15,6 +15,16 @@ ABird turns any website into a standalone desktop application with complete sess
 
 </details>
 
+### Bird has been renamed ABird: migration
+
+If you were using the previous "bird" version (Linux):
+
+```bash
+mv ~/.config/bird ~/.config/abird
+mv ~/.local/share/bird ~/.local/share/abird
+rm -rf ~/.local/share/applications/bird-*
+```
+
 ## Why ABird?
 
 - **Session Isolation**: Run Gmail, Slack, Notion as separate apps — each with its own partition (cookies, localStorage, cache). No more "you're signed into another account" issues.
@@ -29,16 +39,6 @@ ABird turns any website into a standalone desktop application with complete sess
 - **macOS** — WIP
 
 > **Arch Linux**: `yay -S abird-bin`
-
-### Migration from Bird (Linux)
-
-If you were using the previous "bird" version:
-
-```bash
-mv ~/.config/bird ~/.config/abird
-mv ~/.local/share/bird ~/.local/share/abird
-rm -rf ~/.local/share/applications/bird-*
-```
 
 ## Features
 
