@@ -1,6 +1,6 @@
 {
 	"name": "abird",
-	"version": "0.1.3",
+	"version": "0.1.4",
 	"description": "ABird - Desktop Redistribuable Isolated Browser",
 	"main": "out/main/index.js",
 	"pnpm": {
