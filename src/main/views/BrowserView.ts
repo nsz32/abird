@@ -50,14 +50,18 @@ export abstract class BrowserView extends View {
 
 	back() {
 		if (this.webContents.navigationHistory.canGoBack()) {
-			this.webContents.navigationHistory.goBack()
+			this.triggerSpaNavigation("back")
 		}
 	}
 
 	forward() {
 		if (this.webContents.navigationHistory.canGoForward()) {
-			this.webContents.navigationHistory.goForward()
+			this.triggerSpaNavigation("forward")
 		}
+	}
+
+	private triggerSpaNavigation(direction: "back" | "forward") {
+		this.webContents.executeJavaScript(`history.${direction}()`)
 	}
 
 	reload(ignoreCache = false) {
@@ -130,10 +134,7 @@ export abstract class BrowserView extends View {
 	private setupEventListeners() {
 		this.webContents.on("did-navigate", () => this.emitNavState())
 		this.webContents.once("did-start-loading", () => this.emitNavState())
-		this.webContents.on("did-navigate-in-page", () => {
-			this.deduplicateHistory()
-			this.emitNavState()
-		})
+		this.webContents.on("did-navigate-in-page", () => this.emitNavState())
 		this.webContents.on("did-start-loading", () => this.emitNavState())
 		this.webContents.on("did-stop-loading", () => this.emitNavState())
 		this.webContents.on("did-finish-load", () => this.emitNavState())
@@ -161,16 +162,5 @@ export abstract class BrowserView extends View {
 			canGoForward: this.webContents.navigationHistory.canGoForward(),
 			isLoading: this.webContents.isLoading(),
 		})
-	}
-
-	private deduplicateHistory() {
-		const history = this.webContents.navigationHistory
-		const activeIndex = history.getActiveIndex()
-
-		for (let i = activeIndex - 1; i >= Math.max(0, activeIndex - 10); i--) {
-			if (history.getEntryAtIndex(i)?.url === history.getEntryAtIndex(i + 1)?.url) {
-				history.removeEntryAtIndex(i)
-			}
-		}
 	}
 }
