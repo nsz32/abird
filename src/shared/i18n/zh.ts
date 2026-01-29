@@ -192,6 +192,7 @@ export const zhTranslations: Translations = {
 	"menu.tab.editUrl": "编辑网址",
 	"menu.tab.close": "关闭",
 	"menu.page": "页面",
+	"menu.page.print": "打印",
 	"menu.page.find": "查找",
 	"menu.page.zoomIn": "放大",
 	"menu.page.zoomOut": "缩小",

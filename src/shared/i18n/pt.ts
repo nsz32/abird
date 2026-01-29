@@ -192,6 +192,7 @@ export const ptTranslations: Translations = {
 	"menu.tab.editUrl": "Editar URL",
 	"menu.tab.close": "Fechar",
 	"menu.page": "Página",
+	"menu.page.print": "Imprimir",
 	"menu.page.find": "Pesquisar",
 	"menu.page.zoomIn": "Ampliar",
 	"menu.page.zoomOut": "Reduzir",

@@ -71,6 +71,11 @@ export function createAppMenu(): Menu {
 			label: t["menu.page"],
 			submenu: [
 				{
+					label: t["menu.page.print"],
+					accelerator: "CmdOrCtrl+P",
+					click: () => getActiveTab()?.view.webContents.print(),
+				},
+				{
 					label: t["menu.page.find"],
 					accelerator: "CmdOrCtrl+F",
 					click: () => findBarVisible$.emit(true),

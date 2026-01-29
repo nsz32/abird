@@ -192,6 +192,7 @@ export const ruTranslations: Translations = {
 	"menu.tab.editUrl": "Редактировать URL",
 	"menu.tab.close": "Закрыть",
 	"menu.page": "Страница",
+	"menu.page.print": "Печать",
 	"menu.page.find": "Поиск",
 	"menu.page.zoomIn": "Увеличить",
 	"menu.page.zoomOut": "Уменьшить",

@@ -192,6 +192,7 @@ export const hiTranslations: Translations = {
 	"menu.tab.editUrl": "URL संपादित करें",
 	"menu.tab.close": "बंद करें",
 	"menu.page": "पेज",
+	"menu.page.print": "प्रिंट",
 	"menu.page.find": "खोजें",
 	"menu.page.zoomIn": "ज़ूम इन",
 	"menu.page.zoomOut": "ज़ूम आउट",

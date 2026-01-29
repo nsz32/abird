@@ -192,6 +192,7 @@ export const esTranslations: Translations = {
 	"menu.tab.editUrl": "Editar URL",
 	"menu.tab.close": "Cerrar",
 	"menu.page": "Página",
+	"menu.page.print": "Imprimir",
 	"menu.page.find": "Buscar",
 	"menu.page.zoomIn": "Ampliar",
 	"menu.page.zoomOut": "Reducir",

@@ -190,6 +190,7 @@ const en = {
 	"menu.tab.editUrl": "Edit URL",
 	"menu.tab.close": "Close",
 	"menu.page": "Page",
+	"menu.page.print": "Print",
 	"menu.page.find": "Find",
 	"menu.page.zoomIn": "Zoom In",
 	"menu.page.zoomOut": "Zoom Out",

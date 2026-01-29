@@ -192,6 +192,7 @@ export const arTranslations: Translations = {
 	"menu.tab.editUrl": "تعديل الرابط",
 	"menu.tab.close": "إغلاق",
 	"menu.page": "الصفحة",
+	"menu.page.print": "طباعة",
 	"menu.page.find": "بحث",
 	"menu.page.zoomIn": "تكبير",
 	"menu.page.zoomOut": "تصغير",

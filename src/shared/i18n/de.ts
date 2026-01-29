@@ -192,6 +192,7 @@ export const deTranslations: Translations = {
 	"menu.tab.editUrl": "URL bearbeiten",
 	"menu.tab.close": "Schließen",
 	"menu.page": "Seite",
+	"menu.page.print": "Drucken",
 	"menu.page.find": "Suchen",
 	"menu.page.zoomIn": "Vergrößern",
 	"menu.page.zoomOut": "Verkleinern",
