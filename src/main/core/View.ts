@@ -91,7 +91,7 @@ export abstract class View {
 
 		if (!configuredSessions.has(partition)) {
 			configuredSessions.add(partition)
-			setupPermissionHandlers(sess)
+			setupPermissionHandlers(sess, partition)
 		}
 
 		return sess

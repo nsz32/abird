@@ -169,6 +169,14 @@ export const esTranslations: Translations = {
 	"partition.cacheCleanup.maxAgeDays": "Antigüedad máxima (días)",
 	"partition.cacheCleanup.hint": "Los archivos que excedan estos límites se eliminarán al salir",
 	"partition.cacheCleanup.disabled": "desactivado",
+	"partition.permissions.title": "Permisos",
+	"partition.permissions.allowMidi": "Dispositivos MIDI",
+	"partition.permissions.allowMidiSysex": "MIDI SysEx",
+	"partition.permissions.allowFullscreen": "Pantalla completa",
+	"partition.permissions.allowPointerLock": "Bloqueo del puntero",
+	"partition.permissions.allowKeyboardLock": "Bloqueo del teclado",
+	"partition.permissions.allowIdleDetection": "Detección de inactividad",
+	"partition.permissions.allowNotifications": "Notificaciones",
 	"partition.invalidName": "Debe comenzar con una letra, usar solo minúsculas, números y guiones bajos",
 
 	// Rename dialog

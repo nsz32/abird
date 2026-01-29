@@ -71,14 +71,38 @@ export const CacheCleanupConfigSchema = z.object({
 })
 export type CacheCleanupConfig = z.infer<typeof CacheCleanupConfigSchema>
 
+// Partition permissions (Electron permission handler)
+export const PermissionsConfigSchema = z.object({
+	allowMidi: z.boolean().default(true),
+	allowMidiSysex: z.boolean().default(true),
+	allowFullscreen: z.boolean().default(true),
+	allowPointerLock: z.boolean().default(true),
+	allowKeyboardLock: z.boolean().default(true),
+	allowIdleDetection: z.boolean().default(true),
+	allowNotifications: z.boolean().default(true),
+})
+export type PermissionsConfig = z.infer<typeof PermissionsConfigSchema>
+
+/** Ordered list of permission keys for UI iteration */
+export const PERMISSION_KEYS: (keyof PermissionsConfig)[] = [
+	"allowFullscreen",
+	"allowNotifications",
+	"allowPointerLock",
+	"allowKeyboardLock",
+	"allowIdleDetection",
+	"allowMidi",
+	"allowMidiSysex",
+]
+
 // Partition configuration
 export const PartitionConfigSchema = z.object({
 	adBlockEnabled: z.boolean().default(true),
 	cacheCleanup: CacheCleanupConfigSchema.optional(),
+	permissions: PermissionsConfigSchema.partial().optional(),
 })
 export type PartitionConfig = z.infer<typeof PartitionConfigSchema>
 
-// Configuration racine (fichier JSON utilisateur)
+// Root configuration (user JSON file)
 export const BirdConfigSchema = z.object({
 	projectName: z
 		.string()
@@ -87,6 +111,7 @@ export const BirdConfigSchema = z.object({
 	theme: ThemeModeSchema.default("system"),
 	navBar: NavBarConfigSchema.partial().default({}),
 	downloads: DownloadConfigSchema.default({}),
+	permissions: PermissionsConfigSchema.partial().optional(),
 	apps: z.record(z.string(), AppConfigSchema).default({}),
 	partitions: z.record(z.string(), PartitionConfigSchema.partial()).default({}),
 })

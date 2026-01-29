@@ -169,6 +169,14 @@ export const frTranslations: Translations = {
 	"partition.cacheCleanup.maxAgeDays": "Âge max (jours)",
 	"partition.cacheCleanup.hint": "Les fichiers dépassant ces limites seront supprimés à la fermeture",
 	"partition.cacheCleanup.disabled": "désactivé",
+	"partition.permissions.title": "Permissions",
+	"partition.permissions.allowMidi": "Périphériques MIDI",
+	"partition.permissions.allowMidiSysex": "MIDI SysEx",
+	"partition.permissions.allowFullscreen": "Plein écran",
+	"partition.permissions.allowPointerLock": "Verrouillage du pointeur",
+	"partition.permissions.allowKeyboardLock": "Verrouillage du clavier",
+	"partition.permissions.allowIdleDetection": "Détection d'inactivité",
+	"partition.permissions.allowNotifications": "Notifications",
 	"partition.invalidName": "Doit commencer par une lettre, contenir uniquement minuscules, chiffres et underscores",
 
 	// Rename dialog

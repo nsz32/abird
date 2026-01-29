@@ -169,6 +169,14 @@ export const ruTranslations: Translations = {
 	"partition.cacheCleanup.maxAgeDays": "Макс. возраст (дни)",
 	"partition.cacheCleanup.hint": "Файлы, превышающие эти лимиты, будут удалены при выходе",
 	"partition.cacheCleanup.disabled": "отключено",
+	"partition.permissions.title": "Разрешения",
+	"partition.permissions.allowMidi": "MIDI-устройства",
+	"partition.permissions.allowMidiSysex": "MIDI SysEx",
+	"partition.permissions.allowFullscreen": "Полный экран",
+	"partition.permissions.allowPointerLock": "Блокировка указателя",
+	"partition.permissions.allowKeyboardLock": "Блокировка клавиатуры",
+	"partition.permissions.allowIdleDetection": "Обнаружение бездействия",
+	"partition.permissions.allowNotifications": "Уведомления",
 	"partition.invalidName": "Должно начинаться с буквы, использовать только строчные буквы, цифры и подчёркивания",
 
 	// Rename dialog

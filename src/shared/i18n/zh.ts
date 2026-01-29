@@ -169,6 +169,14 @@ export const zhTranslations: Translations = {
 	"partition.cacheCleanup.maxAgeDays": "最大保留天数",
 	"partition.cacheCleanup.hint": "超过这些限制的文件将在退出时删除",
 	"partition.cacheCleanup.disabled": "已禁用",
+	"partition.permissions.title": "权限",
+	"partition.permissions.allowMidi": "MIDI 设备",
+	"partition.permissions.allowMidiSysex": "MIDI SysEx",
+	"partition.permissions.allowFullscreen": "全屏",
+	"partition.permissions.allowPointerLock": "指针锁定",
+	"partition.permissions.allowKeyboardLock": "键盘锁定",
+	"partition.permissions.allowIdleDetection": "空闲检测",
+	"partition.permissions.allowNotifications": "通知",
 	"partition.invalidName": "必须以字母开头，仅使用小写字母、数字和下划线",
 
 	// Rename dialog

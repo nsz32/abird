@@ -169,6 +169,14 @@ export const arTranslations: Translations = {
 	"partition.cacheCleanup.maxAgeDays": "الحد الأقصى للعمر (أيام)",
 	"partition.cacheCleanup.hint": "سيتم حذف الملفات التي تتجاوز هذه الحدود عند الخروج",
 	"partition.cacheCleanup.disabled": "معطل",
+	"partition.permissions.title": "الأذونات",
+	"partition.permissions.allowMidi": "أجهزة MIDI",
+	"partition.permissions.allowMidiSysex": "MIDI SysEx",
+	"partition.permissions.allowFullscreen": "ملء الشاشة",
+	"partition.permissions.allowPointerLock": "قفل المؤشر",
+	"partition.permissions.allowKeyboardLock": "قفل لوحة المفاتيح",
+	"partition.permissions.allowIdleDetection": "كشف الخمول",
+	"partition.permissions.allowNotifications": "الإشعارات",
 	"partition.invalidName": "يجب أن يبدأ بحرف، واستخدام أحرف صغيرة وأرقام وشرطات سفلية فقط",
 
 	// Rename dialog

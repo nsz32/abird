@@ -167,6 +167,14 @@ const en = {
 	"partition.cacheCleanup.maxAgeDays": "Max age (days)",
 	"partition.cacheCleanup.hint": "Files exceeding these limits will be deleted on exit",
 	"partition.cacheCleanup.disabled": "disabled",
+	"partition.permissions.title": "Permissions",
+	"partition.permissions.allowMidi": "MIDI devices",
+	"partition.permissions.allowMidiSysex": "MIDI SysEx",
+	"partition.permissions.allowFullscreen": "Fullscreen",
+	"partition.permissions.allowPointerLock": "Pointer lock",
+	"partition.permissions.allowKeyboardLock": "Keyboard lock",
+	"partition.permissions.allowIdleDetection": "Idle detection",
+	"partition.permissions.allowNotifications": "Notifications",
 	"partition.invalidName": "Must start with a letter, use only lowercase, numbers, and underscores",
 
 	// Rename dialog

@@ -169,6 +169,14 @@ export const hiTranslations: Translations = {
 	"partition.cacheCleanup.maxAgeDays": "अधिकतम आयु (दिन)",
 	"partition.cacheCleanup.hint": "इन सीमाओं से अधिक फ़ाइलें बाहर निकलने पर हटा दी जाएंगी",
 	"partition.cacheCleanup.disabled": "अक्षम",
+	"partition.permissions.title": "अनुमतियाँ",
+	"partition.permissions.allowMidi": "MIDI डिवाइस",
+	"partition.permissions.allowMidiSysex": "MIDI SysEx",
+	"partition.permissions.allowFullscreen": "पूर्ण स्क्रीन",
+	"partition.permissions.allowPointerLock": "पॉइंटर लॉक",
+	"partition.permissions.allowKeyboardLock": "कीबोर्ड लॉक",
+	"partition.permissions.allowIdleDetection": "निष्क्रियता पहचान",
+	"partition.permissions.allowNotifications": "सूचनाएं",
 	"partition.invalidName": "अक्षर से शुरू होना चाहिए, केवल लोअरकेस, संख्याएं और अंडरस्कोर का उपयोग करें",
 
 	// Rename dialog

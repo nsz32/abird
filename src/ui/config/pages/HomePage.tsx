@@ -1,5 +1,5 @@
 import { Button, HStack, IconButton, Text, VStack } from "@chakra-ui/react"
-import type { BirdConfig, DownloadConfig, NavBarConfig } from "@shared/config.schema"
+import { type BirdConfig, type DownloadConfig, type NavBarConfig, PERMISSION_KEYS, type PermissionsConfig } from "@shared/config.schema"
 import { normalizePartitionName } from "@shared/partition"
 import { deriveInternalPattern } from "@shared/routing"
 import type { DeployState, PartitionsState } from "@shared/types"
@@ -14,6 +14,7 @@ import { NavBarConfigForm } from "../components/NavBarConfigForm"
 import { PageHeader } from "../components/PageHeader"
 import { PartitionList } from "../components/PartitionList"
 import { SegmentSelect } from "../components/SegmentSelect"
+import { SwitchField } from "../components/SwitchField"
 
 interface HomePageProps {
 	config: BirdConfig
@@ -51,6 +52,22 @@ export function HomePage({ config, configPath, partitionsState, deployState, act
 			delete newDownloads[key]
 		}
 		onChange({ ...config, downloads: newDownloads })
+	}
+
+	const isPermissionChecked = (key: keyof PermissionsConfig): boolean => {
+		if (key === "allowMidiSysex" && config.permissions?.allowMidi === false) return false
+		return config.permissions?.[key] !== false
+	}
+
+	const updatePermission = (key: keyof PermissionsConfig, value: boolean) => {
+		const newPermissions = { ...config.permissions, [key]: value }
+
+		if (key === "allowMidi" && !value) {
+			newPermissions.allowMidiSysex = false
+		}
+
+		const allTrue = Object.values(newPermissions).every((v) => v !== false)
+		onChange({ ...config, permissions: allTrue ? undefined : newPermissions })
 	}
 
 	const handleCreateApp = async (name: string, startUrl: string) => {
@@ -170,6 +187,17 @@ export function HomePage({ config, configPath, partitionsState, deployState, act
 
 					<ConfigSection title={t("settings.downloads")}>
 						<DownloadsConfigForm mode="global" config={config.downloads || {}} onChange={updateDownloads} />
+					</ConfigSection>
+
+					<ConfigSection title={t("partition.permissions.title")}>
+						{PERMISSION_KEYS.map((key) => (
+							<SwitchField
+								key={key}
+								label={t(`partition.permissions.${key}`)}
+								checked={isPermissionChecked(key)}
+								onChange={(v) => updatePermission(key, v)}
+							/>
+						))}
 					</ConfigSection>
 				</VStack>
 

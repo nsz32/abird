@@ -1,5 +1,5 @@
 import { Badge, Button, HStack, Spinner, Text, VStack } from "@chakra-ui/react"
-import type { BirdConfig, CacheCleanupConfig, PartitionConfig } from "@shared/config.schema"
+import { type BirdConfig, type CacheCleanupConfig, PERMISSION_KEYS, type PartitionConfig, type PermissionsConfig } from "@shared/config.schema"
 import { validatePartitionName } from "@shared/partition"
 import type { PartitionsState } from "@shared/types"
 import { useTranslations } from "@ui/shared/hooks"
@@ -10,6 +10,7 @@ import { NumberField } from "../components/NumberField"
 import { PageHeader } from "../components/PageHeader"
 import { RenameDialog } from "../components/RenameDialog"
 import { SwitchField } from "../components/SwitchField"
+import { TriStateSwitch } from "../components/TriStateSwitch"
 import { formatBytes } from "../utils/format"
 import { getExistingPartitionNames } from "../utils/partitions"
 
@@ -40,6 +41,7 @@ export function PartitionPage({ name, config, partitionsState, activePartition, 
 	const maxFileSizeValue = cacheCleanup?.maxFileSizeMB ?? 0
 	const maxAgeValue = cacheCleanup?.maxAgeDays ?? 0
 	const cacheCleanupEnabled = maxFileSizeValue > 0 || maxAgeValue > 0
+	const permissions = partitionConfig?.permissions
 
 	useEffect(() => {
 		document.title = `${name}`
@@ -92,6 +94,24 @@ export function PartitionPage({ name, config, partitionsState, activePartition, 
 		const newCacheCleanup = { ...cacheCleanup, ...updates }
 		const isEmpty = newCacheCleanup.maxFileSizeMB === undefined && newCacheCleanup.maxAgeDays === undefined
 		updatePartitionConfig({ cacheCleanup: isEmpty ? undefined : newCacheCleanup })
+	}
+
+	const handlePermissionChange = (key: keyof PermissionsConfig, value: boolean | undefined) => {
+		const newPermissions = { ...permissions, [key]: value }
+		if (value === undefined) delete newPermissions[key]
+
+		// midiSysex depends on midi
+		if (key === "allowMidi" && value === false) {
+			newPermissions.allowMidiSysex = false
+		}
+
+		const hasOverrides = Object.values(newPermissions).some((v) => v !== undefined)
+		updatePartitionConfig({ permissions: hasOverrides ? newPermissions : undefined })
+	}
+
+	const getPermissionDefault = (key: keyof PermissionsConfig): boolean => {
+		if (key === "allowMidiSysex" && config.permissions?.allowMidi === false) return false
+		return config.permissions?.[key] !== false
 	}
 
 	if (!partition) {
@@ -194,6 +214,18 @@ export function PartitionPage({ name, config, partitionsState, activePartition, 
 							{t("partition.cacheCleanup.hint")}
 						</Text>
 					)}
+				</ConfigSection>
+
+				<ConfigSection title={t("partition.permissions.title")}>
+					{PERMISSION_KEYS.map((key) => (
+						<TriStateSwitch
+							key={key}
+							label={t(`partition.permissions.${key}`)}
+							value={permissions?.[key]}
+							defaultValue={getPermissionDefault(key)}
+							onChange={(v) => handlePermissionChange(key, v)}
+						/>
+					))}
 				</ConfigSection>
 			</VStack>
 
