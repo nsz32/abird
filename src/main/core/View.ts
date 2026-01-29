@@ -3,6 +3,8 @@ import { type Rectangle, WebContentsView, session } from "electron"
 import { SCROLLBAR_CSS } from "../views/scrollbar.css"
 import { ViewManager, type ZLayer } from "./ViewManager"
 
+const configuredSessions = new Set<string>()
+
 export interface ViewConfig {
 	layer: ZLayer
 	preload?: boolean | string
@@ -81,10 +83,28 @@ export abstract class View {
 		if (!partition) return undefined
 
 		const sess = session.fromPartition(`persist:${partition}`)
+
 		if (userAgent) {
 			sess.setUserAgent(userAgent)
 		}
+
+		if (!configuredSessions.has(partition)) {
+			configuredSessions.add(partition)
+			this.setupPermissionHandlers(sess)
+		}
+
 		return sess
+	}
+
+	private setupPermissionHandlers(sess: Electron.Session) {
+		sess.setPermissionRequestHandler((_webContents, permission, callback) => {
+			const allowed = permission === "midi" || permission === "midiSysex"
+			callback(allowed)
+		})
+
+		sess.setPermissionCheckHandler((_webContents, permission) => {
+			return permission === "midi" || permission === "midiSysex"
+		})
 	}
 
 	private resolvePreload(preload?: boolean | string): string | undefined {
