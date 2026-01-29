@@ -97,8 +97,7 @@ export const navBarBounds$ = new CombinedObservable(
 		const width = windowBounds.width || 1
 		const height = navBarHeight || DEFAULT_NAVBAR_HEIGHT
 
-		// Hidden or autoHide collapsed: no bounds (mouse detection via uiohook)
-		if (!navBar.visible || (navBar.autoHide && !effectiveVisible)) {
+		if (!navBar.visible || !effectiveVisible) {
 			return { x: 0, y: 0, width: 0, height: 0 }
 		}
 
@@ -111,8 +110,7 @@ export const contentBounds$ = new CombinedObservable(
 	(windowBounds, config, navBarHeight, effectiveVisible) => {
 		const { navBar } = config
 
-		// When navbar is hidden or in autoHide collapsed state, content takes full height
-		if (!navBar.visible || (navBar.autoHide && !effectiveVisible)) {
+		if (!navBar.visible || !effectiveVisible) {
 			return { x: 0, y: 0, width: windowBounds.width, height: windowBounds.height }
 		}
 

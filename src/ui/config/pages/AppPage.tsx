@@ -186,12 +186,7 @@ export function AppPage({ name, config, partitionsState, onChange, onNavigate, r
 	const leftInfo = (
 		<HStack gap={1}>
 			<Text>{t("app.partition")} :</Text>
-			<Text
-				color="blue.500"
-				cursor="pointer"
-				_hover={{ textDecoration: "underline" }}
-				onClick={() => onNavigate(`#partition/${app.partition}`)}
-			>
+			<Text color="blue.500" cursor="pointer" _hover={{ textDecoration: "underline" }} onClick={() => onNavigate(`#partition/${app.partition}`)}>
 				{app.partition}
 			</Text>
 		</HStack>
