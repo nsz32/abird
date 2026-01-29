@@ -17,7 +17,7 @@ export const zhTranslations: Translations = {
 	"settings.reloadPartitions": "重新加载分区",
 	"settings.cleanAll": "清理全部",
 	"settings.cleanAllConfirm":
-		"这将删除此项目的所有 ABird 数据和快捷方式。您的所有配置都将丢失。\n\n请确保没有应用程序处于打开状态。\n\n窗口将自动关闭。继续吗？",
+		"这将删除此项目的所有 ABird 数据和快捷方式。您的所有配置都将丢失。\n\n请确保没有 ABird 应用程序处于打开状态。\n\n窗口将自动关闭。继续吗？",
 
 	// Theme
 	"theme.system": "系统",

@@ -17,7 +17,7 @@ export const esTranslations: Translations = {
 	"settings.reloadPartitions": "Recargar particiones",
 	"settings.cleanAll": "Limpiar todo",
 	"settings.cleanAllConfirm":
-		"Se eliminarán TODOS los datos y accesos directos de ABird. Perderá toda su configuración.\n\nAsegúrese de que no haya aplicaciones abiertas.\n\nLa ventana se cerrará automáticamente. ¿Continuar?",
+		"Se eliminarán TODOS los datos y accesos directos de ABird. Perderá toda su configuración.\n\nAsegúrese de que no haya aplicaciones ABird abiertas.\n\nLa ventana se cerrará automáticamente. ¿Continuar?",
 
 	// Theme
 	"theme.system": "Sistema",

@@ -17,7 +17,7 @@ export const deTranslations: Translations = {
 	"settings.reloadPartitions": "Partitionen neu laden",
 	"settings.cleanAll": "Alles bereinigen",
 	"settings.cleanAllConfirm":
-		"Alle ABird-Daten und Verknüpfungen werden gelöscht. Ihre gesamte Konfiguration geht verloren.\n\nBitte stellen Sie sicher, dass keine Anwendungen geöffnet sind.\n\nDas Fenster wird automatisch geschlossen. Fortfahren?",
+		"Alle ABird-Daten und Verknüpfungen werden gelöscht. Ihre gesamte Konfiguration geht verloren.\n\nBitte stellen Sie sicher, dass keine ABird-Anwendungen geöffnet sind.\n\nDas Fenster wird automatisch geschlossen. Fortfahren?",
 
 	// Theme
 	"theme.system": "System",

@@ -17,7 +17,7 @@ export const frTranslations: Translations = {
 	"settings.reloadPartitions": "Recharger les partitions",
 	"settings.cleanAll": "Nettoyer tout",
 	"settings.cleanAllConfirm":
-		"Ceci supprimera TOUTES les données et raccourcis ABird de ce projet. Toute votre configuration sera perdue.\n\nVeuillez vous assurer qu'aucune application n'est ouverte.\n\nLa fenêtre se fermera automatiquement. Continuer ?",
+		"Ceci supprimera TOUTES les données et raccourcis ABird de ce projet. Toute votre configuration sera perdue.\n\nVeuillez vous assurer qu'aucune application ABird n'est ouverte.\n\nLa fenêtre se fermera automatiquement. Continuer ?",
 
 	// Theme
 	"theme.system": "Système",

@@ -15,7 +15,7 @@ const en = {
 	"settings.reloadPartitions": "Reload partitions",
 	"settings.cleanAll": "Clean all",
 	"settings.cleanAllConfirm":
-		"This will remove ALL ABird data and shortcuts for this project. Your entire configuration will be lost.\n\nPlease make sure no applications are currently open.\n\nThe window will close automatically. Continue?",
+		"This will remove ALL ABird data and shortcuts for this project. Your entire configuration will be lost.\n\nPlease make sure no ABird applications are currently open.\n\nThe window will close automatically. Continue?",
 
 	// Theme
 	"theme.system": "System",
