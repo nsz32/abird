@@ -1,6 +1,6 @@
 import type { FindState, NavigationState, ResolvedRoutingConfig, TabOrigin } from "@shared/types"
 import { ViewManager } from "../core/ViewManager"
-import { externalOpened$, findState$, tabs$ } from "../core/states"
+import { externalOpened$, findState$, htmlFullscreen$, tabs$ } from "../core/states"
 import { StateObservable } from "../utils/observable"
 import { openExternal } from "../utils/platform"
 import type { BrowserView } from "../views/BrowserView"
@@ -71,6 +71,7 @@ export class Tab {
 			onNewTab: (url: string, origin: TabOrigin) => this.openChildTab(url, origin),
 			onExternalUrl: (url: string) => this.handleExternalUrl(url),
 			onFindResult: (state: FindState) => this.emitFindResult(state),
+			onHtmlFullscreenChange: (isFullscreen: boolean) => this.handleHtmlFullscreen(isFullscreen),
 		}
 	}
 
@@ -140,5 +141,11 @@ export class Tab {
 			return true
 		}
 		return this.view.hasVisibleContent()
+	}
+
+	private handleHtmlFullscreen(isFullscreen: boolean) {
+		if (isTabActive(this.id)) {
+			htmlFullscreen$.emit(isFullscreen)
+		}
 	}
 }

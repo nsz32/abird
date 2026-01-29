@@ -9,6 +9,7 @@ export interface BrowserViewCallbacks {
 	onNewTab: (url: string, origin: TabOrigin) => void
 	onExternalUrl: (url: string) => void
 	onFindResult: (state: FindState) => void
+	onHtmlFullscreenChange: (isFullscreen: boolean) => void
 }
 
 export interface BrowserViewConfig {
@@ -151,6 +152,14 @@ export abstract class BrowserView extends View {
 				activeMatch: result.activeMatchOrdinal,
 				totalMatches: result.matches,
 			})
+		})
+
+		this.webContents.on("enter-html-full-screen", () => {
+			this.callbacks.onHtmlFullscreenChange(true)
+		})
+
+		this.webContents.on("leave-html-full-screen", () => {
+			this.callbacks.onHtmlFullscreenChange(false)
 		})
 	}
 

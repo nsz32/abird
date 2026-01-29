@@ -75,11 +75,15 @@ export const navState$ = new StateObservable<NavigationState>({
 	isLoading: false,
 })
 
+// HTML5 fullscreen (video player, etc.)
+export const htmlFullscreen$ = new StateObservable<boolean>(false)
+
 // Derived bounds
 const DEFAULT_NAVBAR_HEIGHT = 40
 
-// Navbar effective visibility (considering autoHide)
-export const navBarEffectiveVisible$ = new CombinedObservable([config$, navBarForceShow$], (config, forceShow) => {
+// Navbar effective visibility (considering autoHide and HTML5 fullscreen)
+export const navBarEffectiveVisible$ = new CombinedObservable([config$, navBarForceShow$, htmlFullscreen$], (config, forceShow, htmlFullscreen) => {
+	if (htmlFullscreen) return false
 	const { navBar } = config
 	if (!navBar.visible) return false
 	if (!navBar.autoHide) return true

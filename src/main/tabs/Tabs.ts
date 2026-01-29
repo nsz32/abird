@@ -1,7 +1,7 @@
 import type { TabInfo, TabOrigin } from "@shared/types"
 import { app } from "electron"
 import { ViewManager } from "../core/ViewManager"
-import { activeContentId$, activeTabId$, config$, findBarVisible$, findState$, navState$, tabs$ } from "../core/states"
+import { activeContentId$, activeTabId$, config$, findBarVisible$, findState$, htmlFullscreen$, navState$, tabs$ } from "../core/states"
 import { createLogger } from "../utils/logger"
 import { Tab } from "./Tab"
 
@@ -61,6 +61,7 @@ export function activateTab(id: string) {
 
 	findBarVisible$.emit(tab.findBarVisible)
 	findState$.emit(tab.findState)
+	htmlFullscreen$.emit(false)
 }
 
 export function getTabIndex(id: string): number {
