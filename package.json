@@ -1,7 +1,7 @@
 {
 	"name": "abird",
-	"version": "0.1.4",
-	"description": "ABird - Desktop Redistribuable Isolated Browser",
+	"version": "0.1.5",
+	"description": "ABird : Application Browser, isolated, redistribuable, desktop-integrated",
 	"main": "out/main/index.js",
 	"pnpm": {
 		"onlyBuiltDependencies": ["@biomejs/biome", "electron", "esbuild"]
