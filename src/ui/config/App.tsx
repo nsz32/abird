@@ -132,6 +132,7 @@ export function App() {
 					config={config}
 					partitionsState={partitionsState}
 					onChange={handleChange}
+					onNavigate={navigate}
 					reloadPartitions={reloadPartitions}
 					reloadDeploy={reloadDeploy}
 					onRename={(newName) => handleRenameApp(appName, newName)}

@@ -1,6 +1,14 @@
 import type { Session } from "electron"
 
-const ALLOWED_PERMISSIONS = new Set(["midi", "midiSysex", "fullscreen", "pointerLock", "keyboardLock", "idle-detection"])
+const ALLOWED_PERMISSIONS = new Set([
+	"midi",
+	"midiSysex",
+	"fullscreen",
+	"pointerLock",
+	"keyboardLock",
+	"idle-detection",
+	"notifications",
+])
 
 export function setupPermissionHandlers(session: Session) {
 	session.setPermissionRequestHandler((_webContents, permission, callback) => {

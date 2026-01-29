@@ -26,12 +26,13 @@ interface AppPageProps {
 	config: BirdConfig
 	partitionsState: PartitionsState
 	onChange: (config: BirdConfig) => void
+	onNavigate: (hash: string) => void
 	reloadPartitions: () => Promise<void>
 	reloadDeploy: () => Promise<void>
 	onRename: (newName: string) => void
 }
 
-export function AppPage({ name, config, partitionsState, onChange, reloadPartitions, reloadDeploy, onRename }: AppPageProps) {
+export function AppPage({ name, config, partitionsState, onChange, onNavigate, reloadPartitions, reloadDeploy, onRename }: AppPageProps) {
 	const { t } = useTranslations()
 	const app = config.apps[name]
 
@@ -182,10 +183,24 @@ export function AppPage({ name, config, partitionsState, onChange, reloadPartiti
 		</HStack>
 	)
 
+	const leftInfo = (
+		<HStack gap={1}>
+			<Text>{t("app.partition")} :</Text>
+			<Text
+				color="blue.500"
+				cursor="pointer"
+				_hover={{ textDecoration: "underline" }}
+				onClick={() => onNavigate(`#partition/${app.partition}`)}
+			>
+				{app.partition}
+			</Text>
+		</HStack>
+	)
+
 	return (
 		<PageHeader
 			title={name}
-			leftInfo={app.startUrl}
+			leftInfo={leftInfo}
 			rightInfo={rightInfo}
 			actions={headerActions}
 			onRename={() => setShowRenameDialog(true)}
