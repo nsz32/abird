@@ -1,6 +1,6 @@
 {
 	"name": "abird",
-	"version": "0.1.5",
+	"version": "0.1.6",
 	"description": "ABird : Application Browser, isolated, redistribuable, desktop-integrated",
 	"main": "out/main/index.js",
 	"pnpm": {
@@ -22,12 +22,14 @@
 		"check": "pnpm lint && pnpm typecheck",
 		"knip": "knip",
 		"package:asar": "tsx scripts/prepare-asar.ts",
+		"package:deb": "electron-builder --linux deb",
 		"package:appimage": "electron-builder --linux AppImage",
 		"package:win": "electron-builder --win",
 		"package:mac": "echo 'WIP: macOS packaging not yet implemented'"
 	},
 	"keywords": ["electron", "webapp", "wrapper"],
-	"author": "ABird Team",
+	"homepage": "https://github.com/nsz32/abird",
+	"author": "ABird Team <nicolas.szabo@ikmail.com>",
 	"license": "MIT",
 	"type": "module",
 	"engines": {
