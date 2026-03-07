@@ -6,6 +6,8 @@
 
 ABird turns any website into a standalone desktop application with complete session isolation, advanced kiosk mode, and (WIP) enterprise-ready packaging.
 
+If you liked [Nativefier](https://github.com/nativefier/nativefier) (now archived), ABird picks up where it left off — with a modern stack, a configuration UI, and active development.
+
 <details>
 <summary>📸 Screenshots</summary>
 
